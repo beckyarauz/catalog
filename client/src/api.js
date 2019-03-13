@@ -63,6 +63,28 @@ export default {
 
   // This is an example on how to use this method in a different file
   // api.getCountries().then(countries => { /* ... */ })
+  // submitFile(file) {
+  //   //converts file to FormData function might be used later in case of saving files
+  //   const formData = new FormData();
+  //   formData.append('file', file);
+  //   return formData;
+  // },
+  uploadToS3(file) {
+    const formData = new FormData();
+    formData.append('file', file);
+    // console.log(file);
+    service
+      .post(`/upload`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }).then(response => {
+        // handle your response;
+      }).catch(error => {
+        // handle your error
+      })
+
+  },
   getCountries() {
     return service
       .get('/countries')
@@ -70,12 +92,12 @@ export default {
       .catch(errHandler)
   },
 
-  addCountry(body) {
-    return service
-      .post('/countries', body)
-      .then(res => res.data)
-      .catch(errHandler)
-  },
+  // addCountry(body) {
+  //   return service
+  //     .post('/countries', body)
+  //     .then(res => res.data)
+  //     .catch(errHandler)
+  // },
 
   getSecret() {
     return service
@@ -97,3 +119,6 @@ export default {
       .catch(errHandler)
   },
 }
+
+
+

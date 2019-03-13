@@ -99,3 +99,10 @@ body {
     color: $primary;
   }
 }
+
+.field:invalid {
+  border: 1px solid red;
+}
+.field:valid {
+  border: 2px solid green;
+}

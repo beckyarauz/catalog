@@ -2,8 +2,35 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
-  username: String,
-  password: String
+  username: {
+    type:String,
+    lowercase: true,
+    required: true,
+  },
+  password: String,
+  role: {
+    type: String,
+    enum: ['ADMIN','BUYER','SELLER'],
+    default:'SELLER'
+  },
+  firstName: String,
+  lastName:String,
+  email:String,
+  phone:Number,
+  about:String,
+  logoUrl:String,
+  userPictureUrl: String,
+  rating: Number,
+  tags:[String],
+  clients:{
+    type: [Schema.Types.ObjectId],
+    ref: 'User'
+  },
+  products: {
+    type: [Schema.Types.ObjectId],
+    ref: 'Product'
+  },
+  policy:String
 }, {
     timestamps: {
       createdAt: 'created_at',
