@@ -10,7 +10,7 @@ const bcryptSalt = 10;
 // const bcryptSalt = 10
 
 router.post("/signup", (req, res, next) => {
-  console.log(req.body)
+  console.log('body',req)
   const { username, password} = req.body
   if (!username || !password) {
     res.status(400).json({ message: "Indicate username and password" })
@@ -27,7 +27,7 @@ router.post("/signup", (req, res, next) => {
         const salt = bcrypt.genSaltSync(bcryptSalt)
         const hashPass = bcrypt.hashSync(password, salt)
         const newUser = new User({ username, password: hashPass})
-        res.status(201).json({message:"succesfully signed Up!"})
+        res.status(200).json({message:"succesfully signed Up!"})
         return newUser.save()
       }
       
@@ -36,11 +36,10 @@ router.post("/signup", (req, res, next) => {
       // LOG IN THIS USER
       // "req.logIn()" is a Passport method that calls "serializeUser()"
       // (that saves the USER ID in the session)
-      req.logIn(userSaved, () => {
-        // hide "encryptedPassword" before sending the JSON (it's a security risk)
-        userSaved.password = undefined;
-        res.json( userSaved );
-      });
+      console.log('usersaved',userSaved)
+      req.logIn((userSaved),(e)=>{
+        console.log(e)
+      })
     })
     .catch(err => next(err))
 })
@@ -72,14 +71,14 @@ router.get('/logout', (req, res, next) => {
   });
 });
 router.get("/isLogged", (req, res) => {
-  console.log('file: auth.js message: verification if user is logged in',req.user);
+  // console.log('file: auth.js message: verification if user is logged in',req.user);
   if(req.user !== undefined && req.user !== null){
     // res.status(200).json({ message: 'You are logged in' })
     res.json({message:'hey',isLogged:true})
     return true;
   } else {
     // res.status(400).json({ message: 'You are not  logged in' })
-    console.log('user not logged in')
+    console.log('file:auth.js GET/isLogged user not logged in')
     res.json({message:'not logged in',isLogged:false})
     return false;
   }

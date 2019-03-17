@@ -20,31 +20,49 @@ let saveUser = async (user) => {
 }
 
 router.post('/company-info', async (request, response) => {
+  try{
+// console.log('requestBody',request.body);
+let updatedUser = request.body.stateInfo;
+// console.log('updated user:',updatedUser);
+if(!updatedUser.password || updatedUser.password === undefined){
   
-  // console.log('requestBody',request.body);
-  let updatedUser = request.body.stateInfo;
-  // console.log('updated user:',updatedUser);
-  if(!updatedUser.password || updatedUser.password === undefined){
-    
-    console.log('password not updated',updatedUser.password);
-    // let dbUser =  await User.findOneAndUpdate({'username': user.username},{user});
-    let dbUser =  await User.find({'username': updatedUser.username});
+  console.log('password not updated',updatedUser.password);
+  // let dbUser =  await User.findOneAndUpdate({'username': user.username},{user});
+  let dbUser =  await User.findOne({'username': updatedUser.username});
+  console.log('updated user:',updatedUser);
+  console.log('DBuser:',dbUser);
+  await dbUser.set({
+    username: updatedUser.username,
+    lastName: updatedUser.lastName,
+    firstName: updatedUser.firstName,
+    phone:updatedUser.phone,
+    email:updatedUser.email,
+    about: updatedUser.about,
+    logoUrl: updatedUser.logoUrl,
+    category: updatedUser.category
+  })
+  await dbUser.save();
 
-    // for(field of updatedUser){
-    //   console.log('field:',field);
-    // }
-    console.log('dbUser',dbUser);
+  response.status(200).json({message: 'Changes saved',user:dbUser});
+  // for(field of updatedUser){
+  //   console.log('field:',field);
+  // }
+  console.log('dbUser',dbUser);
 
-    
-  } else {
-    console.log('password will be updated',updatedUser.password);
-    
-    response.status(200).json({message: ' new password encrypted and saved'});
-     
+  
+} else {
+  console.log('password will be updated',updatedUser.password);
+  
+  response.status(200).json({message: ' new password encrypted and saved'});
+   
+}
+
+
+// saveUser()
+  } catch(e){
+    console.log(e.message)
   }
   
-
-  // saveUser()
 
 });
 

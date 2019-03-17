@@ -3,12 +3,11 @@ import { Route, Switch } from 'react-router-dom';
 import Home from './pages/Home';
 import Countries from './pages/Countries';
 import FileUpload from './pages/FileUpload';
-import AddCountry from './pages/AddCountry';
-import TestMaterialForm from './pages/TestMaterialForm';
+import AddProduct from './pages/AddProduct';
 import Secret from './pages/Secret';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
-import AccountForm from './pages/AccountForm';
+import ManageAccount from './pages/ManageAccount';
 import api from '../api';
 import logo from '../logo.svg';
 
@@ -19,7 +18,7 @@ export default class App extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      isLogged: true
+      isLogged: false
     }
   }
 
@@ -60,13 +59,12 @@ export default class App extends Component {
         <Switch>
           <Route path="/" exact component={Home} />
           <Route path="/countries" component={Countries} />
-          <Route path="/add-country" component={AddCountry} />
-          <Route path="/signup" component={Signup} />
+          <Route path="/add-product" component={AddProduct} />
+          <Route path="/signup" render={(props) => <Signup {...props} inLogin={this.handleLogin}/>} />
           <Route path="/login" render={(props) => <Login {...props} inLogin={this.handleLogin}/>} />
           <Route path="/secret" component={Secret} />
           <Route path="/upload" component={FileUpload} />
-          <Route path="/manage-account" component={AccountForm} />
-          <Route path="/form-test" component={TestMaterialForm} />
+          <Route path="/manage-account" component={ManageAccount} />
           <Route render={() => <h2>404</h2>} />
         </Switch>
       </div>

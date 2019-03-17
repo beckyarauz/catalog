@@ -17,11 +17,8 @@ import OutlinedInput from '@material-ui/core/OutlinedInput';
 import MenuItem from '@material-ui/core/MenuItem';
 import Button from '@material-ui/core/Button'
 
-
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
-
-
 
 const styles = theme => ({
   root: {
@@ -77,8 +74,7 @@ TextMaskCustom.propTypes = {
   inputRef: PropTypes.func.isRequired,
 };
 
-
-class TextFields extends React.Component {
+class ManageAccount extends React.Component {
 
   state = {
     user:{
@@ -89,11 +85,12 @@ class TextFields extends React.Component {
       email: "",
       phone: '( 49)0000-0000',
       category: "food",
-      description: "",
-      logo: "",
+      about: "",
+      logoUrl: "",
     }, 
     labelWidth: 0,    
-    logo: "",
+    image: "",
+    imageFS: "",
     message: null,
     valid: false,
     // textmask: '(  )    -    ',
@@ -101,14 +98,36 @@ class TextFields extends React.Component {
     
   }
 
+  componentWillMount(){
+    (async () =>{
+      try{
+        await this.getUser();
+        let password,info;
+        ({password,...info} = this.state.user)
+
+        let stateValues = Object.values(info);
+        console.log(stateValues);
+        this.setState({valid: stateValues.every(isNotEmpty)});
+
+            function isNotEmpty(currentValue) {
+              //I'm not evaluating the logo yet but I still put the File validation
+              return currentValue.length > 0 || currentValue instanceof File;
+            }
+      }catch(e){
+        console.log(e.message)
+      }
+    })()
+    
+  }
+
   componentDidMount() {
-    this.setState({
-      labelWidth: ReactDOM.findDOMNode(this.InputLabelRef).offsetWidth,
-    });
+    // this.setState({
+    //   labelWidth: ReactDOM.findDOMNode(this.InputLabelRef).offsetWidth,
+    // });
   }
 
   handleChange = name => event => {
-    let info,password,logo;
+    let info,password,logoUrl;
     if(name !== 'logo'){
       // console.log(event.target.name)
       var user = {...this.state.user}
@@ -117,7 +136,7 @@ class TextFields extends React.Component {
       this.setState(currentState => ({user}), () => {
         // console.log(this.state.user);
 
-        ({password,logo,...info} = this.state.user)
+        ({password,logoUrl,...info} = this.state.user)
 
         let stateValues = Object.values(info);
 
@@ -131,10 +150,19 @@ class TextFields extends React.Component {
         }
       });
 
-    } else {
-      this.setState({
-        logo: event.target.files[0]
-      });
+    } else if(event.target.files.length > 0){
+      var file = event.target.files[0];
+      this.setState({ image: file });
+      var reader = new FileReader();
+      const scope = this;
+      reader.onload = function () {
+        scope.setState({
+          imageFS: reader.result
+        })
+      }
+
+      reader.readAsDataURL(file);
+      
     }
   };
   handleClickShowPassword = () => {
@@ -142,22 +170,25 @@ class TextFields extends React.Component {
   };
 
   submitToServer = async ()=>{
+    // console.log('submition!');
+    // api.updateUser(this.state.user)
     console.log('submition!');
-    let url;
-    let user = {...this.state.user};
-
-    if(this.state.logo && this.state.logo instanceof File){
-      console.log('uploaded Logo');
-      const stateFile = this.state.logo;
-      url = await api.uploadToS3(stateFile);
+    if (this.state.imageFS !== undefined) {
+      console.log('new image uploaded')
+      let user = { ...this.state.user};
+      let url = await api.uploadToS3(this.state.image, 'logo');
       console.log('Form api response', url.data.Location);
-      user.logo = url.data.Location;
+      user.logoUrl = url.data.Location;
+
+      this.setState(currentState => ({ user }), async () => {
+        await api.updateUser(this.state.user);
+      });
+      return;
     }
 
-    this.setState(currentState =>({user}),( ) =>{
-      api.updateUser(this.state.user)
-    });
-    
+
+    return await api.updateUser(this.state.user);
+
   }
   unvalidFormHandler = ()=>{
     this.setState({message:'fill all the fields!' })
@@ -168,13 +199,28 @@ class TextFields extends React.Component {
     e.preventDefault()
     this.state.valid ? this.submitToServer() : this.unvalidFormHandler();
   }
-  getUser = (e) => {
-    e.preventDefault();
-    api.getUserInfo();
+  getUser = async () => {
+    let info = await api.getUserInfo();
+    let user = info.data.user;
+    this.setState({user});
   }
-  getLogged = (e) => {
-    e.preventDefault();
-    api.isLoggedIn();
+  deleteFile = async (e) => {
+    e.preventDefault()
+    let deleted = await api.deleteFromS3(this.state.user.logoUrl,'logo');
+    console.log('deleted response:', deleted)
+    if(deleted.data.message){
+      this.setState(currentState => ({message:deleted.data.message,imageFS:null,image:null}))
+    }
+    let user = {...this.state.user};
+    user.logoUrl = "";
+    this.setState({user})
+  }
+  componentDidUpdate(prevProps,prevState){
+    if(prevState.message !== this.state.message){
+      setTimeout(() =>{
+        this.setState(currentState => ({message: null}))
+      }, 3000)
+    }
   }
 
   render() {
@@ -184,9 +230,8 @@ class TextFields extends React.Component {
     return (
       <div>
         <h2>Account</h2>
-        <form className={classes.container} noValidate autoComplete="off">
-        <Button variant="contained" component="span" className={classes.button} onClick={this.getUser}>UserInfo</Button>
-        <Button variant="contained" component="span" className={classes.button} onClick={this.getLogged}>Logged in?</Button>
+        {this.state.user.username && <form className={classes.container} noValidate autoComplete="off">
+        
         <TextField
           id="username"
           label="Username"
@@ -267,8 +312,17 @@ class TextFields extends React.Component {
           />
         </FormControl>
         <h2>Company Info</h2>
-        {this.state.user.logo && <div className={classes.imageSection}><img src={this.state.user.logo} alt="company logo"/></div>}
-        {/* <div className={classes.imageSection}><img src='https://catalog-beckyarauz.s3.amazonaws.com/logos/1552577053269-physics.png-lg.png' alt="company logo"/></div> */}
+        {
+          (this.state.user.logoUrl && 
+        <div className={classes.imageSection}><img src={this.state.user.logoUrl} width="100" height="100" alt="logo from db"/></div>) 
+        || (this.state.imageFS && 
+        <div className={classes.imageSection}><img src={this.state.imageFS} width="100" height="100" alt="company logo"/></div>)
+        }
+        
+        {this.state.message && <div className="info info-danger">
+          {this.state.message}
+        </div>}
+        <br></br>
         <input
           accept="image/*"
           className={classes.input}
@@ -283,6 +337,8 @@ class TextFields extends React.Component {
             Upload Logo
           </Button>
         </label> 
+        <Button variant="contained" component="span" className={classes.button} onClick={this.deleteFile}>Delete</Button>
+        
         <FormControl variant="outlined" className={classes.formControl}>
           <InputLabel
             ref={ref => {
@@ -313,10 +369,10 @@ class TextFields extends React.Component {
         </FormControl>
         <TextField
           id="standard-description"
-          label="Description"
+          label="About"
           className={classNames(classes.textarea, classes.textField)}
-          value={this.state.user.description}
-          onChange={this.handleChange('description')}
+          value={this.state.user.about}
+          onChange={this.handleChange('about')}
           margin="normal"
           variant="outlined"
           multiline={true}
@@ -328,17 +384,15 @@ class TextFields extends React.Component {
         />
       <Button variant="contained" component="span" className={classes.button} onClick={this.handleClick} disabled={!this.state.valid}>Update</Button>
       </form>
-      {this.state.message && <div className="info info-danger">
-          {this.state.message}
-        </div>}
+      }
       </div>
       
     );
   }
 }
 
-TextFields.propTypes = {
+ManageAccount.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(TextFields);
+export default withStyles(styles)(ManageAccount);

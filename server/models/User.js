@@ -16,12 +16,12 @@ const userSchema = new Schema({
   firstName: String,
   lastName:String,
   email:String,
-  phone:Number,
+  phone:String,
   about:String,
   logoUrl:String,
   userPictureUrl: String,
   rating: Number,
-  tags:[String],
+  category:String,
   clients:{
     type: [Schema.Types.ObjectId],
     ref: 'User'

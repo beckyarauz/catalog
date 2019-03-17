@@ -48,12 +48,20 @@ export default {
     return service
       .get('/logout')
   },
-  uploadToS3(file) {
-     return (async (file) =>{
+  async deleteFromS3(url,type){
+    return await service
+    .post(`/upload/delete`,{url,type:type})
+  },
+  async uploadToS3(file,type) {
+    if(!file){
+      return {message: 'no image to upload'}
+    }
+    console.log('type',type);
       const formData = new FormData();
     
       formData.append('file', file);
-      // console.log(file);
+      formData.append('myType', type);
+      // console.log('formdata',formData);
       let data = await service
                       .post(`/upload`, formData, {
                         headers: {
@@ -62,15 +70,16 @@ export default {
                       })
       console.log('uploadtoS3 async', data);
       return data;
-      })(file)
-
   },
-  getUserInfo(){
-    service.get('/user/account-info')
+  async getUserInfo(){
+    // console.log('getUserInfocalled')
+    let data = await service.get('/user/account-info');
+    // console.log('api getUserInfo response:', data)
+    return data;
   },
   updateUser(stateInfo){
-    console.log('api updateUser called');
-    console.log(stateInfo);
+    // console.log('api updateUser called');
+    // console.log(stateInfo);
     service.post(`/update/company-info`,{stateInfo})
     .then(res=> console.log(res))
     .catch(e => console.log(e))
@@ -101,6 +110,11 @@ export default {
       .then(res => res.data)
       .catch(errHandler)
   },
+  async addProduct(product){
+    console.log('addProduct api called!');
+    return await service.post('/product/add',{product});
+
+  }
 }
 
 

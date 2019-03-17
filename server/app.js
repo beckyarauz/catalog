@@ -5,15 +5,15 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
 const express = require('express')
-const mongoose = require('mongoose')
 const logger = require('morgan')
 const nocache = require('nocache')
 const session = require("express-session");
 const bcrypt = require('bcrypt');
 const bcryptSalt = 10;
-const MongoStore = require('connect-mongo')(session)
 const passport = require('passport');
 const User = require("./models/User")
+const MongoStore = require('connect-mongo')(session);
+const mongoose = require('mongoose')
 
 require('./configs/database')
 
@@ -57,7 +57,9 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'irongenerator',
   resave: true,
   saveUninitialized: true,
-}));
+  store: new MongoStore({ mongooseConnection: mongoose.connection })
+}))
+require('./passport')(app)
 
 passport.serializeUser((user, cb) => {
   cb(null, user._id);
@@ -102,6 +104,7 @@ app.use('/api/countries', require('./routes/countries'))
 app.use('/api/upload', require('./routes/upload'))
 app.use('/api/update', require('./routes/update'))
 app.use('/api/user', require('./routes/user'))
+app.use('/api/product', require('./routes/product'))
 
 // For any routes that starts with "/api", catch 404 and forward to error handler
 app.use('/api/*', (req, res, next) => {

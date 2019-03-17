@@ -24,14 +24,13 @@ export default class NavBar extends Component {
     return ( <div>
       <NavLink to="/" exact>Home</NavLink>
             <NavLink to="/countries">Countries</NavLink>
-            <NavLink to="/add-country">Add country</NavLink>
+            <NavLink to="/add-product">Add a Product</NavLink>
             {!this.props.isLogged && <NavLink to="/signup">Signup</NavLink>}
             {!this.props.isLogged && <NavLink to="/login">Login</NavLink>}
             {this.props.isLogged && <Link to="/" onClick={(e) => this.handleLogoutClick(e)}>Logout</Link>}
             <NavLink to="/secret">Secret</NavLink>
             <NavLink to="/upload">Upload</NavLink>
             <NavLink to="/manage-account">Manage Account</NavLink>
-            <NavLink to="/form-test">Form Test</NavLink>
     </div>)
   }
   
