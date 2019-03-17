@@ -8,8 +8,12 @@ const express = require('express')
 const mongoose = require('mongoose')
 const logger = require('morgan')
 const nocache = require('nocache')
-const session = require("express-session")
+const session = require("express-session");
+const bcrypt = require('bcrypt');
+const bcryptSalt = 10;
 const MongoStore = require('connect-mongo')(session)
+const passport = require('passport');
+const User = require("./models/User")
 
 require('./configs/database')
 
@@ -39,19 +43,65 @@ app.use(express.static(path.join(__dirname, '../client/build')))
 
 
 // Enable authentication using session + passport
+// app.use(session({
+//   secret: process.env.SESSION_SECRET || 'irongenerator',
+//   resave: true,
+//   saveUninitialized: true,
+//   store: new MongoStore({ mongooseConnection: mongoose.connection })
+// }))
+// require('./passport')(app)
+const LocalStrategy = require('passport-local').Strategy;
+const flash = require('connect-flash');
+
 app.use(session({
   secret: process.env.SESSION_SECRET || 'irongenerator',
   resave: true,
   saveUninitialized: true,
-  store: new MongoStore({ mongooseConnection: mongoose.connection })
-}))
-require('./passport')(app)
+}));
+
+passport.serializeUser((user, cb) => {
+  cb(null, user._id);
+});
+
+passport.deserializeUser((id, cb) => {
+  User.findById(id, (err, user) => {
+    if (err) { return cb(err); }
+    cb(null, user);
+  });
+});
+
+// app.use(flash());
+
+
+passport.use(new LocalStrategy(
+  function(username, password, done) {
+    console.log('file:app.js message: LocalStrategy')
+    User.findOne({ username: username }, function (err, user) {
+      // console.log(user);
+      if (err) { return done(err); }
+      if (!user) {
+        console.log('user does not exits')
+        return done(null, false, { message: 'Incorrect username.' });
+      }
+      if (!bcrypt.compareSync(password, user.password)) {
+        console.log('incorrect password')
+        return done(null, false, { message: 'Incorrect password' });
+      }
+      return done(null, user);
+    });
+  }
+));
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 
 app.use('/api', require('./routes/index'))
 app.use('/api', require('./routes/auth'))
 app.use('/api/countries', require('./routes/countries'))
 app.use('/api/upload', require('./routes/upload'))
+app.use('/api/update', require('./routes/update'))
+app.use('/api/user', require('./routes/user'))
 
 // For any routes that starts with "/api", catch 404 and forward to error handler
 app.use('/api/*', (req, res, next) => {

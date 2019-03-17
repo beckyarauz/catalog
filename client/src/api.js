@@ -16,11 +16,14 @@ const errHandler = err => {
 
 export default {
   service: service,
-
-  // This method is synchronous and returns true or false
   // To know if the user is connected, we just check if we have a value for localStorage.getItem('user')
-  isLoggedIn() {
-    return localStorage.getItem('user') != null
+   isLoggedIn() {
+    return service.get('/isLogged')
+      .then( res => {
+        // console.log('console',res.data.isLogged);
+        return res.data.isLogged;
+      })
+      .catch(e => console.log(e));     
   },
 
   // This method returns the user from the localStorage
@@ -30,29 +33,14 @@ export default {
   },
 
   // This method signs up and logs in the user
-  signup(userInfo) {
-    return service
-      .post('/signup', userInfo)
-      .then(res => {
-        // If we have localStorage.getItem('user') saved, the application will consider we are loggedin
-        localStorage.setItem('user', JSON.stringify(res.data))
-        return res.data
-      })
-      .catch(errHandler)
+  async signup(userInfo) {
+    return await service
+      .post('/signup', userInfo);
   },
 
-  login(username, password) {
-    return service
-      .post('/login', {
-        username,
-        password,
-      })
-      .then(res => {
-        // If we have localStorage.getItem('user') saved, the application will consider we are loggedin
-        localStorage.setItem('user', JSON.stringify(res.data))
-        return res.data
-      })
-      .catch(errHandler)
+  async login(username, password) {
+    console.log('file: api.js message: api.login called', `${username},${password}`);
+    await service.post('/login',{username, password});
   },
 
   logout() {
@@ -60,30 +48,32 @@ export default {
     return service
       .get('/logout')
   },
-
-  // This is an example on how to use this method in a different file
-  // api.getCountries().then(countries => { /* ... */ })
-  // submitFile(file) {
-  //   //converts file to FormData function might be used later in case of saving files
-  //   const formData = new FormData();
-  //   formData.append('file', file);
-  //   return formData;
-  // },
   uploadToS3(file) {
-    const formData = new FormData();
-    formData.append('file', file);
-    // console.log(file);
-    service
-      .post(`/upload`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      }).then(response => {
-        // handle your response;
-      }).catch(error => {
-        // handle your error
-      })
+     return (async (file) =>{
+      const formData = new FormData();
+    
+      formData.append('file', file);
+      // console.log(file);
+      let data = await service
+                      .post(`/upload`, formData, {
+                        headers: {
+                          'Content-Type': 'multipart/form-data'
+                        }
+                      })
+      console.log('uploadtoS3 async', data);
+      return data;
+      })(file)
 
+  },
+  getUserInfo(){
+    service.get('/user/account-info')
+  },
+  updateUser(stateInfo){
+    console.log('api updateUser called');
+    console.log(stateInfo);
+    service.post(`/update/company-info`,{stateInfo})
+    .then(res=> console.log(res))
+    .catch(e => console.log(e))
   },
   getCountries() {
     return service
@@ -91,13 +81,6 @@ export default {
       .then(res => res.data)
       .catch(errHandler)
   },
-
-  // addCountry(body) {
-  //   return service
-  //     .post('/countries', body)
-  //     .then(res => res.data)
-  //     .catch(errHandler)
-  // },
 
   getSecret() {
     return service

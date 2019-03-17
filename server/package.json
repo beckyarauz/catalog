@@ -12,6 +12,7 @@
     "bcrypt": "^3.0.4",
     "body-parser": "^1.18.3",
     "busboy": "^0.3.0",
+    "connect-flash": "^0.1.1",
     "connect-mongo": "^2.0.3",
     "cookie-parser": "^1.4.4",
     "cors": "^2.8.5",
