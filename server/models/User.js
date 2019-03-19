@@ -14,6 +14,8 @@ const userSchema = new Schema({
     default:'SELLER'
   },
   firstName: String,
+  company: String,
+  address: String,
   lastName:String,
   email:String,
   phone:String,

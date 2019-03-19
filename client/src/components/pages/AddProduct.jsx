@@ -1,16 +1,13 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 // import MaskedInput from 'react-text-mask';
+import NumberFormat from 'react-number-format';
 import api from '../../api';
 
 import { withStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
-// import Input from '@material-ui/core/Input';
-// import InputLabel from '@material-ui/core/InputLabel';
-// import FormControl from '@material-ui/core/FormControl';
-// import IconButton from '@material-ui/core/IconButton';
 import InputAdornment from '@material-ui/core/InputAdornment';
 // import Select from '@material-ui/core/Select';
 // import OutlinedInput from '@material-ui/core/OutlinedInput';
@@ -60,7 +57,7 @@ const styles = theme => ({
 //       ref={ref => {
 //         inputRef(ref ? ref.inputElement : null);
 //       }}
-//       mask={['(', /[1-9]/, /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/,'-', /\d/, /\d/, /\d/, /\d/]}
+//       mask={[ /\d/,/\d/, /\d/, /\d/, '.', /\d/, /\d/]}
 //       placeholderChar={'\u2000'}
 //       showMask
 //     />
@@ -71,45 +68,63 @@ const styles = theme => ({
 //   inputRef: PropTypes.func.isRequired,
 // };
 
+function NumberFormatCustom(props) {
+  const { inputRef, onChange, ...other } = props;
+
+  return (
+    <NumberFormat
+      {...other}
+      getInputRef={inputRef}
+      onValueChange={values => {
+        onChange({
+          target: {
+            value: values.value,
+          },
+        });
+      }}
+      thousandSeparator
+      decimalScale={2}
+      // prefix="$"
+    />
+  );
+}
+
+NumberFormatCustom.propTypes = {
+  inputRef: PropTypes.func.isRequired,
+  onChange: PropTypes.func.isRequired,
+};
+
 class AddProduct extends React.Component {
 
   state = {
     product: {
       name: '',
       price: '',
-      // category:'',
       description: '',
-      // seller: '', //should be userID
-      // imageUrl:'',
+      imageUrl:'',
     },
-    user: '',
-    image: '',
-    imageFS: undefined,
+    user: null,
+    productId: null,
+    image: null,
+    imageFS: null,
     labelWidth: 0,
     message: null,
     valid: false,
   }
 
   componentWillMount() {
-    // this.getUser();
+    this.setState(currentState =>({redirect:!this.props.isSeller}))
   }
 
-  // componentDidMount() {
-  //   this.setState({
-  //     labelWidth: ReactDOM.findDOMNode(this.InputLabelRef).offsetWidth,
-  //   });
-  // }
 
   handleChange = name => event => {
-
-
     if (name !== 'image') {
       let product = { ...this.state.product }
       product[name] = event.target.value;
       this.setState(currentState => ({ product }), () => {
         // console.log(this.state.product);
-        let info;
-        ({ ...info } = this.state.product)
+        let info, imageUrl;
+        ({ imageUrl,...info } = this.state.product)
 
         let stateValues = Object.values(info);
         this.setState({ valid: stateValues.every(isNotEmpty) });
@@ -119,8 +134,7 @@ class AddProduct extends React.Component {
           return currentValue.length > 0 || currentValue instanceof File;
         }
       })
-    } else {
-
+    } else if(event.target.files.length > 0){
       var file = event.target.files[0];
       this.setState({ image: file });
       var reader = new FileReader();
@@ -136,26 +150,25 @@ class AddProduct extends React.Component {
   };
 
   submitToServer = async () => {
-    console.log('submition!');
-    if (this.state.imageFS !== undefined) {
-      console.log('new image uploaded')
+    // console.log('submition!');
+    if (this.state.imageFS !== undefined && this.state.imageFS !== null) {
+      // console.log('new image uploaded')
       let product = { ...this.state.product };
       let url = await api.uploadToS3(this.state.image, 'product');
-      console.log('Form api response', url.data.Location);
+      // console.log('Form api response', url.data.Location);
       product.imageUrl = url.data.Location;
 
       this.setState(currentState => ({ product }), async () => {
-        await api.addProduct(this.state.product);
+        let data = await api.addProduct(this.state.product);
+        this.setState({productId:data.data.product._id,message:data.data.message})
       });
+      return;
     }
-
-
-    await api.addProduct(this.state.product);
-
+    let data = await api.addProduct(this.state.product);
+    this.setState({productId:data.data.product._id,message:data.data.message})
   }
   unvalidFormHandler = () => {
     this.setState({ message: 'fill all the fields!' })
-    console.log('fill all the fields!');
   }
 
   handleClick = (e) => {
@@ -178,6 +191,14 @@ class AddProduct extends React.Component {
     this.setState({ product })
   }
 
+  componentDidUpdate(prevProps,prevState){
+    if(prevState.message !== this.state.message){
+      setTimeout(() =>{
+        this.setState(currentState => ({message: null}))
+      }, 3000)
+    }
+  }
+
   render() {
     const { classes } = this.props;
 
@@ -196,17 +217,18 @@ class AddProduct extends React.Component {
             variant="outlined"
           />
           <TextField
-            id="productPrice"
-            label="Price"
-            className={classes.textField}
-            value={this.state.product.price}
-            onChange={this.handleChange('price')}
-            margin="normal"
-            variant="outlined"
-            InputProps={{
-              startAdornment: <InputAdornment position="start">$</InputAdornment>,
-            }}
-          />
+          className={classes.formControl}
+          label="Price"
+          value={this.state.product.price}
+          onChange={this.handleChange('price')}
+          id="formatted-numberformat-input"
+          variant="outlined"
+          InputProps={{
+            inputComponent: NumberFormatCustom,
+            startAdornment: <InputAdornment position="start">$</InputAdornment>,
+          }}
+        />
+          
           {this.state.imageFS && <div className={classes.imageSection}><img src={this.state.imageFS} width="100" height="100" alt="product sample" /></div>}
           <input
             accept="image/*"

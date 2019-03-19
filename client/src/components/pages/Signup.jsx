@@ -27,8 +27,15 @@ export default class Signup extends Component {
     api.signup(data)
       .then(result => {
         console.log('SUCCESS!')
+        console.log(result)
         this.props.inLogin();
-        this.props.history.push("/manage-account")
+        this.setState({
+          message: result.data.message
+        })
+        setTimeout(()=>{
+          this.props.history.push("/manage-account")
+        },3000)
+        
          // Redirect to the home page
       })
       .catch(err => this.setState({ message: err.toString() }))

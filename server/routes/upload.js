@@ -89,19 +89,24 @@ router.post('/', (request, response) => {
           fileName = `policies/${timestamp}-${name}-lg`;
           data = await uploadFile(buffer, fileName, type);
         } else if(type.ext === 'png' || type.ext === 'jpeg' || type.ext === 'jpg'){
-          let sharpBuffer = await sharp(path)
-                                .resize(100, 100)
-                                .toBuffer();
+          let sharpBuffer;
           if(myType === 'product'){
+            sharpBuffer = await sharp(path)
+            .resize(240,345)
+            .toBuffer();
+
             fileName = `productImages/${timestamp}-${name}`;
+
           } else if(myType === 'logo'){
+            sharpBuffer = await sharp(path)
+            .resize(100, 100)
+            .toBuffer();
+
             fileName = `logos/${timestamp}-${name}`;
           }
-          
-          // console.log('image upload');
+
           data = await uploadFile(sharpBuffer, fileName, type);
-          // data ='hey';
-          //save the data.Location to User.logo
+         
         }
         return response.status(200).send(data);
       } catch (error) {

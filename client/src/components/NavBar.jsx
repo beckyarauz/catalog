@@ -12,9 +12,6 @@ export default class NavBar extends Component {
     }
   }
 
-  isLogged = async (e) => {
-    return await api.isLoggedIn();    
-  }
   handleLogoutClick = async (e) => {
     await api.logout();
     this.props.inLogout();
@@ -23,14 +20,12 @@ export default class NavBar extends Component {
   render(){
     return ( <div>
       <NavLink to="/" exact>Home</NavLink>
-            <NavLink to="/countries">Countries</NavLink>
             <NavLink to="/add-product">Add a Product</NavLink>
+            <NavLink to="/profile">Profile</NavLink>
+            <NavLink to="/manage-account">Manage Account</NavLink>
             {!this.props.isLogged && <NavLink to="/signup">Signup</NavLink>}
             {!this.props.isLogged && <NavLink to="/login">Login</NavLink>}
             {this.props.isLogged && <Link to="/" onClick={(e) => this.handleLogoutClick(e)}>Logout</Link>}
-            <NavLink to="/secret">Secret</NavLink>
-            <NavLink to="/upload">Upload</NavLink>
-            <NavLink to="/manage-account">Manage Account</NavLink>
     </div>)
   }
   

@@ -20,8 +20,8 @@ export default {
    isLoggedIn() {
     return service.get('/isLogged')
       .then( res => {
-        // console.log('console',res.data.isLogged);
-        return res.data.isLogged;
+        // console.log('console',res.data);
+        return res.data;
       })
       .catch(e => console.log(e));     
   },
@@ -56,7 +56,7 @@ export default {
     if(!file){
       return {message: 'no image to upload'}
     }
-    console.log('type',type);
+    // console.log('type',type);
       const formData = new FormData();
     
       formData.append('file', file);
@@ -68,7 +68,7 @@ export default {
                           'Content-Type': 'multipart/form-data'
                         }
                       })
-      console.log('uploadtoS3 async', data);
+      // console.log('uploadtoS3 async', data);
       return data;
   },
   async getUserInfo(){
@@ -77,12 +77,8 @@ export default {
     // console.log('api getUserInfo response:', data)
     return data;
   },
-  updateUser(stateInfo){
-    // console.log('api updateUser called');
-    // console.log(stateInfo);
-    service.post(`/update/company-info`,{stateInfo})
-    .then(res=> console.log(res))
-    .catch(e => console.log(e))
+  async updateUser(stateInfo){
+    return await service.post(`/update/company-info`,{stateInfo})
   },
   getCountries() {
     return service
@@ -112,7 +108,15 @@ export default {
   },
   async addProduct(product){
     console.log('addProduct api called!');
-    return await service.post('/product/add',{product});
+    let savedProd = await service.post('/product/add',{product});
+    console.log('addProduct RESPONSE',savedProd)
+    return savedProd;
+
+  },
+  async getProducts(user){
+    console.log('get Products!')
+    let products = await service.get(`/product/${user}/all`);
+    return products;
 
   }
 }

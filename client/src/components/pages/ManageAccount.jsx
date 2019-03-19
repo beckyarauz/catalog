@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+// import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import MaskedInput from 'react-text-mask';
@@ -82,18 +82,19 @@ class ManageAccount extends React.Component {
       firstName:"",
       lastName:"",
       password: "",
+      company: "something",
+      address: "something",
       email: "",
       phone: '( 49)0000-0000',
       category: "food",
-      about: "",
+      about: "Write What's your coumpany about, the inspiration and what makes you unique! :D",
       logoUrl: "",
     }, 
     labelWidth: 0,    
-    image: "",
-    imageFS: "",
+    image: null,
+    imageFS: null,
     message: null,
     valid: false,
-    // textmask: '(  )    -    ',
     showPassword: false,
     
   }
@@ -106,7 +107,7 @@ class ManageAccount extends React.Component {
         ({password,...info} = this.state.user)
 
         let stateValues = Object.values(info);
-        console.log(stateValues);
+        // console.log(stateValues);
         this.setState({valid: stateValues.every(isNotEmpty)});
 
             function isNotEmpty(currentValue) {
@@ -120,11 +121,11 @@ class ManageAccount extends React.Component {
     
   }
 
-  componentDidMount() {
-    // this.setState({
-    //   labelWidth: ReactDOM.findDOMNode(this.InputLabelRef).offsetWidth,
-    // });
-  }
+  // componentDidMount() {
+  //   // this.setState({
+  //   //   labelWidth: ReactDOM.findDOMNode(this.InputLabelRef).offsetWidth,
+  //   // });
+  // }
 
   handleChange = name => event => {
     let info,password,logoUrl;
@@ -170,14 +171,11 @@ class ManageAccount extends React.Component {
   };
 
   submitToServer = async ()=>{
-    // console.log('submition!');
-    // api.updateUser(this.state.user)
-    console.log('submition!');
-    if (this.state.imageFS !== undefined) {
-      console.log('new image uploaded')
+    if (this.state.imageFS !== undefined && this.state.imageFS !== null) {
+      // console.log('new image uploaded')
       let user = { ...this.state.user};
       let url = await api.uploadToS3(this.state.image, 'logo');
-      console.log('Form api response', url.data.Location);
+      // console.log('Form api response', url.data.Location);
       user.logoUrl = url.data.Location;
 
       this.setState(currentState => ({ user }), async () => {
@@ -186,13 +184,13 @@ class ManageAccount extends React.Component {
       return;
     }
 
+    let response = await api.updateUser(this.state.user);
 
-    return await api.updateUser(this.state.user);
-
+    this.setState({message:response.data.message })
   }
   unvalidFormHandler = ()=>{
     this.setState({message:'fill all the fields!' })
-    console.log('fill all the fields!');
+    // console.log('fill all the fields!');
   }
 
   handleClick = (e) => {
@@ -245,6 +243,38 @@ class ManageAccount extends React.Component {
           }}
         />
         <TextField
+          id="company"
+          label="Company Name"
+          className={classNames(classes.margin, classes.textField)}
+          value={this.state.user.company}
+          onChange={this.handleChange('company')}
+          margin="normal"
+          variant="outlined"
+        />
+        
+        <TextField
+          id="outlined-adornment-password"
+          className={classNames(classes.margin, classes.textField)}
+          variant="outlined"
+          type={this.state.showPassword ? 'text' : 'password'}
+          label="Password"
+          value={this.state.password}
+          onChange={this.handleChange('password')}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton
+                  aria-label="Toggle password visibility"
+                  onClick={this.handleClickShowPassword}
+                >
+                  {this.state.showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+        />
+        <h2>Contact Info</h2>
+        <TextField
           id="standard-firstname"
           label="First Name"
           className={classes.textField}
@@ -268,28 +298,6 @@ class ManageAccount extends React.Component {
           //   startAdornment: <InputAdornment position="start"></InputAdornment>,
           // }}
         />
-        <TextField
-          id="outlined-adornment-password"
-          className={classNames(classes.margin, classes.textField)}
-          variant="outlined"
-          type={this.state.showPassword ? 'text' : 'password'}
-          label="Password"
-          value={this.state.password}
-          onChange={this.handleChange('password')}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton
-                  aria-label="Toggle password visibility"
-                  onClick={this.handleClickShowPassword}
-                >
-                  {this.state.showPassword ? <VisibilityOff /> : <Visibility />}
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
-        />
-        <h2>Contact Info</h2>
         <TextField
           id="standard-email"
           label="Email"
@@ -355,7 +363,7 @@ class ManageAccount extends React.Component {
               <OutlinedInput
                 labelWidth={this.state.labelWidth}
                 name="category"
-                id="outlined-age-simple"
+                id="outlined-category-simple"
               />
             }
           >
