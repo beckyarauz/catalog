@@ -4,7 +4,7 @@ const router = express.Router();
 const User = require('../models/User');
 
 
-router.get('/account-info', async (request, res) => {
+router.get('/info', async (request, res) => {
   try{
     console.log('file: user.js GET /accountInfo reques.user',request.user.username);
     let dbUser = await User.findOne({username:request.user.username}).select('username about phone email category logoUrl firstName lastName company address')

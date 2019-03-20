@@ -108,6 +108,7 @@ app.use('/api/upload', require('./routes/upload'))
 app.use('/api/update', require('./routes/update'))
 app.use('/api/user', require('./routes/user'))
 app.use('/api/product', require('./routes/product'))
+app.use('/api/company', require('./routes/company'))
 
 // For any routes that starts with "/api", catch 404 and forward to error handler
 app.use('/api/*', (req, res, next) => {

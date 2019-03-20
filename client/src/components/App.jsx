@@ -1,20 +1,19 @@
 import React, { Component } from 'react';
 import { Route, Switch, Redirect } from 'react-router-dom';
+
+import Icon from '@material-ui/core/Icon';
+
+import NavBar from './NavBar';
+
 import Home from './pages/Home';
-import Countries from './pages/Countries';
-import FileUpload from './pages/FileUpload';
 import AddProduct from './pages/AddProduct';
 import Profile from './pages/Profile';
-import Material from './pages/MaterialProfile';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import ManageAccount from './pages/ManageAccount';
-import api from '../api';
-import logo from '../logo.svg';
-import Icon from '@material-ui/core/Icon';
+import Browse from './pages/Browse';
 
-// import Button from '@material-ui/core/Button';
-import NavBar from './NavBar';
+import api from '../api';
 
 export default class App extends Component {
   constructor(props) {
@@ -30,11 +29,14 @@ export default class App extends Component {
     (async (e) => {
       // console.log('file:app.jsx variable: this.state.isLogged', this.state.isLogged)
       let response = await api.isLoggedIn();
-      console.log(response);
+      // console.log(response);
+      if(response !== undefined && response.isLogged){
         this.setState({
-            isLogged: response.isLogged,
-            isSeller: response.isLogged
-      })
+          isLogged: response.isLogged,
+          isSeller: response.isLogged
+        })
+      }
+        
     })()
     
   }
@@ -82,7 +84,15 @@ export default class App extends Component {
                   <Profile {...props}/>
                 )
               )} />
-          <Route path="/manage-account" component={ManageAccount} />
+          <Route path="/manage-account" render={(props) => (
+                !this.state.isLogged ? (
+                  <Redirect to="/login"/>
+                ) : (
+                  <ManageAccount {...props}/>
+                )
+              )} />
+          {/* <Route path="/manage-account" component={ManageAccount} /> */}
+          <Route path="/browse" component={Browse} />
           <Route render={() => <h2>404</h2>} />
         </Switch>
       </div>

@@ -104,7 +104,7 @@ class ManageAccount extends React.Component {
       try{
         await this.getUser();
         let password,info;
-        ({password,...info} = this.state.user)
+        ({password,...info} = this.state.user);
 
         let stateValues = Object.values(info);
         // console.log(stateValues);

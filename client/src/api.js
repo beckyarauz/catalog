@@ -73,9 +73,16 @@ export default {
   },
   async getUserInfo(){
     // console.log('getUserInfocalled')
-    let data = await service.get('/user/account-info');
+    let data = await service.get('/user/info');
     // console.log('api getUserInfo response:', data)
     return data;
+  },
+  async getCompanies(category){
+    // console.log('get Companies!')
+    let data = await service.get(`/company/${category}/all`);
+    // console.log('get Companies! data:',data)
+    return data;
+
   },
   async updateUser(stateInfo){
     return await service.post(`/update/company-info`,{stateInfo})
@@ -107,14 +114,14 @@ export default {
       .catch(errHandler)
   },
   async addProduct(product){
-    console.log('addProduct api called!');
+    // console.log('addProduct api called!');
     let savedProd = await service.post('/product/add',{product});
     console.log('addProduct RESPONSE',savedProd)
     return savedProd;
 
   },
   async getProducts(user){
-    console.log('get Products!')
+    // console.log('get Products!')
     let products = await service.get(`/product/${user}/all`);
     return products;
 
