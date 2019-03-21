@@ -60,11 +60,12 @@ export default class App extends Component {
   render() {
     return (
       <div className="App">
-        <header className="App-header">
+        <header className="App-header" style={{ textAlign: 'center' }}>
           <Icon fontSize='large'>shopping_cart</Icon>
           <h1 className="App-title">Local Market</h1>
           <NavBar isLogged={this.state.isLogged} inLogout={this.handleLogout} />
         </header>
+        <div className="App-content">
         <Switch>
           <Route path="/" exact component={Home} />
           <Route path="/add-product" render={(props) => (
@@ -95,6 +96,8 @@ export default class App extends Component {
           <Route path="/browse" component={Browse} />
           <Route render={() => <h2>404</h2>} />
         </Switch>
+        </div>
+        
       </div>
     );
   }

@@ -1,5 +1,8 @@
 import React from 'react';
 // import ReactDOM from 'react-dom';
+import ReactMapGL, { NavigationControl, Popup, Marker } from 'react-map-gl';
+import Icon from '@material-ui/core/Icon';
+
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import MaskedInput from 'react-text-mask';
@@ -32,11 +35,10 @@ const styles = theme => ({
     marginLeft: theme.spacing.unit,
     marginRight: theme.spacing.unit,
     width: 200,
-    flexBasis: 200,
   },
-  imageSection:{
+  imageSection: {
     flexBasis: 200,
-    display:'flex',
+    display: 'flex',
     'justify-content': 'center',
     alignItems: 'center'
 
@@ -47,12 +49,14 @@ const styles = theme => ({
   },
   button: {
     margin: theme.spacing.unit,
-    width:200
+    width: 200
   },
-  textarea:{
-    width:200
+  textarea: {
+    width: 200
   }
 });
+
+const TOKEN = 'pk.eyJ1IjoiYmVja3lhcmF1eiIsImEiOiJjanRpb2kyc3cwbjVkM3luem42bW5ydHJ2In0.4-rDIk32b4VkF9Y_g9oLqg';
 
 function TextMaskCustom(props) {
   const { inputRef, ...other } = props;
@@ -63,7 +67,7 @@ function TextMaskCustom(props) {
       ref={ref => {
         inputRef(ref ? ref.inputElement : null);
       }}
-      mask={['(', /[1-9]/, /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/,'-', /\d/, /\d/, /\d/, /\d/]}
+      mask={['(', /[1-9]/, /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
       placeholderChar={'\u2000'}
       showMask
     />
@@ -77,10 +81,10 @@ TextMaskCustom.propTypes = {
 class ManageAccount extends React.Component {
 
   state = {
-    user:{
+    user: {
       username: "",
-      firstName:"",
-      lastName:"",
+      firstName: "",
+      lastName: "",
       password: "",
       company: "something",
       address: "something",
@@ -89,61 +93,115 @@ class ManageAccount extends React.Component {
       category: "food",
       about: "Write What's your coumpany about, the inspiration and what makes you unique! :D",
       logoUrl: "",
-    }, 
-    labelWidth: 0,    
+      geolocation: {
+        latitude: 0,
+        longitude: 0
+      }
+    },
+    viewport: {
+      latitude: 0,
+      longitude: 0,
+      zoom: 13,
+      bearing: 0,
+      pitch: 0,
+      width: 200,
+      height: 200,
+    },
+    labelWidth: 0,
     image: null,
     imageFS: null,
     message: null,
     valid: false,
     showPassword: false,
-    
+
   }
 
-  componentWillMount(){
-    (async () =>{
-      try{
-        await this.getUser();
-        let password,info;
-        ({password,...info} = this.state.user);
+  componentWillMount() {
 
-        let stateValues = Object.values(info);
-        // console.log(stateValues);
-        this.setState({valid: stateValues.every(isNotEmpty)});
+    (async () => {
+      try {
+        let user = await this.getUser();
+        this.setState(prevState => ({user}),() =>{
+          // console.log(this.state.user.geolocation);
+          // console.log('state User after Mounting:',this.state.user);
+           if (this.state.user.geolocation.latitude === 0 && this.state.user.geolocation.longitude === 0 && "geolocation" in navigator) {
+            console.log('geolocation has not been set');
+            let self = this;
+            navigator.geolocation.getCurrentPosition(function (position) {
+              let user = { ...self.state.user };
+              let geolocation = { ...user.geolocation };
+              console.log('current User geolocation',geolocation)
 
-            function isNotEmpty(currentValue) {
-              //I'm not evaluating the logo yet but I still put the File validation
-              return currentValue.length > 0 || currentValue instanceof File;
-            }
-      }catch(e){
+              geolocation.latitude = position.coords.latitude;
+              geolocation.longitude = position.coords.longitude;
+
+              user.geolocation = geolocation;
+
+              self.setState({ user });
+            })
+          } else {
+            /* geolocation IS NOT available */
+            let viewport = this.state.viewport;
+            viewport.latitude = this.state.user.geolocation.latitude;
+            viewport.longitude = this.state.user.geolocation.longitude;
+
+            this.setState(prevState => ({viewport}))
+          }
+        });
+
+        // let password, info;
+        // ({ password, ...info } = this.state.user);
+
+        // let stateValues = Object.values(info);
+        // // console.log(stateValues);
+        // // this.setState({ valid: stateValues.every(isNotEmpty) });
+
+        // function isNotEmpty(currentValue) {
+        //   //I'm not evaluating the logo yet but I still put the File validation
+        //   return currentValue.length > 0 || currentValue instanceof File;
+        // }
+       
+
+        
+      } catch (e) {
         console.log(e.message)
       }
     })()
-    
+
+
+
   }
 
-  // componentDidMount() {
-  //   // this.setState({
-  //   //   labelWidth: ReactDOM.findDOMNode(this.InputLabelRef).offsetWidth,
-  //   // });
-  // }
+  handleMarkerDrag = (e) => {
+    let user = this.state.user;
+    let geolocation = user.geolocation;
+
+    geolocation.longitude = e.lngLat[0];
+    geolocation.latitude = e.lngLat[1];
+
+    user.geolocation = geolocation;
+
+    this.setState({ user })
+  }
+
 
   handleChange = name => event => {
-    let info,password,logoUrl;
-    if(name !== 'logo'){
+    let info, password, logoUrl,geolocation;
+    if (name !== 'logo') {
       // console.log(event.target.name)
-      var user = {...this.state.user}
+      var user = { ...this.state.user }
       // console.log(user[name]);
       user[name] = event.target.value;
-      this.setState(currentState => ({user}), () => {
+      this.setState(currentState => ({ user }), () => {
         // console.log(this.state.user);
 
-        ({password,logoUrl,...info} = this.state.user)
+        ({ password, logoUrl,geolocation, ...info } = this.state.user)
 
         let stateValues = Object.values(info);
 
         // console.log('stateValues',stateValues);
 
-        this.setState({valid: stateValues.every(isNotEmpty)});
+        this.setState({ valid: stateValues.every(isNotEmpty) });
 
         function isNotEmpty(currentValue) {
           //I'm not evaluating the logo yet but I still put the File validation
@@ -151,7 +209,7 @@ class ManageAccount extends React.Component {
         }
       });
 
-    } else if(event.target.files.length > 0){
+    } else if (event.target.files.length > 0) {
       var file = event.target.files[0];
       this.setState({ image: file });
       var reader = new FileReader();
@@ -163,17 +221,17 @@ class ManageAccount extends React.Component {
       }
 
       reader.readAsDataURL(file);
-      
+
     }
   };
   handleClickShowPassword = () => {
     this.setState(state => ({ showPassword: !state.showPassword }));
   };
 
-  submitToServer = async ()=>{
+  submitToServer = async () => {
     if (this.state.imageFS !== undefined && this.state.imageFS !== null) {
       // console.log('new image uploaded')
-      let user = { ...this.state.user};
+      let user = { ...this.state.user };
       let url = await api.uploadToS3(this.state.image, 'logo');
       // console.log('Form api response', url.data.Location);
       user.logoUrl = url.data.Location;
@@ -186,10 +244,10 @@ class ManageAccount extends React.Component {
 
     let response = await api.updateUser(this.state.user);
 
-    this.setState({message:response.data.message })
+    this.setState({ message: response.data.message })
   }
-  unvalidFormHandler = ()=>{
-    this.setState({message:'fill all the fields!' })
+  unvalidFormHandler = () => {
+    this.setState({ message: 'fill all the fields!' })
     // console.log('fill all the fields!');
   }
 
@@ -200,24 +258,46 @@ class ManageAccount extends React.Component {
   getUser = async () => {
     let info = await api.getUserInfo();
     let user = info.data.user;
-    this.setState({user});
+    return user;
+
+    // console.log(user)
+    // this.setState({ user });
   }
   deleteFile = async (e) => {
     e.preventDefault()
-    let deleted = await api.deleteFromS3(this.state.user.logoUrl,'logo');
+    let deleted = await api.deleteFromS3(this.state.user.logoUrl, 'logo');
     console.log('deleted response:', deleted)
-    if(deleted.data.message){
-      this.setState(currentState => ({message:deleted.data.message,imageFS:null,image:null}))
+    if (deleted.data.message) {
+      this.setState(currentState => ({ message: deleted.data.message, imageFS: null, image: null }))
     }
-    let user = {...this.state.user};
+    let user = { ...this.state.user };
     user.logoUrl = "";
-    this.setState({user})
+    this.setState({ user })
   }
-  componentDidUpdate(prevProps,prevState){
-    if(prevState.message !== this.state.message){
-      setTimeout(() =>{
-        this.setState(currentState => ({message: null}))
+
+  handleViewportChange = (viewport) =>{
+    console.log('viewport Change:',viewport);
+    this.setState(prevState => ({viewport}));
+  }
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.message !== this.state.message) {
+      setTimeout(() => {
+        this.setState(currentState => ({ message: null }))
       }, 3000)
+    }
+    if (prevState.viewport !== this.state.viewport) {
+      console.log('Component did Udpdate and viewport changed')
+      let user = this.state.user;
+      let geolocation = user.geolocation;
+
+      geolocation.latitude = this.state.viewport.latitude;
+      geolocation.longitude = this.state.viewport.longitude;
+
+      user.geolocation = geolocation;
+      console.log(this.state.viewport.latitude)
+
+      this.setState(currentState => ({ user }))
+
     }
   }
 
@@ -226,175 +306,196 @@ class ManageAccount extends React.Component {
     const { phone } = this.state.user;
 
     return (
-      <div>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <h2>Account</h2>
-        {this.state.user.username && <form className={classes.container} noValidate autoComplete="off">
-        
-        <TextField
-          id="username"
-          label="Username"
-          className={classNames(classes.margin, classes.textField)}
-          value={this.state.user.username}
-          onChange={this.handleChange('username')}
-          margin="normal"
-          variant="outlined"
-          InputProps={{
-            startAdornment: <InputAdornment position="start">@</InputAdornment>,
-          }}
-        />
-        <TextField
-          id="company"
-          label="Company Name"
-          className={classNames(classes.margin, classes.textField)}
-          value={this.state.user.company}
-          onChange={this.handleChange('company')}
-          margin="normal"
-          variant="outlined"
-        />
-        
-        <TextField
-          id="outlined-adornment-password"
-          className={classNames(classes.margin, classes.textField)}
-          variant="outlined"
-          type={this.state.showPassword ? 'text' : 'password'}
-          label="Password"
-          value={this.state.password}
-          onChange={this.handleChange('password')}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton
-                  aria-label="Toggle password visibility"
-                  onClick={this.handleClickShowPassword}
-                >
-                  {this.state.showPassword ? <VisibilityOff /> : <Visibility />}
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
-        />
-        <h2>Contact Info</h2>
-        <TextField
-          id="standard-firstname"
-          label="First Name"
-          className={classes.textField}
-          value={this.state.user.firstName}
-          onChange={this.handleChange('firstName')}
-          margin="normal"
-          variant="outlined"
-          // InputProps={{
-          //   startAdornment: <InputAdornment position="start"></InputAdornment>,
-          // }}
-        />
-        <TextField
-          id="standard-name"
-          label="Last Name"
-          className={classes.textField}
-          value={this.state.user.lastName}
-          onChange={this.handleChange('lastName')}
-          margin="normal"
-          variant="outlined"
-          // InputProps={{
-          //   startAdornment: <InputAdornment position="start"></InputAdornment>,
-          // }}
-        />
-        <TextField
-          id="standard-email"
-          label="Email"
-          className={classes.textField}
-          value={this.state.user.email}
-          onChange={this.handleChange('email')}
-          margin="normal"
-          variant="outlined"
-          // InputProps={{
-          //   startAdornment: <InputAdornment position="start"></InputAdornment>,
-          // }}
-        />
-        <FormControl className={classes.formControl}>
-          <InputLabel htmlFor="formatted-text-mask-input">Phone Number</InputLabel>
-          <Input
-            value={phone}
-            onChange={this.handleChange('phone')}
-            id="formatted-text-mask-input"
-            inputComponent={TextMaskCustom}
-          />
-        </FormControl>
-        <h2>Company Info</h2>
-        {
-          (this.state.user.logoUrl && 
-        <div className={classes.imageSection}><img src={this.state.user.logoUrl} width="100" height="100" alt="logo from db"/></div>) 
-        || (this.state.imageFS && 
-        <div className={classes.imageSection}><img src={this.state.imageFS} width="100" height="100" alt="company logo"/></div>)
-        }
-        
-        {this.state.message && <div className="info info-danger">
-          {this.state.message}
-        </div>}
-        <br></br>
-        <input
-          accept="image/*"
-          className={classes.input}
-          style={{ display: 'none' }}
-          id="raised-button-file"
-          multiple
-          type="file"
-          onChange={this.handleChange('logo')}
-        />
-        <label htmlFor="raised-button-file">
-          <Button variant="contained" component="span" className={classes.button}>
-            Upload Logo
-          </Button>
-        </label> 
-        <Button variant="contained" component="span" className={classes.button} onClick={this.deleteFile}>Delete</Button>
-        
-        <FormControl variant="outlined" className={classes.formControl}>
-          <InputLabel
-            ref={ref => {
-              this.InputLabelRef = ref;
-            }}
-            htmlFor="outlined-category-simple"
-          >
-            Category
-          </InputLabel>
-          <Select
-            value={this.state.user.category}
-            onChange={this.handleChange('category')}
-            input={
-              <OutlinedInput
-                labelWidth={this.state.labelWidth}
-                name="category"
-                id="outlined-category-simple"
+        {this.state.user.username && (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+            {/* <form className={classes.container} noValidate autoComplete="off"> */}
+
+            <TextField
+              id="username"
+              label="Username"
+              className={classNames(classes.margin, classes.textField)}
+              value={this.state.user.username}
+              onChange={this.handleChange('username')}
+              margin="normal"
+              variant="outlined"
+              InputProps={{
+                startAdornment: <InputAdornment position="start">@</InputAdornment>,
+              }}
+            />
+            <TextField
+              id="company"
+              label="Company Name"
+              className={classNames(classes.margin, classes.textField)}
+              value={this.state.user.company}
+              onChange={this.handleChange('company')}
+              margin="normal"
+              variant="outlined"
+            />
+
+            <TextField
+              id="outlined-adornment-password"
+              className={classNames(classes.margin, classes.textField)}
+              variant="outlined"
+              type={this.state.showPassword ? 'text' : 'password'}
+              label="Password"
+              value={this.state.password}
+              onChange={this.handleChange('password')}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="Toggle password visibility"
+                      onClick={this.handleClickShowPassword}
+                    >
+                      {this.state.showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <h2>Contact Info</h2>
+            <TextField
+              id="standard-firstname"
+              label="First Name"
+              className={classes.textField}
+              value={this.state.user.firstName}
+              onChange={this.handleChange('firstName')}
+              margin="normal"
+              variant="outlined"
+            // InputProps={{
+            //   startAdornment: <InputAdornment position="start"></InputAdornment>,
+            // }}
+            />
+            <TextField
+              id="standard-name"
+              label="Last Name"
+              className={classes.textField}
+              value={this.state.user.lastName}
+              onChange={this.handleChange('lastName')}
+              margin="normal"
+              variant="outlined"
+            // InputProps={{
+            //   startAdornment: <InputAdornment position="start"></InputAdornment>,
+            // }}
+            />
+            <TextField
+              id="standard-email"
+              label="Email"
+              className={classes.textField}
+              value={this.state.user.email}
+              onChange={this.handleChange('email')}
+              margin="normal"
+              variant="outlined"
+            // InputProps={{
+            //   startAdornment: <InputAdornment position="start"></InputAdornment>,
+            // }}
+            />
+            <FormControl className={classes.formControl}>
+              <InputLabel htmlFor="formatted-text-mask-input">Phone Number</InputLabel>
+              <Input
+                value={phone}
+                onChange={this.handleChange('phone')}
+                id="formatted-text-mask-input"
+                inputComponent={TextMaskCustom}
               />
+            </FormControl>
+            <h6>Location</h6>
+            <ReactMapGL
+              {...this.state.viewport}
+              // latitude={this.state.user.geolocation.latitude}
+              // longitude={this.state.user.geolocation.longitude}
+              mapStyle="mapbox://styles/beckyarauz/cjtisim0s272e1fubskpzz1om"
+              mapboxApiAccessToken={TOKEN}
+              // onViewportChange={(viewport) => this.setState({ viewport })}
+              onViewportChange={(viewport) => this.handleViewportChange(viewport)}
+
+            >
+              <div style={{ position: 'absolute' }}>
+                <NavigationControl onViewportChange={(viewport) => this.setState({ viewport })} />
+              </div>
+              <Marker latitude={this.state.user.geolocation.latitude} longitude={this.state.user.geolocation.longitude} offsetLeft={-20} offsetTop={-10} draggable={true} onDragEnd={e => this.handleMarkerDrag(e)}>
+                <div ><Icon>location_on</Icon></div>
+              </Marker>
+            </ReactMapGL>
+            <h2>Company Info</h2>
+            {
+              (this.state.user.logoUrl &&
+                <div className={classes.imageSection}><img src={this.state.user.logoUrl} width="100" height="100" alt="logo from db" /></div>)
+              || (this.state.imageFS &&
+                <div className={classes.imageSection}><img src={this.state.imageFS} width="100" height="100" alt="company logo" /></div>)
             }
-          >
-            <MenuItem value="">
-              <em>None</em>
-            </MenuItem>
-            <MenuItem value={'beauty'}>Beauty</MenuItem>
-            <MenuItem value={'clothing'}>Clothing</MenuItem>
-            <MenuItem value={'food'}>Food</MenuItem>
-          </Select>
-        </FormControl>
-        <TextField
-          id="standard-description"
-          label="About"
-          className={classNames(classes.textarea, classes.textField)}
-          value={this.state.user.about}
-          onChange={this.handleChange('about')}
-          margin="normal"
-          variant="outlined"
-          multiline={true}
-          rows={4}
-          rowsMax={4}
-          InputProps={{
-            startAdornment: <InputAdornment position="start"> </InputAdornment>,
-          }}
-        />
-      <Button variant="contained" component="span" className={classes.button} onClick={this.handleClick} disabled={!this.state.valid}>Update</Button>
-      </form>
-      }
+
+            {this.state.message && <div className="info info-danger">
+              {this.state.message}
+            </div>}
+            <br></br>
+            <input
+              accept="image/*"
+              className={classes.input}
+              style={{ display: 'none' }}
+              id="raised-button-file"
+              multiple
+              type="file"
+              onChange={this.handleChange('logo')}
+            />
+            <label htmlFor="raised-button-file">
+              <Button variant="contained" component="span" className={classes.button}>
+                Upload Logo
+          </Button>
+            </label>
+            <Button variant="contained" component="span" className={classes.button} onClick={this.deleteFile}>Delete</Button>
+
+            <FormControl variant="outlined" className={classes.formControl}>
+              <InputLabel
+                ref={ref => {
+                  this.InputLabelRef = ref;
+                }}
+                htmlFor="outlined-category-simple"
+              >
+                Category
+          </InputLabel>
+              <Select
+                value={this.state.user.category}
+                onChange={this.handleChange('category')}
+                input={
+                  <OutlinedInput
+                    labelWidth={this.state.labelWidth}
+                    name="category"
+                    id="outlined-category-simple"
+                  />
+                }
+              >
+                <MenuItem value="">
+                  <em>None</em>
+                </MenuItem>
+                <MenuItem value={'beauty'}>Beauty</MenuItem>
+                <MenuItem value={'clothing'}>Clothing</MenuItem>
+                <MenuItem value={'food'}>Food</MenuItem>
+              </Select>
+            </FormControl>
+            <TextField
+              id="standard-description"
+              label="About"
+              className={classNames(classes.textarea, classes.textField)}
+              value={this.state.user.about}
+              onChange={this.handleChange('about')}
+              margin="normal"
+              variant="outlined"
+              multiline={true}
+              rows={4}
+              rowsMax={4}
+              InputProps={{
+                startAdornment: <InputAdornment position="start"> </InputAdornment>,
+              }}
+            />
+            <Button variant="contained" component="span" className={classes.button} onClick={this.handleClick} disabled={!this.state.valid}>Update</Button>
+            {/* </form> */}
+          </div>
+        )}
       </div>
-      
+
     );
   }
 }

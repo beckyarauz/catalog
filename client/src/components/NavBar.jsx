@@ -10,7 +10,8 @@ export default class NavBar extends Component {
   }
 
   render(){
-    return ( <div>
+    return ( 
+    <div style={{ textAlign: 'center' }}>
       <NavLink to="/" exact>Home</NavLink>
             <NavLink to="/add-product">Add a Product</NavLink>
             <NavLink to="/profile">Profile</NavLink>
@@ -19,7 +20,8 @@ export default class NavBar extends Component {
             {!this.props.isLogged && <NavLink to="/signup">Signup</NavLink>}
             {!this.props.isLogged && <NavLink to="/login">Login</NavLink>}
             {this.props.isLogged && <Link to="/" onClick={(e) => this.handleLogoutClick(e)}>Logout</Link>}
-    </div>)
+    </div>
+    )
   }
   
   

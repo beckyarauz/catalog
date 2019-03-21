@@ -7,7 +7,7 @@ const User = require('../models/User');
 router.get('/info', async (request, res) => {
   try{
     console.log('file: user.js GET /accountInfo reques.user',request.user.username);
-    let dbUser = await User.findOne({username:request.user.username}).select('username about phone email category logoUrl firstName lastName company address')
+    let dbUser = await User.findOne({username:request.user.username}).select('username about phone email category logoUrl firstName lastName company address geolocation')
     // let username, about, phone,email,category,logoUrl,firstName,lastName,company,address;
   
     // ({username, about, phone,email,category,firstName,lastName,logoUrl,company,address} = dbUser);

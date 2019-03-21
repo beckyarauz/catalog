@@ -39,7 +39,8 @@ if(!updatedUser.password || updatedUser.password === undefined){
     email:updatedUser.email,
     about: updatedUser.about,
     logoUrl: updatedUser.logoUrl,
-    category: updatedUser.category
+    category: updatedUser.category,
+    geolocation: updatedUser.geolocation
   })
   await dbUser.save();
 

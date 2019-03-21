@@ -42,11 +42,16 @@ body {
 // --------------------
 // Style for App component
 .App {
-  text-align: center;
+  // text-align: center;
 
   .App-logo {
     animation: App-logo-spin infinite 20s linear;
     height: 80px;
+  }
+  
+  .App-content{
+    display:flex;
+    justify-content: center;
   }
 
   .App-header {

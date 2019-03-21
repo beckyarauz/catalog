@@ -14,6 +14,7 @@ const userSchema = new Schema({
     default:'SELLER'
   },
   firstName: String,
+  geolocation: Object,
   company: String,
   address: String,
   lastName:String,
