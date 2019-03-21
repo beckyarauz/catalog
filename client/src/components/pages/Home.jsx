@@ -6,6 +6,18 @@ export default class Home extends Component {
   //   this.state = {
   //   }
   // }
+
+  componendDidMount(){
+    if ("geolocation" in navigator) {
+      console.log('geolocation is available')
+      navigator.geolocation.getCurrentPosition(function(position) {
+        console.log(position.coords.latitude, position.coords.longitude);
+      });
+    } else {
+      console.log('geolocation is NOT available')
+    }
+  }
+
   render() {                
     return (
       <div className="Home">

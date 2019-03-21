@@ -74,7 +74,6 @@ passport.deserializeUser((id, cb) => {
 
 app.use(flash());
 
-
 passport.use(new LocalStrategy(
   function(username, password, done) {
     console.log('file:app.js message: LocalStrategy')
@@ -99,7 +98,6 @@ passport.use(new LocalStrategy(
 
 app.use(passport.initialize());
 app.use(passport.session());
-
 
 app.use('/api', require('./routes/index'))
 app.use('/api', require('./routes/auth'))
