@@ -56,7 +56,8 @@ const styles = theme => ({
   }
 });
 
-const TOKEN = 'pk.eyJ1IjoiYmVja3lhcmF1eiIsImEiOiJjanRpb2kyc3cwbjVkM3luem42bW5ydHJ2In0.4-rDIk32b4VkF9Y_g9oLqg';
+// const TOKEN = 'pk.eyJ1IjoiYmVja3lhcmF1eiIsImEiOiJjanRpb2kyc3cwbjVkM3luem42bW5ydHJ2In0.4-rDIk32b4VkF9Y_g9oLqg';
+const TOKEN = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
 
 function TextMaskCustom(props) {
   const { inputRef, ...other } = props;
@@ -113,15 +114,22 @@ class ManageAccount extends React.Component {
     message: null,
     valid: false,
     showPassword: false,
+  }
 
+  isNotEmpty = (currentValue) => {
+    return currentValue instanceof Object || currentValue.length > 0 || currentValue instanceof File;
   }
 
   componentWillMount() {
-
     (async () => {
       try {
         let user = await this.getUser();
-        this.setState(prevState => ({user}),() =>{
+        let password, info;
+        ({ password, ...info } = user);
+
+        let stateValues = Object.values(info);
+
+        this.setState(prevState => ({user,valid:stateValues.every(this.isNotEmpty)}),() =>{
           // console.log(this.state.user.geolocation);
           // console.log('state User after Mounting:',this.state.user);
            if (this.state.user.geolocation.latitude === 0 && this.state.user.geolocation.longitude === 0 && "geolocation" in navigator) {
@@ -148,28 +156,10 @@ class ManageAccount extends React.Component {
             this.setState(prevState => ({viewport}))
           }
         });
-
-        // let password, info;
-        // ({ password, ...info } = this.state.user);
-
-        // let stateValues = Object.values(info);
-        // // console.log(stateValues);
-        // // this.setState({ valid: stateValues.every(isNotEmpty) });
-
-        // function isNotEmpty(currentValue) {
-        //   //I'm not evaluating the logo yet but I still put the File validation
-        //   return currentValue.length > 0 || currentValue instanceof File;
-        // }
-       
-
-        
       } catch (e) {
         console.log(e.message)
       }
     })()
-
-
-
   }
 
   handleMarkerDrag = (e) => {
@@ -183,7 +173,6 @@ class ManageAccount extends React.Component {
 
     this.setState({ user })
   }
-
 
   handleChange = name => event => {
     let info, password, logoUrl,geolocation;
@@ -259,9 +248,6 @@ class ManageAccount extends React.Component {
     let info = await api.getUserInfo();
     let user = info.data.user;
     return user;
-
-    // console.log(user)
-    // this.setState({ user });
   }
   deleteFile = async (e) => {
     e.preventDefault()
@@ -310,8 +296,6 @@ class ManageAccount extends React.Component {
         <h2>Account</h2>
         {this.state.user.username && (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-            {/* <form className={classes.container} noValidate autoComplete="off"> */}
-
             <TextField
               id="username"
               label="Username"
@@ -333,7 +317,6 @@ class ManageAccount extends React.Component {
               margin="normal"
               variant="outlined"
             />
-
             <TextField
               id="outlined-adornment-password"
               className={classNames(classes.margin, classes.textField)}
@@ -364,9 +347,6 @@ class ManageAccount extends React.Component {
               onChange={this.handleChange('firstName')}
               margin="normal"
               variant="outlined"
-            // InputProps={{
-            //   startAdornment: <InputAdornment position="start"></InputAdornment>,
-            // }}
             />
             <TextField
               id="standard-name"
@@ -376,9 +356,6 @@ class ManageAccount extends React.Component {
               onChange={this.handleChange('lastName')}
               margin="normal"
               variant="outlined"
-            // InputProps={{
-            //   startAdornment: <InputAdornment position="start"></InputAdornment>,
-            // }}
             />
             <TextField
               id="standard-email"
@@ -388,9 +365,6 @@ class ManageAccount extends React.Component {
               onChange={this.handleChange('email')}
               margin="normal"
               variant="outlined"
-            // InputProps={{
-            //   startAdornment: <InputAdornment position="start"></InputAdornment>,
-            // }}
             />
             <FormControl className={classes.formControl}>
               <InputLabel htmlFor="formatted-text-mask-input">Phone Number</InputLabel>
@@ -401,14 +375,12 @@ class ManageAccount extends React.Component {
                 inputComponent={TextMaskCustom}
               />
             </FormControl>
-            <h6>Location</h6>
+            <h3>Location</h3>
+            <p>Move the pointer to set your bussiness location</p>
             <ReactMapGL
               {...this.state.viewport}
-              // latitude={this.state.user.geolocation.latitude}
-              // longitude={this.state.user.geolocation.longitude}
               mapStyle="mapbox://styles/beckyarauz/cjtisim0s272e1fubskpzz1om"
               mapboxApiAccessToken={TOKEN}
-              // onViewportChange={(viewport) => this.setState({ viewport })}
               onViewportChange={(viewport) => this.handleViewportChange(viewport)}
 
             >
@@ -491,7 +463,6 @@ class ManageAccount extends React.Component {
               }}
             />
             <Button variant="contained" component="span" className={classes.button} onClick={this.handleClick} disabled={!this.state.valid}>Update</Button>
-            {/* </form> */}
           </div>
         )}
       </div>

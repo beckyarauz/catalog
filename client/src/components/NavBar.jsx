@@ -13,13 +13,13 @@ export default class NavBar extends Component {
     return ( 
     <div style={{ textAlign: 'center' }}>
       <NavLink to="/" exact>Home</NavLink>
-            <NavLink to="/add-product">Add a Product</NavLink>
-            <NavLink to="/profile">Profile</NavLink>
-            <NavLink to="/manage-account">Manage Account</NavLink>
-            <NavLink to="/browse">Browse</NavLink>
-            {!this.props.isLogged && <NavLink to="/signup">Signup</NavLink>}
-            {!this.props.isLogged && <NavLink to="/login">Login</NavLink>}
-            {this.props.isLogged && <Link to="/" onClick={(e) => this.handleLogoutClick(e)}>Logout</Link>}
+      {this.props.isLogged &&<NavLink to="/add-product">Add a Product</NavLink>}
+      {this.props.isLogged &&<NavLink to="/profile">Profile</NavLink>}
+      {this.props.isLogged &&<NavLink to="/manage-account">Manage Account</NavLink>}
+      <NavLink to="/browse">Browse</NavLink>
+      {!this.props.isLogged && <NavLink to="/signup">Signup</NavLink>}
+      {!this.props.isLogged && <NavLink to="/login">Login</NavLink>}
+      {this.props.isLogged && <Link to="/" onClick={(e) => this.handleLogoutClick(e)}>Logout</Link>}
     </div>
     )
   }

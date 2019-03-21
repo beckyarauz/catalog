@@ -19,7 +19,7 @@ router.get('/:category/all', async (req,res) => {
   let category = req.params.category;
   try{
     // console.log('file: company.js GET /info req.params.category',category);
-    let dbUsers = await User.find({category:category}).select('company about')
+    let dbUsers = await User.find({category:category}).select('company about category')
     if(dbUsers !== null && dbUsers !== undefined && dbUsers.length > 0){
       res.status(200).json({companies: dbUsers})
     } else {

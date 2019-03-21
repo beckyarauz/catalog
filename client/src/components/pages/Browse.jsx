@@ -88,7 +88,8 @@ const styles = theme => ({
   },
   demo:{
     overflow: 'scroll',
-    maxWidth: 375
+    minWidth: 375,
+    maxWidth: 375,
   },
   image: {
     '&:hover, &$focusVisible': {
@@ -175,12 +176,12 @@ class Browse extends Component {
         {
           name: 'Tattoo',
           image:'https://i.pinimg.com/originals/03/5d/9e/035d9ee5c531a63269a106d6daa87af0.jpg',
-          icon:'color_lens'
+          icon:'brush'
         },
         {
           name: 'Art',
           image:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSf5Fl3X6g94efmszJFpV3OxNchZXM9xLvfsetuOgKw_LYzYycCQQ',
-          icon:'brush'
+          icon:'color_lens'
         },
       ],
       message: null,
