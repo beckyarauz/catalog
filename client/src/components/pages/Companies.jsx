@@ -55,12 +55,12 @@ class Companies extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      category:'',
+      category:'none',
       companies:null,
       message: null,
       error: null,
       spacing: '16',
-      cardImage:''
+      location:null
     }
   }
 
@@ -110,18 +110,48 @@ class Companies extends Component {
     return myCat;
   }
   componentDidMount(){
-    this.setState({category:this.props.category})
+    console.log('mounted Companies')
+    if(this.props.category && this.props.category !== null){
+      this.setState({category:this.props.category})
+    } 
+    if ("geolocation" in navigator) {
+      console.log('setting geolocation')
+      let self = this;
+      navigator.geolocation.getCurrentPosition(async function (position) {
+        
+        let currentLocation = {
+          latitude: position.coords.latitude,
+          longitude:position.coords.longitude
+        }
+
+        // console.log('geolocation:', self.state.currentLocation);
+          console.log('calling getCompanies api');
+          let data = await api.getCompanies(self.state.category,currentLocation);
+          
+          console.log(data)
+
+
+        self.setState(prevState =>( { currentLocation, companies:data.data.companies }), async () =>{
+          
+          console.log('companies loaded from server', self.state.companies)
+        });
+      })
+    } else {
+      console.log('geolocation not available');
+    }
+    
   }
   componentDidUpdate(prevProps, prevState, snapshot){
-    if(prevProps !== this.props){
-      // this.backImage();
+    if(prevProps.category !== this.props.category ){
+      console.log('category has been changed')
       this.setState(currentState => ({category:this.props.category}), ()=>{
         let category = this.state.category;
-        if(category){
+        let location = this.state.currentLocation;
+        if(category && category !== 'none' && category !== null){
           category = category.toLowerCase();
           (async ()=>{
             console.log('async',category);
-            let data = await api.getCompanies(category);
+            let data = await api.getCompanies(category,location);
 
             if(data.data.companies && data.data.companies !== undefined && data.data.companies !== null && data.data.companies.length > 0){
               let companies = data.data.companies;
@@ -150,6 +180,9 @@ class Companies extends Component {
         }
       });
     }
+    // if(this.state.category === 'none' && prevState.companies !== this.state.companies ){
+
+    // }
   }
 
   render() {

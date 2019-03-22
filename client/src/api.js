@@ -77,11 +77,21 @@ export default {
     // console.log('api getUserInfo response:', data)
     return data;
   },
-  async getCompanies(category){
-    // console.log('get Companies!')
-    let data = await service.get(`/company/${category}/all`);
-    // console.log('get Companies! data:',data)
-    return data;
+  async getCompanies(category,location){
+    console.log('get Companies! location:',location)
+    console.log('get Companies! category:',category)
+    if(category !== 'none' && category !== null){
+      console.log('category is set')
+      let data = await service.get(`/company/${category}/all`);
+      console.log('get Companies! data:',data)
+      return data;
+    } else {
+      console.log('getting server')
+      let data = await service.get(`/company/all?latitude=${location.latitude}&longitude=${location.longitude}`);
+        console.log('get Companies with location! data:',data)
+      return data;
+    }
+    
 
   },
   async updateUser(stateInfo){
