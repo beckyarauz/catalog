@@ -39,7 +39,7 @@ export default {
   },
 
   async login(username, password) {
-    console.log('file: api.js message: api.login called', `${username},${password}`);
+    // console.log('file: api.js message: api.login called', `${username},${password}`);
     await service.post('/login',{username, password});
   },
 
@@ -77,18 +77,18 @@ export default {
     // console.log('api getUserInfo response:', data)
     return data;
   },
-  async getCompanies(category,location){
-    console.log('get Companies! location:',location)
-    console.log('get Companies! category:',category)
-    if(category !== 'none' && category !== null){
-      console.log('category is set')
+  async getCompanies(category,location,dist){
+    // console.log('get Companies! location:',location)
+    // console.log('get Companies! category:',category)
+    if(category !== 'all' && category !== null){
+      // console.log('category is set')
       let data = await service.get(`/company/${category}/all`);
-      console.log('get Companies! data:',data)
+      // console.log('get Companies! data:',data)
       return data;
     } else {
-      console.log('getting server')
+      // console.log('getting server')
       let data = await service.get(`/company/all?latitude=${location.latitude}&longitude=${location.longitude}`);
-        console.log('get Companies with location! data:',data)
+        // console.log('get Companies with location! data:',data)
       return data;
     }
     
@@ -126,7 +126,7 @@ export default {
   async addProduct(product){
     // console.log('addProduct api called!');
     let savedProd = await service.post('/product/add',{product});
-    console.log('addProduct RESPONSE',savedProd)
+    // console.log('addProduct RESPONSE',savedProd)
     return savedProd;
 
   },

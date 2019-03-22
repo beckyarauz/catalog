@@ -19,6 +19,7 @@ const userSchema = new Schema({
   address: String,
   lastName:String,
   email:String,
+  tags:[Object],
   phone:String,
   about:String,
   logoUrl:String,

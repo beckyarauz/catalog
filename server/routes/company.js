@@ -51,9 +51,9 @@ function deg2rad(deg) {
 router.get('/all/', async (req,res) => {
   try{
     let location = req.query;
-    console.log('query location',location)
+    // console.log('query location',location)
       let dbUsers = await User.find().select('company about category geolocation');
-      console.log(dbUsers);
+      // console.log(dbUsers);
       let filtered = dbUsers.filter(user => {
         let dbLocation = user.geolocation;
         let distance = getDistanceFromLatLonInKm(location.latitude,location.longitude,dbLocation.latitude,dbLocation.longitude);
@@ -61,7 +61,7 @@ router.get('/all/', async (req,res) => {
         // return user.geolocation
         return distance < 30 && distance > 0 ;
       })
-      console.log(filtered)
+      // console.log(filtered)
 
       // let nearCompanies = {...filtered}
       if(filtered.length > 0){

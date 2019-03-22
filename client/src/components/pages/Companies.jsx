@@ -55,7 +55,7 @@ class Companies extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      category:'none',
+      category:'all',
       companies:null,
       message: null,
       error: null,
@@ -65,7 +65,7 @@ class Companies extends Component {
   }
 
   backImage = (category) =>{
-    console.log('backimage',category)
+    // console.log('backimage',category)
     let myCat;
     let image;
     let icon;
@@ -79,7 +79,7 @@ class Companies extends Component {
         icon = 'restaurant'
         break;
       case 'gifts':
-        image = 'https://i.pinimg.com/originals/f0/c3/32/f0c332d32df07415ecb1f07dc500fa74.jpg';
+        image = 'https://st2.depositphotos.com/4948655/8247/v/950/depositphotos_82474894-stock-illustration-seamless-birthday-pattern.jpg';
         icon = 'redeem'
         break;
       case 'furniture':
@@ -110,12 +110,11 @@ class Companies extends Component {
     return myCat;
   }
   componentDidMount(){
-    console.log('mounted Companies')
+    // console.log('mounted Companies')
     if(this.props.category && this.props.category !== null){
       this.setState({category:this.props.category})
     } 
     if ("geolocation" in navigator) {
-      console.log('setting geolocation')
       let self = this;
       navigator.geolocation.getCurrentPosition(async function (position) {
         
@@ -123,18 +122,11 @@ class Companies extends Component {
           latitude: position.coords.latitude,
           longitude:position.coords.longitude
         }
-
-        // console.log('geolocation:', self.state.currentLocation);
-          console.log('calling getCompanies api');
-          let data = await api.getCompanies(self.state.category,currentLocation);
-          
-          console.log(data)
-
-
-        self.setState(prevState =>( { currentLocation, companies:data.data.companies }), async () =>{
-          
-          console.log('companies loaded from server', self.state.companies)
-        });
+        let data = await api.getCompanies(self.state.category,currentLocation);
+        self.setState(prevState =>( { currentLocation, companies:data.data.companies,message:'Companies near you' }));
+        setTimeout(() =>{
+          self.setState({message:null})
+        }, 2000)
       })
     } else {
       console.log('geolocation not available');
@@ -143,14 +135,14 @@ class Companies extends Component {
   }
   componentDidUpdate(prevProps, prevState, snapshot){
     if(prevProps.category !== this.props.category ){
-      console.log('category has been changed')
+      // console.log('category has been changed')
       this.setState(currentState => ({category:this.props.category}), ()=>{
         let category = this.state.category;
         let location = this.state.currentLocation;
-        if(category && category !== 'none' && category !== null){
+        if(category && category !== 'all' && category !== null){
           category = category.toLowerCase();
           (async ()=>{
-            console.log('async',category);
+            // console.log('async',category);
             let data = await api.getCompanies(category,location);
 
             if(data.data.companies && data.data.companies !== undefined && data.data.companies !== null && data.data.companies.length > 0){
@@ -180,7 +172,7 @@ class Companies extends Component {
         }
       });
     }
-    // if(this.state.category === 'none' && prevState.companies !== this.state.companies ){
+    // if(this.state.category === 'all' && prevState.companies !== this.state.companies ){
 
     // }
   }

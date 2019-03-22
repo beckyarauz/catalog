@@ -40,7 +40,8 @@ if(!updatedUser.password || updatedUser.password === undefined){
     about: updatedUser.about,
     logoUrl: updatedUser.logoUrl,
     category: updatedUser.category,
-    geolocation: updatedUser.geolocation
+    geolocation: updatedUser.geolocation,
+    tags: updatedUser.tags
   })
   await dbUser.save();
 
@@ -48,11 +49,11 @@ if(!updatedUser.password || updatedUser.password === undefined){
   // for(field of updatedUser){
   //   console.log('field:',field);
   // }
-  console.log('dbUser',dbUser);
+  // console.log('dbUser',dbUser);
 
   
 } else {
-  console.log('password will be updated',updatedUser.password);
+  // console.log('password will be updated',updatedUser.password);
   
   response.status(200).json({message: ' new password encrypted and saved'});
    

@@ -1,7 +1,8 @@
 import React from 'react';
-// import ReactDOM from 'react-dom';
+
+import Tag from './Tagify';
+
 import ReactMapGL, { NavigationControl, Popup, Marker } from 'react-map-gl';
-import Icon from '@material-ui/core/Icon';
 
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
@@ -18,7 +19,8 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 import Select from '@material-ui/core/Select';
 import OutlinedInput from '@material-ui/core/OutlinedInput';
 import MenuItem from '@material-ui/core/MenuItem';
-import Button from '@material-ui/core/Button'
+import Button from '@material-ui/core/Button';
+import Icon from '@material-ui/core/Icon';
 
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
@@ -37,7 +39,6 @@ const styles = theme => ({
     width: 200,
   },
   imageSection: {
-    flexBasis: 200,
     display: 'flex',
     'justify-content': 'center',
     alignItems: 'center'
@@ -90,6 +91,7 @@ class ManageAccount extends React.Component {
       company: "something",
       address: "something",
       email: "",
+      tags: [],
       phone: '( 49)0000-0000',
       category: "food",
       about: "Write What's your coumpany about, the inspiration and what makes you unique! :D",
@@ -129,42 +131,42 @@ class ManageAccount extends React.Component {
 
         let stateValues = Object.values(info);
 
-        this.setState(prevState => ({user,valid:stateValues.every(this.isNotEmpty)}),() =>{
-          
-        console.log(this.state.user.geolocation);
-        // console.log('state User after Mounting:',this.state.user);
-         if ((this.state.user.geolocation.latitude === 0 && this.state.user.geolocation.longitude === 0) && "geolocation" in navigator) {
-          console.log('geolocation has not been set');
-          let self = this;
-          navigator.geolocation.getCurrentPosition(function (position) {
-            let user = { ...self.state.user };
-            let geolocation = { ...user.geolocation };
-            // console.log('current State User geolocation',geolocation)
-            // console.log('current geolocation',position)
+        this.setState(prevState => ({ user, valid: stateValues.every(this.isNotEmpty) }), () => {
 
-            geolocation.latitude = position.coords.latitude;
-            geolocation.longitude = position.coords.longitude;
+          console.log(this.state.user.geolocation);
+          // console.log('state User after Mounting:',this.state.user);
+          if ((this.state.user.geolocation.latitude === 0 && this.state.user.geolocation.longitude === 0) && "geolocation" in navigator) {
+            console.log('geolocation has not been set');
+            let self = this;
+            navigator.geolocation.getCurrentPosition(function (position) {
+              let user = { ...self.state.user };
+              let geolocation = { ...user.geolocation };
+              // console.log('current State User geolocation',geolocation)
+              // console.log('current geolocation',position)
 
-            user.geolocation = geolocation;
+              geolocation.latitude = position.coords.latitude;
+              geolocation.longitude = position.coords.longitude;
 
-            let viewport = self.state.viewport;
-            viewport.latitude = user.geolocation.latitude;
-            viewport.longitude = user.geolocation.longitude;
+              user.geolocation = geolocation;
 
-            // this.setState(prevState => ({viewport}))
+              let viewport = self.state.viewport;
+              viewport.latitude = user.geolocation.latitude;
+              viewport.longitude = user.geolocation.longitude;
 
-            self.setState(prevState => ({ user, viewport }),() =>{
-              console.log('changed user geolocation:', self.state.user.geolocation)
-            });
-          })
-        } else {
-          /* geolocation IS NOT available */
-          let viewport = this.state.viewport;
-          viewport.latitude = this.state.user.geolocation.latitude;
-          viewport.longitude = this.state.user.geolocation.longitude;
+              // this.setState(prevState => ({viewport}))
 
-          this.setState(prevState => ({viewport}))
-        }
+              self.setState(prevState => ({ user, viewport }), () => {
+                console.log('changed user geolocation:', self.state.user.geolocation)
+              });
+            })
+          } else {
+            /* geolocation IS NOT available */
+            let viewport = this.state.viewport;
+            viewport.latitude = this.state.user.geolocation.latitude;
+            viewport.longitude = this.state.user.geolocation.longitude;
+
+            this.setState(prevState => ({ viewport }))
+          }
         });
 
       } catch (e) {
@@ -186,29 +188,24 @@ class ManageAccount extends React.Component {
   }
 
   handleChange = name => event => {
-    let info, password, logoUrl,geolocation;
+    let info, password, logoUrl, geolocation;
     if (name !== 'logo') {
-      // console.log(event.target.name)
+      if (name === 'tags') {
+        // console.log(event)
+        let user = { ...this.state.user };
+        let tags = event;
+        user.tags = tags;
+        this.setState({ user })
+        return;
+      }
       var user = { ...this.state.user }
-      // console.log(user[name]);
       user[name] = event.target.value;
       this.setState(currentState => ({ user }), () => {
-        // console.log(this.state.user);
-
-        ({ password, logoUrl,geolocation, ...info } = this.state.user)
+        ({ password, logoUrl, geolocation, ...info } = this.state.user)
 
         let stateValues = Object.values(info);
-
-        // console.log('stateValues',stateValues);
-
         this.setState({ valid: stateValues.every(this.isNotEmpty) });
-
-        // function isNotEmpty(currentValue) {
-        //   //I'm not evaluating the logo yet but I still put the File validation
-        //   return currentValue.length > 0 || currentValue instanceof File;
-        // }
       });
-
     } else if (event.target.files.length > 0) {
       var file = event.target.files[0];
       this.setState({ image: file });
@@ -272,9 +269,9 @@ class ManageAccount extends React.Component {
     this.setState({ user })
   }
 
-  handleViewportChange = (viewport) =>{
+  handleViewportChange = (viewport) => {
     // console.log('viewport Change:',viewport);
-    this.setState(prevState => ({viewport}));
+    this.setState(prevState => ({ viewport }));
   }
   componentDidUpdate(prevProps, prevState) {
     if (prevState.message !== this.state.message) {
@@ -307,6 +304,7 @@ class ManageAccount extends React.Component {
         <h2>Account</h2>
         {this.state.user.username && (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+
             <TextField
               id="username"
               label="Username"
@@ -458,6 +456,9 @@ class ManageAccount extends React.Component {
                 <MenuItem value={'food'}>Food</MenuItem>
               </Select>
             </FormControl>
+
+            <Tag handleTagChange={this.handleChange('tags')} initialTags={this.state.user.tags} />
+
             <TextField
               id="standard-description"
               label="About"
@@ -477,7 +478,6 @@ class ManageAccount extends React.Component {
           </div>
         )}
       </div>
-
     );
   }
 }

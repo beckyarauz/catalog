@@ -12,6 +12,7 @@ import AppBar from '@material-ui/core/AppBar';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import Icon from '@material-ui/core/Icon';
+
 import Companies from './Companies';
 // import Products from './Products';
 // import Contact from './Contact';
@@ -61,6 +62,7 @@ const styles = theme => ({
   text:{
     fontSize: 14,
   },
+  
   tabs: {
     // textAlign:'center',
     flexGrow: 1,
@@ -148,6 +150,11 @@ class Browse extends Component {
     this.state = {
       companies:null,
       categories:[
+        {
+          name: 'All',
+          image:'https://i.pinimg.com/originals/ca/cb/fc/cacbfcff3d9472212d9c3ffbb4085ced.jpg',
+          icon:'shopping_cart'
+        },
         {
           name: 'Beauty',
           image:'https://img3.stockfresh.com/files/b/balabolka/m/95/5959516_stock-vector-seamless-pattern-with-beauty-and-cosmetics-background.jpg',
