@@ -12,17 +12,14 @@ import AppBar from '@material-ui/core/AppBar';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import Icon from '@material-ui/core/Icon';
+import TextField from '@material-ui/core/TextField';
+import InputAdornment from '@material-ui/core/InputAdornment';
+
+import allCategoryBG from '../../images/all-category.png';
 
 import Companies from './Companies';
-// import Products from './Products';
-// import Contact from './Contact';
-
-// import api from '../../api';
 
 import { withStyles } from '@material-ui/core/styles';
-// import Button from '@material-ui/core/Button'
-
-// import api from '../../api';
 
 const styles = theme => ({
   root: {
@@ -32,6 +29,10 @@ const styles = theme => ({
   },
   margin: {
     margin: theme.spacing.unit,
+  },
+  textField: {
+    marginLeft: theme.spacing.unit,
+    marginRight: theme.spacing.unit,
   },
   content:{
     display: 'flex',
@@ -152,7 +153,7 @@ class Browse extends Component {
       categories:[
         {
           name: 'All',
-          image:'https://i.pinimg.com/originals/ca/cb/fc/cacbfcff3d9472212d9c3ffbb4085ced.jpg',
+          image:allCategoryBG,
           icon:'shopping_cart'
         },
         {
@@ -194,13 +195,21 @@ class Browse extends Component {
       message: null,
       error: null,
       spacing: '16',
-      selectedCategory:null
+      selectedCategory:null,
+      searchInput:''
     }
   }
 
   handleChange = (event, value) => {
     this.setState({ selectedCategory: value });
   };
+  handleSearchChange = (e) => {
+    // console.log(e.target.value)
+    let value = e.target.value;
+    this.setState(state => ({searchInput: value}))
+
+    
+  }
 
   render() {
     const { spacing } = this.state;
@@ -208,6 +217,17 @@ class Browse extends Component {
     return (
       // this.state.loaded && (
       <div className={classNames(classes.root ,classes.margin)}>
+      <TextField
+              id="search"
+              label="Search Bussines by tags"
+              className={classNames(classes.margin, classes.textField)}
+              value={this.state.searchInput}
+              onChange={this.handleSearchChange}
+              margin="normal"
+              InputProps={{
+                startAdornment: <InputAdornment position="start"><Icon>search</Icon></InputAdornment>,
+              }}
+            />
       
         <Grid container className={classes.gridClass} spacing={16} >
           <Grid item xs={12}>
@@ -249,7 +269,8 @@ class Browse extends Component {
             </Grid>
           </Grid>
         </Grid>
-        <Companies category={this.state.selectedCategory}/>
+        
+        <Companies category={this.state.selectedCategory} search={this.state.searchInput}/>
       </div>
       // ) 
     );

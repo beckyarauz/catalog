@@ -1,10 +1,5 @@
 import React from 'react';
 import { WithContext as ReactTags } from 'react-tag-input';
-
-// import Button from '@material-ui/core/Button'
-import IconButton from '@material-ui/core/IconButton';
-import Icon from '@material-ui/core/Icon';
-import Avatar from '@material-ui/core/Avatar';
  
 const KeyCodes = {
   comma: 188,
@@ -20,10 +15,14 @@ export default class Tag extends React.Component {
         this.state = {
             tags: [
                 { id: "food", text: "food" },
-                { id: "makeup", text: "makeup" }
+                { id: "makeup", text: "makeup" },
+                { id: "vegan", text: "vegan" }
              ],
             suggestions: [
                 { id: 'makeup', text: 'makeup' },
+                { id: 'vintage', text: 'vintage' },
+                { id: 'dresses', text: 'dresses' },
+                { id: 'accesories', text: 'accesories' },
                 { id: 'salon', text: 'salon' },
                 { id: 'clothes', text: 'clothes' },
                 { id: 'murals', text: 'murals' },

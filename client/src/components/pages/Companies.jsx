@@ -48,6 +48,17 @@ const styles = theme => ({
     flexDirection: 'column',
     alignItems:'center',
     justifyContent:'center'
+  },
+  tagsContainer:{
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'space-evenly',
+    padding: '10px 0 10px 0'
+    // margin: '10px 0 10px 0'
+  },
+  tags: {
+    padding:'5px',
+    backgroundColor: '#eee',
   }
 });
 
@@ -60,7 +71,8 @@ class Companies extends Component {
       message: null,
       error: null,
       spacing: '16',
-      location:null
+      location:null,
+      filteredCompanies:[]
     }
   }
 
@@ -130,13 +142,16 @@ class Companies extends Component {
       })
     } else {
       console.log('geolocation not available');
+      //ADD A MESSAGE FOR THE USER: IS IMPORTANT TO ACTIVATE GEOLOCATION
     }
     
   }
   componentDidUpdate(prevProps, prevState, snapshot){
     if(prevProps.category !== this.props.category ){
-      // console.log('category has been changed')
       this.setState(currentState => ({category:this.props.category}), ()=>{
+        if(this.state.filteredCompanies.length > 0){
+          this.setState(state => ({filteredCompanies:[]}))
+        }
         let category = this.state.category;
         let location = this.state.currentLocation;
         if(category && category !== 'all' && category !== null){
@@ -172,9 +187,26 @@ class Companies extends Component {
         }
       });
     }
-    // if(this.state.category === 'all' && prevState.companies !== this.state.companies ){
+    if(this.props.search !== prevProps.search){
+      if(this.state.filteredCompanies.length > 0 && this.props.search.length <= 0){
+        this.setState(state =>({ filteredCompanies:[] }));
+        return;
+      }
+      let str = this.props.search;
+      let reg = new RegExp('^'+str, 'i');
 
-    // }
+      let filteredCompanies = this.state.companies.filter(company => (
+        company.tags.length > 0
+        ));
+      
+        filteredCompanies = filteredCompanies.filter( company => (() => {
+          return company.tags.filter(tag => reg.test(tag)).length > 0
+        })())
+
+      if(filteredCompanies.length > 0){
+        this.setState(state =>({ filteredCompanies }));
+      } 
+    }
   }
 
   render() {
@@ -184,13 +216,12 @@ class Companies extends Component {
       <div className={classNames(classes.root ,classes.margin)}>
         {this.state.error && <div className="info info-danger">{this.state.error}</div>}
         {this.state.message && <div className="info alert-info">{this.state.message}</div>}
-        {this.state.companies && (this.state.companies.length > 0) && (this.state.companies.map((company,idx) => {
+        {(this.props.search.length <= 0) && this.state.companies && (this.state.companies.length > 0) && (this.state.companies.map((company,idx) => {
           let image, icon;
           ({image, icon } = this.backImage(company.category));
             return (
               <Paper className={classNames(classes.paper)} key={company._id}>
                 <Grid className={classNames(classes.gridContainer)} container spacing={16} direction='column'>
-                
                       <Paper className={classNames(classes.gridImage,classes.gridItem)} elevation={18} style={{ backgroundImage: `url(${image})`}}>
                         <Grid container style={{height:'100%', width:'100%',position:'relative'}}>
                           <Avatar style={{backgroundColor:'rgba(0,0,0,0.5)', position:'absolute',bottom:5,right:5}}><Icon>{icon}</Icon></Avatar>
@@ -203,6 +234,45 @@ class Companies extends Component {
                             <Typography component="p">
                               {company.about}
                             </Typography>
+                            <div className={classes.tagsContainer}>
+                            {company.tags && company.tags !== undefined && company.tags.length > 0 && (
+                              company.tags.map((tag,idx) => (
+                              <Paper key={idx} className={classes.tags}>{tag}</Paper>
+                              ))
+                            )}
+                            </div>
+                            
+                      </Paper>
+                </Grid>
+            </Paper>
+            )
+        }))}
+        {(this.props.search.length > 0) && (this.state.filteredCompanies.length > 0) && (this.state.filteredCompanies.map((company,idx) => {
+          let image, icon;
+          ({image, icon } = this.backImage(company.category));
+            return (
+              <Paper className={classNames(classes.paper)} key={company._id}>
+                <Grid className={classNames(classes.gridContainer)} container spacing={16} direction='column'>
+                      <Paper className={classNames(classes.gridImage,classes.gridItem)} elevation={18} style={{ backgroundImage: `url(${image})`}}>
+                        <Grid container style={{height:'100%', width:'100%',position:'relative'}}>
+                          <Avatar style={{backgroundColor:'rgba(0,0,0,0.5)', position:'absolute',bottom:5,right:5}}><Icon>{icon}</Icon></Avatar>
+                        </Grid>
+                      </Paper>
+                      <Paper className={classNames(classes.gridContent,classes.gridItem)} elevation={4}>
+                            <Typography variant="h5" component="h3">
+                              {company.company}
+                            </Typography>
+                            <Typography component="p">
+                              {company.about}
+                            </Typography>
+                            <div className={classes.tagsContainer}>
+                            {company.tags && company.tags !== undefined && company.tags.length > 0 && (
+                              company.tags.map((tag,idx) => (
+                              <Paper key={idx} className={classes.tags}>{tag}</Paper>
+                              ))
+                            )}
+                            </div>
+                            
                       </Paper>
                 </Grid>
             </Paper>
