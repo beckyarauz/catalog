@@ -1,7 +1,12 @@
 import React, { Component } from 'react';
 import { Route, Switch, Redirect } from 'react-router-dom';
+import { BrowserRouter as Router } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import Icon from '@material-ui/core/Icon';
+import Chip from '@material-ui/core/Chip';
+import FaceIcon from '@material-ui/icons/Face';
+import Avatar from '@material-ui/core/Avatar';
 
 import NavBar from './NavBar';
 
@@ -24,14 +29,18 @@ export default class App extends Component {
       user:null
     }
   }
-
   componentWillMount(){
-    console.log(this.props)
-    this.setState({
-            user: this.props.user,
-            isLogged: this.props.logged,
-            isSeller: this.props.seller
-          })
+    (async (e) => {
+      let response = await api.isLoggedIn();
+      if(response !== undefined && response.isLogged){
+        this.setState({
+                    user: response.user,
+                    isLogged: response.isLogged,
+                    isSeller: response.seller
+                  })
+      }
+        
+    })()
   }
 
   handleLogin = () =>{
@@ -42,8 +51,6 @@ export default class App extends Component {
             isLogged: data.isLogged,
             isSeller: data.isSeller
       })
-      // this.props.history.push('/');
-      window.location.reload();
     })()
   }
   handleLogout = () =>{
@@ -51,15 +58,30 @@ export default class App extends Component {
       isLogged: false,
       isSeller: false
     })
-    window.location.reload();
   }
 
   render() {
     return (
+      <Router>
       <div className="App">
+      
+        <div className="App-bod">
         <header className="App-header" style={{ textAlign: 'center' }}>
           <Icon fontSize='large'>shopping_cart</Icon>
           <h1 className="App-title">Local Market</h1>
+          {this.state.user && (
+          // <Link to={`/profile/${this.props.user}`} >
+          <Link to={`/profile/${this.state.user}`} >
+          <Chip
+            avatar={
+              <Avatar>
+                <FaceIcon />
+              </Avatar>
+            }
+            label={this.state.user}
+            style={{marginBottom:'20px'}}
+          />
+          </Link>)}
           <NavBar isLogged={this.state.isLogged} inLogout={this.handleLogout} user={this.state.user}/>
         </header>
         <div className="App-content">
@@ -95,8 +117,10 @@ export default class App extends Component {
           <Route render={() => <h2>404</h2>} />
         </Switch>
         </div>
+        </div>
         
       </div>
+      </Router>
     );
   }
 }
