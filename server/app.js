@@ -76,12 +76,7 @@ app.use(flash());
 
 passport.use(new LocalStrategy(
   function(username, password, done) {
-    console.log('file:app.js message: LocalStrategy')
-    console.log('username:',username)
-    console.log('password:',password)
     User.findOne({ username: username }, function (err, user) {
-      // console.log(user);
-      console.log('UserFind', user)
       if (err) { return done(err); }
       if (!user) {
         console.log('user does not exits')

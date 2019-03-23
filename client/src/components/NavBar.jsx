@@ -5,8 +5,8 @@ import api from '../api';
 export default class NavBar extends Component {
 
   handleLogoutClick = async (e) => {
-    await api.logout();
     this.props.inLogout();
+    await api.logout();
   }
 
   render(){
@@ -14,7 +14,7 @@ export default class NavBar extends Component {
     <div style={{ textAlign: 'center' }}>
       <NavLink to="/" exact>Home</NavLink>
       {this.props.isLogged &&<NavLink to="/add-product">Add a Product</NavLink>}
-      {this.props.isLogged &&<NavLink to="/profile">Profile</NavLink>}
+      {this.props.isLogged &&<NavLink to={`/profile/${this.props.user}`}>Profile</NavLink>}
       {this.props.isLogged &&<NavLink to="/manage-account">Manage Account</NavLink>}
       <NavLink to="/browse">Browse</NavLink>
       {!this.props.isLogged && <NavLink to="/signup">Signup</NavLink>}

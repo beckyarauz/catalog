@@ -88,34 +88,34 @@ class Profile extends Component {
       },
       message: null,
       error: null,
-      value:0 //value of the Tabs
+      isOwner:false,
+      value:0, //value of the Tabs
     }
   }
 
-  getUser = async () => {
-    let info = await api.getUserInfo();
+  getUser = async (username) => {
+    let info = await api.getUserInfo(username);
     let user = info.data.user;
-    this.setState({user});
+    let isOwner = info.data.isOwner;
+    console.log('isOwner',isOwner)
+    // this.setState({user,isOwner});
+    let data = await api.getProducts(user.username);
+    let products = data.data.products;
+
+    user.products = products;
+    console.log(products);
+    this.setState(currentState => ({user,isOwner}))
   }
 
   componentWillMount(){
-    
+    console.log(this.props.location)
+      let path = this.props.location.pathname;
+      let link = path.substring(path.search('profile'));
+      let user = link.substring(link.search('/')+1);
     (async ()=>{
-      await this.getUser();
-
-      let data = await api.getProducts(this.state.user.username);
-      let products = data.data.products
-      
-      let user = this.state.user;
-
-      user.products = products;
-      console.log(products);
-      this.setState(currentState => ({user}))
+      await this.getUser(user);
     })()
-  }
-  componentDidMount(){
-    //setting the default Tab render
-    this.props.history.push('/profile/products')
+    
   }
 
   handleChange = (event, value) => {
@@ -155,16 +155,16 @@ class Profile extends Component {
               textColor="primary"
               centered={true}
             >
-              <Tab icon={<Link to="/profile/products"><Icon>shopping_cart</Icon></Link>} />
-              <Tab icon={<Link to="/profile/contact"><PhoneIcon/></Link>} />
+              <Tab icon={<Link to={`/profile/${this.state.user.username}/products`}><Icon>shopping_cart</Icon></Link>} />
+              <Tab icon={<Link to={`/profile/${this.state.user.username}/contact`}><PhoneIcon/></Link>} />
               {/* <Tab icon={<FavoriteIcon />} />
               <Tab icon={<PersonPinIcon />} /> */}
             </Tabs>
           </Paper>
           <div className={classNames(classes.container)}>
             <Switch>
-              <Route path="/profile/contact" exact render={(props) => <Contact {...props} phone={this.state.user.phone} email={this.state.user.email} address={this.state.user.address} name={`${this.state.user.firstName} ${this.state.user.lastName}`}/>} />
-              <Route path="/profile/products" exact render={(props)=> <Products {...props} products={this.state.user.products}  user={this.state.user.username}/>} />
+              <Route path={`/profile/${this.state.user.username}/contact`} exact render={(props) => <Contact {...props} phone={this.state.user.phone} email={this.state.user.email} address={this.state.user.address} name={`${this.state.user.firstName} ${this.state.user.lastName}`}/>} />
+              <Route path={`/profile/${this.state.user.username}/products`} exact render={(props)=> <Products {...props} products={this.state.user.products}  user={this.state.user.username}/>} />
               {/* <Route render={() => <h2>404</h2>} /> */}
             </Switch>
           </div>

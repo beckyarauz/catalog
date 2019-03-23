@@ -10,9 +10,9 @@ router.get('/:user/all', async (req,res) => {
 
   let userId = await User.findOne({username: user}).select({_id:1});
 
-  console.log('userId',userId);
+  // console.log('userId',userId);
   let products = await Product.find({seller: userId._id}).select('tags name price description imageUrl')
-  console.log('products',products);
+  // console.log('products',products);
 
   res.status(200).json({message:'products', products:products})
 
@@ -21,9 +21,7 @@ router.post('/add', async (request, res) => {
   try{
     let product = request.body.product;
     let user = await User.findOne({username: request.user.username}).select({products:1});
-    // if(user !== null && user !== undefined){
-    //   res.status(201);
-    // }
+   
     let productArray = [...user.products];
 
     let seller = {seller: user._id}

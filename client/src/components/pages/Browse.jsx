@@ -1,14 +1,10 @@
 import React,{Component} from 'react';
-// import { Link } from 'react-router-dom';
-// import { Route, Switch } from 'react-router-dom';
+
 import ButtonBase from '@material-ui/core/ButtonBase';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import Avatar from '@material-ui/core/Avatar';
 import Grid from '@material-ui/core/Grid';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import AppBar from '@material-ui/core/AppBar';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import Icon from '@material-ui/core/Icon';
@@ -56,7 +52,6 @@ const styles = theme => ({
     // backgroundColor:'green'
   },
   infoContainer:{
-    // backgroundColor:'pink',
     textAlign: 'left',
     paddingLeft: 15,
   }, 
@@ -65,10 +60,8 @@ const styles = theme => ({
   },
   
   tabs: {
-    // textAlign:'center',
     flexGrow: 1,
     maxWidth: 500,
-    // borderRadius: '25px'
   },
   gridClass: {
     flexGrow: 1,
@@ -204,11 +197,12 @@ class Browse extends Component {
     this.setState({ selectedCategory: value });
   };
   handleSearchChange = (e) => {
-    // console.log(e.target.value)
     let value = e.target.value;
     this.setState(state => ({searchInput: value}))
+  }
 
-    
+  handleCardClick = (username) => {
+    this.props.history.push(`/profile/${username}`)
   }
 
   render() {
@@ -270,7 +264,7 @@ class Browse extends Component {
           </Grid>
         </Grid>
         
-        <Companies category={this.state.selectedCategory} search={this.state.searchInput}/>
+        <Companies category={this.state.selectedCategory} search={this.state.searchInput} handleCardClick={this.handleCardClick}/>
       </div>
       // ) 
     );

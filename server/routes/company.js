@@ -17,7 +17,7 @@ router.get('/info', async (request, res) => {
 router.get('/:category/all', async (req,res) => {
   let category = req.params.category;
   try{
-      let dbUsers = await User.find({category:category}).select('company about category geolocation tags')
+      let dbUsers = await User.find({category:category}).select('company about category geolocation tags username')
       if(dbUsers !== null && dbUsers !== undefined && dbUsers.length > 0){
         res.status(200).json({companies: dbUsers})
       } else {
@@ -33,7 +33,7 @@ router.get('/all/', async (req,res) => {
   try{
     let location = req.query;
     // console.log('query location',location)
-      let dbUsers = await User.find().select('company about category geolocation tags');
+      let dbUsers = await User.find().select('company about category geolocation tags username');
       // console.log(dbUsers);
       let filtered = dbUsers.filter(user => {
         let dbLocation = user.geolocation;

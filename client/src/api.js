@@ -71,9 +71,15 @@ export default {
       // console.log('uploadtoS3 async', data);
       return data;
   },
-  async getUserInfo(){
+  // async getUserInfo(){
+  //   // console.log('getUserInfocalled')
+  //   let data = await service.get('/user/info');
+  //   // console.log('api getUserInfo response:', data)
+  //   return data;
+  // },
+  async getUserInfo(username){
     // console.log('getUserInfocalled')
-    let data = await service.get('/user/info');
+    let data = await service.get(`/user/profile/${username}`);
     // console.log('api getUserInfo response:', data)
     return data;
   },
@@ -86,13 +92,17 @@ export default {
       // console.log('get Companies! data:',data)
       return data;
     } else {
-      // console.log('getting server')
+      if(location && location !== undefined){
+        // console.log('getting server')
       let data = await service.get(`/company/all?latitude=${location.latitude}&longitude=${location.longitude}`);
-        // console.log('get Companies with location! data:',data)
+      // console.log('get Companies with location! data:',data)
       return data;
+      } else {
+        return {data: {
+          message: `Can't find companies if you don't turn your location on`
+        }}
+      }
     }
-    
-
   },
   async updateUser(stateInfo){
     return await service.post(`/update/company-info`,{stateInfo})
