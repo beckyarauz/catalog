@@ -5,17 +5,24 @@ const Product = require('../models/Product');
 const User = require('../models/User');
 
 router.get('/:user/all', async (req,res) => {
-  let user = req.params.user;
-  // console.log('body',req.params);
-
-  let userId = await User.findOne({username: user}).select({_id:1});
-
-  // console.log('userId',userId);
-  let products = await Product.find({seller: userId._id}).select('tags name price description imageUrl')
-  // console.log('products',products);
-
-  res.status(200).json({message:'products', products:products})
-
+  try{
+    let user = req.params.user;
+    // console.log('body',req.params);
+  
+    let userId = await User.findOne({username: user}).select({_id:1});
+  
+    // console.log('userId',userId);
+    let products = await Product.find({seller: userId._id}).select('tags name price description imageUrl')
+    // console.log('products',products);
+  
+    if(products.length > 0){
+      res.status(200).json({message:'products', products:products})
+    } else {
+      res.status(200).json({error:'No Products found'})
+    }
+  } catch(e){
+    console.log(e.message)
+  }
 })
 router.post('/add', async (request, res) => {
   try{
@@ -42,12 +49,12 @@ router.post('/add', async (request, res) => {
  
 });
 router.post('/delete', async (request, res) => {
+  console.log('product.js /delete product info',request.body.product);
   try{
-    // console.log('product info',request.body.product);
     let product = request.body.product;
-    let deletedProduct = await Product.findOneAndRemove({_id: product.id})
+    let deletedProduct = await Product.findOneAndRemove({_id: product})
 
-    res.status(200).json({message: `Product has been deleted, product id: ${deletedProduct}`})
+    res.status(200).json({message: `Product has been deleted: ${deletedProduct.name}`})
   } catch(e){
     console.log(e.message);
     res.status(400).json({message: `Product couldn't be deleted`})

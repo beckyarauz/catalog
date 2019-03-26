@@ -92,17 +92,17 @@ router.post('/', (request, response) => {
           let sharpBuffer;
           if(myType === 'product'){
             sharpBuffer = await sharp(path)
-            .resize(240,345)
+            .resize(240,240)
             .toBuffer();
 
-            fileName = `productImages/${timestamp}-${name}`;
+            fileName = `productImages/${request.user.username}/${timestamp}-${name}-${request.user.username}`;
 
           } else if(myType === 'logo'){
             sharpBuffer = await sharp(path)
             .resize(100, 100)
             .toBuffer();
 
-            fileName = `logos/${timestamp}-${name}`;
+            fileName = `logos/${request.user.username}/${timestamp}-${name}-${request.user.username}`;
           }
 
           data = await uploadFile(sharpBuffer, fileName, type);

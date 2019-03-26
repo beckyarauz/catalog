@@ -49,9 +49,11 @@ export default class Tag extends React.Component {
     }
  
     handleAddition(tag) {
+        console.log(tag)
         this.setState(state => ({ tags: [...state.tags, tag] }),() => {
-            let tags = this.state.tags.map(tag => tag);
-            this.props.handleTagChange(tags);
+            // let tags = this.state.tags.map(tag => tag);
+            // let tagObject = {id: tag, text: tag}
+            this.props.handleTagChange(tag);
         });
     }
  

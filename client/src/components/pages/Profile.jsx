@@ -96,19 +96,20 @@ class Profile extends Component {
   getUser = async (username) => {
     let info = await api.getUserInfo(username);
     let user = info.data.user;
-    let isOwner = info.data.isOwner;
-    console.log('isOwner',isOwner)
-    // this.setState({user,isOwner});
+    
     let data = await api.getProducts(user.username);
+    if(data.data.error){
+      this.setState(state=> ({error:data.data.error}))
+    }
     let products = data.data.products;
 
+    let isOwner = info.data.isOwner;
+
     user.products = products;
-    console.log(products);
     this.setState(currentState => ({user,isOwner}))
   }
 
   componentWillMount(){
-    console.log(this.props.location)
       let path = this.props.location.pathname;
       let link = path.substring(path.search('profile'));
       let user = link.substring(link.search('/')+1);
@@ -118,9 +119,48 @@ class Profile extends Component {
     
   }
 
+  componentDidUpdate(prevProps,prevState){
+    let path = this.props.location.pathname;
+      let link = path.substring(path.search('profile'));
+      let user = link.substring(link.search('/')+1);
+      if(prevProps.location.pathname !== this.props.location.pathname){
+        (async ()=>{
+        await this.getUser(user);
+        })()
+      }
+      if(prevState.message !== this.state.message){
+        setTimeout(() =>{
+          this.setState(currentState => ({message: null}))
+        }, 3000)
+      }
+      if(prevState.error !== this.state.error){
+        setTimeout(() =>{
+          this.setState(currentState => ({error: null}))
+        }, 3000)
+      }
+    
+  }
+
   handleChange = (event, value) => {
     this.setState({ value });
   };
+  handleDeleteProduct = async (image,id) => {
+    if(image && image.length > 0){
+      await api.deleteFromS3(image,'product');
+    }
+    let response = await api.deleteProduct(id);
+    let user = {...this.state.user};
+    let products = [...user.products];
+    let found = products.filter(product => product._id === id).map(product => products.indexOf(product));
+   
+    products.splice(found[0],1);
+
+    user.products = products;
+
+    if(response.data.message){
+      this.setState(state => ({user,message:response.data.message}))
+    }
+  }
 
   render() {
     const { value } = this.state;
@@ -162,9 +202,11 @@ class Profile extends Component {
             </Tabs>
           </Paper>
           <div className={classNames(classes.container)}>
+          {this.state.message && <h1>{this.state.message}</h1> }
+          {this.state.error && <h1>{this.state.error}</h1>}
             <Switch>
               <Route path={`/profile/${this.state.user.username}/contact`} exact render={(props) => <Contact {...props} phone={this.state.user.phone} email={this.state.user.email} address={this.state.user.address} name={`${this.state.user.firstName} ${this.state.user.lastName}`}/>} />
-              <Route path={`/profile/${this.state.user.username}/products`} exact render={(props)=> <Products {...props} products={this.state.user.products}  user={this.state.user.username}/>} />
+              <Route path={`/profile/${this.state.user.username}/products`} exact render={(props)=> <Products {...props} products={this.state.user.products}  user={this.state.user.username} isOwner={this.state.isOwner} handleDelete={this.handleDeleteProduct}/>} />
               {/* <Route render={() => <h2>404</h2>} /> */}
             </Switch>
           </div>

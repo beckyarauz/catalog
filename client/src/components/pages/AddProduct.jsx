@@ -2,22 +2,27 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-// import MaskedInput from 'react-text-mask';
 import NumberFormat from 'react-number-format';
+
 import api from '../../api';
 
 import { withStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import InputAdornment from '@material-ui/core/InputAdornment';
-// import Select from '@material-ui/core/Select';
-// import OutlinedInput from '@material-ui/core/OutlinedInput';
-// import MenuItem from '@material-ui/core/MenuItem';
 import Button from '@material-ui/core/Button'
 
 const styles = theme => ({
   root: {
+    width:'100%',
     display: 'flex',
     flexWrap: 'wrap',
+    justifyContent:'center'
+  },
+  form:{
+    width:'100%',
+    display: 'flex',
+    flexDirection:'column',
+    alignItems:'center'
   },
   margin: {
     margin: theme.spacing.unit,
@@ -26,14 +31,16 @@ const styles = theme => ({
     marginLeft: theme.spacing.unit,
     marginRight: theme.spacing.unit,
     width: 200,
-    flexBasis: 200,
   },
   imageSection: {
-    flexBasis: 200,
     display: 'flex',
     'justify-content': 'center',
     alignItems: 'center'
 
+  },
+  priceField:{
+    margin: theme.spacing.unit,
+    maxWidth:150,
   },
   formControl: {
     margin: theme.spacing.unit,
@@ -116,13 +123,11 @@ class AddProduct extends React.Component {
     this.setState(currentState =>({redirect:!this.props.isSeller}))
   }
 
-
   handleChange = name => event => {
     if (name !== 'image') {
       let product = { ...this.state.product }
       product[name] = event.target.value;
       this.setState(currentState => ({ product }), () => {
-        // console.log(this.state.product);
         let info, imageUrl;
         ({ imageUrl,...info } = this.state.product)
 
@@ -150,12 +155,9 @@ class AddProduct extends React.Component {
   };
 
   submitToServer = async () => {
-    // console.log('submition!');
     if (this.state.imageFS !== undefined && this.state.imageFS !== null) {
-      // console.log('new image uploaded')
       let product = { ...this.state.product };
       let url = await api.uploadToS3(this.state.image, 'product');
-      // console.log('Form api response', url.data.Location);
       product.imageUrl = url.data.Location;
 
       this.setState(currentState => ({ product }), async () => {
@@ -186,6 +188,9 @@ class AddProduct extends React.Component {
     if(deleted.data.message){
       this.setState(currentState => ({message:deleted.data.message}))
     }
+    if(deleted.data.error){
+      this.setState(currentState => ({error:deleted.data.error}))
+    }
     let product = { ...this.state.product };
     product.imageUrl = "";
     this.setState({ product })
@@ -197,15 +202,20 @@ class AddProduct extends React.Component {
         this.setState(currentState => ({message: null}))
       }, 3000)
     }
+    if(prevState.error !== this.state.error){
+      setTimeout(() =>{
+        this.setState(currentState => ({error: null}))
+      }, 3000)
+    }
   }
 
   render() {
     const { classes } = this.props;
 
     return (
-      <div>
+      <div className={classes.root}>
         <h2>Add a Product</h2>
-        <form className={classes.container} noValidate autoComplete="off">
+        <form className={classes.form} noValidate autoComplete="off">
 
           <TextField
             id="productName"
@@ -217,7 +227,7 @@ class AddProduct extends React.Component {
             variant="outlined"
           />
           <TextField
-          className={classes.formControl}
+          className={classes.priceField}
           label="Price"
           value={this.state.product.price}
           onChange={this.handleChange('price')}
@@ -289,11 +299,15 @@ class AddProduct extends React.Component {
               startAdornment: <InputAdornment position="start"> </InputAdornment>,
             }}
           />
-          <Button variant="contained" component="span" className={classes.button} onClick={this.handleClick} disabled={!this.state.valid}>Update</Button>
-        </form>
-        {this.state.message && <div className="info info-danger">
+          {this.state.message && <div className="info">
           {this.state.message}
         </div>}
+          {this.state.error && <div className="info info-danger">
+          {this.state.error}
+        </div>}
+          <Button variant="contained" component="span" className={classes.button} onClick={this.handleClick} disabled={!this.state.valid}>Update</Button>
+        </form>
+        
       </div>
 
     );

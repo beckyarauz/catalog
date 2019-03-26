@@ -6,7 +6,7 @@ const User = require('../models/User');
 
 router.get('/info', async (request, res) => {
   try{
-    console.log('file: user.js GET /accountInfo reques.user',request.user.username);
+    console.log('file: user.js GET /accountInfo request.user',request.user.username);
     let dbUser = await User.findOne({username:request.user.username}).select('username about phone email category logoUrl firstName lastName company address geolocation tags')
     // let isOwner = request.user && request.user === 
     res.status(200).json({user: dbUser, isOwner})

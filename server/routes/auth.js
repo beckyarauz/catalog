@@ -75,7 +75,6 @@ router.get('/logout', (req, res, next) => {
   });
 });
 router.get("/isLogged", (req, res) => {
-  // console.log('file: auth.js message: verification if user is logged in',req.user);
   if(req.user !== undefined && req.user !== null){
     if(req.user.role === 'SELLER'){
       res.status(200).json({message:'You are logged in',isLogged:true, isSeller:true,user:req.user.username})

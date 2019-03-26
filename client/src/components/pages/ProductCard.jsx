@@ -8,63 +8,114 @@
   import CardMedia from '@material-ui/core/CardMedia';
   import Button from '@material-ui/core/Button';
   import Typography from '@material-ui/core/Typography';
+  import Icon from '@material-ui/core/Icon';
+  import ButtonBase from '@material-ui/core/ButtonBase';
+
+ 
   
   const styles = {
     card: {
-      maxWidth: 345,
+      maxWidth: 150,
+      minWidth: 150,
+      marginBottom: '20px',
     },
     media: {
-      height: 240,
+      height: 150,
     },
+    title: {
+      fontSize: 14,
+    },
+    content :{
+      padding:'5px',
+    },
+    actionText:{
+      fontSize: '0.7rem'
+    },
+    trash:{
+      color: 'red',
+      padding:0,
+      width: 27
+    },
+    edit:{
+      color: 'green',
+      padding:0,
+      width: 27
+    },
+    actionIcons:{
+      textAlign: 'center',
+    }
   };
   
   function ProductCard(props) {
     const { classes } = props;
-
-    // const product = {
-    //   name: props.name,
-    //   price: props.price,
-    //   description: props.description,
-
-    // }
     let handleDetail = (e) => {
       props.detailHandler({name: props.name, id:props.dbid})
     }
     let handleContactSeller = (e) => {
       let productId = props.dbid;
+      console.log(productId)
+      props.contactSeller(productId);
+    }
+    let handleEditProduct = (e) => {
+      let productId = props.dbid;
+      console.log(productId)
+      props.edit(productId);
+    }
+    let handleDeleteProduct = (e) => {
+      let productId = props.dbid;
+      props.delete(props.image,productId);
+    }
+    let handleSaveProduct = (e) => {
+      let productId = props.dbid;
+      props.save(productId);
     }
 
     return (
       <Card className={classes.card}>
         <CardActionArea>
-          <CardMedia
-            className={classes.media}
-            image={props.image}
-            title="Contemplative Reptile"
-          />
-          <CardContent>
-            <Typography gutterBottom variant="h5" component="h2">
-              {/* Lizard */}
-              {props.name}
-            </Typography>
-            <Typography gutterBottom variant="h6" component="h2">
+          {props.image ?
+         ( <CardMedia
+          className={classes.media}
+          image={props.image}
+          title="Contemplative Reptile"
+        />) : 
+        (<CardMedia
+        className={classes.media}
+        image='http://saveabandonedbabies.org/wp-content/uploads/2015/08/default.png'
+        title="Contemplative Reptile"
+      />)
+          }
+          <CardContent className={classes.content}>
+          <Typography className={classes.title} color="textSecondary" gutterBottom>
+         {props.name}
+        </Typography>
+            <Typography gutterBottom component="p">
               ${props.price}
             </Typography>
-            <Typography component="p">
-            {props.description}
-              {/* Lizards are a widespread group of squamate reptiles, with over 6,000 species, ranging
-              across all continents except Antarctica */}
-            </Typography>
+            {props.isOwner ? (
+            <div className={classes.actionIcons}>
+            <ButtonBase className={classes.edit} onClick={handleEditProduct}>
+              <Icon>create</Icon>
+            </ButtonBase>
+            <ButtonBase className={classes.trash} onClick={handleDeleteProduct}>
+              <Icon>delete</Icon>
+            </ButtonBase>
+              </div>) :
+              (<ButtonBase className={classes.trash} onClick={handleSaveProduct}>
+              <Icon>bookmark</Icon>
+            </ButtonBase>)
+          }
           </CardContent>
         </CardActionArea>
+        {!props.isOwner &&
         <CardActions>
-          <Button size="small" color="primary" onClick={e => handleDetail(e)}>
+          <Button size="small" className={classes.actionText} color="primary" onClick={e => handleDetail(e)}>
             Details
           </Button>
-          <Button size="small" color="primary" onClick={e => handleContactSeller(e)}>
+          <Button size="small" className={classes.actionText} color="primary" onClick={e => handleContactSeller(e)}>
             Contact Seller
           </Button>
-        </CardActions>
+        </CardActions>}
       </Card>
     );
   }

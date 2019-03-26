@@ -79,6 +79,7 @@ export default {
   // },
   async getUserInfo(username){
     // console.log('getUserInfocalled')
+    // console.log(username)
     let data = await service.get(`/user/profile/${username}`);
     // console.log('api getUserInfo response:', data)
     return data;
@@ -107,11 +108,9 @@ export default {
   async updateUser(stateInfo){
     return await service.post(`/update/company-info`,{stateInfo})
   },
-  getCountries() {
-    return service
-      .get('/countries')
-      .then(res => res.data)
-      .catch(errHandler)
+  async deleteProduct(id){
+    let data = await service.post('/product/delete',{product:id})
+    return data;
   },
 
   getSecret() {
@@ -134,17 +133,13 @@ export default {
       .catch(errHandler)
   },
   async addProduct(product){
-    // console.log('addProduct api called!');
     let savedProd = await service.post('/product/add',{product});
-    // console.log('addProduct RESPONSE',savedProd)
     return savedProd;
 
   },
   async getProducts(user){
-    // console.log('get Products!')
     let products = await service.get(`/product/${user}/all`);
     return products;
-
   }
 }
 

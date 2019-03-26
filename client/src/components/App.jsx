@@ -26,7 +26,7 @@ export default class App extends Component {
     this.state = {
       isLogged: false,
       isSeller: false,
-      user:null
+      user:null,
     }
   }
   componentWillMount(){
@@ -44,10 +44,10 @@ export default class App extends Component {
   }
 
   handleLogin = () =>{
-    // window.location.reload();
     (async (e) => {
       let data = await api.isLoggedIn();
       this.setState({
+            user: data.user,
             isLogged: data.isLogged,
             isSeller: data.isSeller
       })
@@ -56,7 +56,8 @@ export default class App extends Component {
   handleLogout = () =>{
     this.setState({
       isLogged: false,
-      isSeller: false
+      isSeller: false,
+      user: null
     })
   }
 
@@ -89,14 +90,19 @@ export default class App extends Component {
           <Route path="/" exact component={Home} />
           <Route path="/home" exact component={Home} />
           <Route path="/add-product" render={(props) => (
-                !this.state.isSeller ? (
+                (this.state.isSeller === false) ? (
                   <Redirect to="/"/>
                 ) : (
                   <AddProduct {...props}/>
                 )
               )} />
+          {/* <Route path="/add-product" render={(props) => <AddProduct {...props}/>} /> */}
           <Route path="/signup" render={(props) => <Signup {...props} inLogin={this.handleLogin}/>} />
-          <Route path="/login" render={(props) => <Login {...props} inLogin={this.handleLogin}/>} />
+          <Route path="/login" render={(props) =>
+            this.state.isLogged ? 
+            <Redirect to={`/profile/${this.state.user}`}/> :
+             <Login {...props} inLogin={this.handleLogin}/>
+             } />
           <Route path={`/profile/${this.state.user}`} render={(props) => (
                 !this.state.isLogged ? (
                   <Redirect to="/"/>
@@ -109,7 +115,7 @@ export default class App extends Component {
                 !this.state.isLogged ? (
                   <Redirect to="/login"/>
                 ) : (
-                  <ManageAccount {...props}/>
+                  <ManageAccount {...props} user={this.state.user}/>
                 )
               )} />
           {/* <Route path="/manage-account" component={ManageAccount} /> */}

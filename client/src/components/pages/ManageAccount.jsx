@@ -123,9 +123,12 @@ class ManageAccount extends React.Component {
   }
 
   componentWillMount() {
+
+    
     (async () => {
       try {
-        let user = await this.getUser();
+        console.log(this.props.user);
+        let user = await this.getUser(this.props.user);
         let password, info;
         ({ password, ...info } = user);
 
@@ -191,10 +194,12 @@ class ManageAccount extends React.Component {
     let info, password, logoUrl, geolocation;
     if (name !== 'logo') {
       if (name === 'tags') {
-        // console.log(event)
+        console.log(event)
         let user = { ...this.state.user };
         let tags = event;
-        user.tags = tags;
+
+        user.tags.push(tags);
+        
         this.setState({ user })
         return;
       }
@@ -252,9 +257,10 @@ class ManageAccount extends React.Component {
     e.preventDefault()
     this.state.valid ? this.submitToServer() : this.unvalidFormHandler();
   }
-  getUser = async () => {
-    let info = await api.getUserInfo();
+  getUser = async (username) => {
+    let info = await api.getUserInfo(username);
     let user = info.data.user;
+    console.log(user);
     return user;
   }
   deleteFile = async (e) => {
