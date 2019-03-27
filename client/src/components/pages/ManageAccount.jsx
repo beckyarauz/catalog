@@ -127,7 +127,6 @@ class ManageAccount extends React.Component {
     
     (async () => {
       try {
-        console.log(this.props.user);
         let user = await this.getUser(this.props.user);
         let password, info;
         ({ password, ...info } = user);
@@ -136,16 +135,11 @@ class ManageAccount extends React.Component {
 
         this.setState(prevState => ({ user, valid: stateValues.every(this.isNotEmpty) }), () => {
 
-          console.log(this.state.user.geolocation);
-          // console.log('state User after Mounting:',this.state.user);
           if ((this.state.user.geolocation.latitude === 0 && this.state.user.geolocation.longitude === 0) && "geolocation" in navigator) {
-            console.log('geolocation has not been set');
             let self = this;
             navigator.geolocation.getCurrentPosition(function (position) {
               let user = { ...self.state.user };
               let geolocation = { ...user.geolocation };
-              // console.log('current State User geolocation',geolocation)
-              // console.log('current geolocation',position)
 
               geolocation.latitude = position.coords.latitude;
               geolocation.longitude = position.coords.longitude;
@@ -194,7 +188,6 @@ class ManageAccount extends React.Component {
     let info, password, logoUrl, geolocation;
     if (name !== 'logo') {
       if (name === 'tags') {
-        console.log(event)
         let user = { ...this.state.user };
         let tags = event;
 
@@ -232,10 +225,8 @@ class ManageAccount extends React.Component {
 
   submitToServer = async () => {
     if (this.state.imageFS !== undefined && this.state.imageFS !== null) {
-      // console.log('new image uploaded')
       let user = { ...this.state.user };
       let url = await api.uploadToS3(this.state.image, 'logo');
-      // console.log('Form api response', url.data.Location);
       user.logoUrl = url.data.Location;
 
       this.setState(currentState => ({ user }), async () => {
@@ -250,7 +241,6 @@ class ManageAccount extends React.Component {
   }
   unvalidFormHandler = () => {
     this.setState({ message: 'fill all the fields!' })
-    // console.log('fill all the fields!');
   }
 
   handleClick = (e) => {
@@ -260,13 +250,11 @@ class ManageAccount extends React.Component {
   getUser = async (username) => {
     let info = await api.getUserInfo(username);
     let user = info.data.user;
-    console.log(user);
     return user;
   }
   deleteFile = async (e) => {
     e.preventDefault()
     let deleted = await api.deleteFromS3(this.state.user.logoUrl, 'logo');
-    console.log('deleted response:', deleted)
     if (deleted.data.message) {
       this.setState(currentState => ({ message: deleted.data.message, imageFS: null, image: null }))
     }
@@ -276,7 +264,6 @@ class ManageAccount extends React.Component {
   }
 
   handleViewportChange = (viewport) => {
-    // console.log('viewport Change:',viewport);
     this.setState(prevState => ({ viewport }));
   }
   componentDidUpdate(prevProps, prevState) {
@@ -286,7 +273,6 @@ class ManageAccount extends React.Component {
       }, 3000)
     }
     if (prevState.viewport !== this.state.viewport) {
-      // console.log('Component did Udpdate and viewport changed')
       let user = this.state.user;
       let geolocation = user.geolocation;
 
@@ -294,7 +280,6 @@ class ManageAccount extends React.Component {
       geolocation.longitude = this.state.viewport.longitude;
 
       user.geolocation = geolocation;
-      // console.log(this.state.viewport.latitude)
 
       this.setState(currentState => ({ user }))
 
