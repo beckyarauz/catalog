@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 // import Typography from '@material-ui/core/Typography';
 import ProductCard from './ProductCard';
 import ProductDetail from './ProductDetail';
+import ProductEdit from './ProductEdit';
 import { withStyles } from '@material-ui/core/styles';
 import api from '../../api';
 
@@ -24,7 +25,7 @@ class Products extends Component {
     super(props)
     this.state = {
       products:null,
-      open: false,
+      openDetail: false,
       message:'',
       error:'',
       selectedProduct:{
@@ -54,24 +55,33 @@ class Products extends Component {
     }
   }
   handleClickOpen = (value) => {
-
     this.setState(currentState => ({
-      open: true,
+      openDetail: true,
+      selectedProduct:value
+    }));
+  };
+  handleClickOpenEdit = (value) => {
+    // console.log(value)
+    this.setState(currentState => ({
+      openEdit: true,
       selectedProduct:value
     }));
   };
   handleClose = (value) => {
-    this.setState({ open: false});
+    this.setState({ openDetail: false});
+  };
+  handleCloseEdit = (value) => {
+    this.setState({ openEdit: false});
   };
 
   handleDeleteProduct = async (image,id) => {
     await this.props.handleDelete(image,id);
   }
   handleSaveProduct = async (id) => {
-    // await this.props.handleSave(id);
+    console.log(id)
   }
-  handleEditProduct = async (id) => {
-    // await this.props.handleEdit(id);
+  handleEditProduct = async (value) => {
+    this.handleClickOpenEdit(value);
   }
 
   render() {
@@ -80,8 +90,15 @@ class Products extends Component {
         <ProductDetail
           name={this.state.selectedProduct.name}
           dbid={this.state.selectedProduct.id}
-          open={this.state.open}
+          open={this.state.openDetail}
           onClose={this.handleClose}
+        />
+        <ProductEdit
+          name={this.state.selectedProduct.name}
+          description={this.state.selectedProduct.description}
+          dbid={this.state.selectedProduct.id}
+          open={this.state.openEdit}
+          onClose={this.handleCloseEdit}
         />
         {this.state.message && <div className="info">
           {this.state.message}
@@ -103,7 +120,7 @@ class Products extends Component {
                       dbid={product._id}
                       key={idx}
                       description={product.description} 
-                      detailHandler={this.handleClickOpen} 
+                      detailHandler={this.handleClickOpen}  
                       image={product.imageUrl} 
                       price={product.price}/>
                       

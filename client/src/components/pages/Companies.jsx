@@ -248,7 +248,7 @@ class Companies extends Component {
                           <div className={classes.tagsContainer}>
                           {company.tags && company.tags !== undefined && company.tags.length > 0 && (
                             company.tags.map((tag,idx) => (
-                            <Paper key={idx} className={classes.tags}>{tag}</Paper>
+                            <Paper key={idx} className={classes.tags}>{tag.text}</Paper>
                             ))
                           )}
                           </div>

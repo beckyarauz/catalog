@@ -1,17 +1,36 @@
-import React from 'react';
 
+
+import React from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
+import { withStyles } from '@material-ui/core/styles';
+import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
+import Divider from '@material-ui/core/Divider';
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import IconButton from '@material-ui/core/IconButton';
+import Typography from '@material-ui/core/Typography';
+import CloseIcon from '@material-ui/icons/Close';
+import Slide from '@material-ui/core/Slide';
+import TextField from '@material-ui/core/TextField';
+import InputAdornment from '@material-ui/core/InputAdornment';
+
 import NumberFormat from 'react-number-format';
+
+import classNames from 'classnames';
 
 import api from '../../api';
 
-import { withStyles } from '@material-ui/core/styles';
-import TextField from '@material-ui/core/TextField';
-import InputAdornment from '@material-ui/core/InputAdornment';
-import Button from '@material-ui/core/Button'
-
 const styles = theme => ({
+  container:{
+    padding: '0 15px',
+  },
+  appBar: {
+    position: 'relative',
+  },
+  flex: {
+    flex: 1,
+  },
   root: {
     width:'100%',
     display: 'flex',
@@ -55,25 +74,9 @@ const styles = theme => ({
   }
 });
 
-// function TextMaskCustom(props) {
-//   const { inputRef, ...other } = props;
-
-//   return (
-//     <MaskedInput
-//       {...other}
-//       ref={ref => {
-//         inputRef(ref ? ref.inputElement : null);
-//       }}
-//       mask={[ /\d/,/\d/, /\d/, /\d/, '.', /\d/, /\d/]}
-//       placeholderChar={'\u2000'}
-//       showMask
-//     />
-//   );
-// }
-
-// TextMaskCustom.propTypes = {
-//   inputRef: PropTypes.func.isRequired,
-// };
+function Transition(props) {
+  return <Slide direction="up" {...props} />;
+}
 
 function NumberFormatCustom(props) {
   const { inputRef, onChange, ...other } = props;
@@ -101,8 +104,7 @@ NumberFormatCustom.propTypes = {
   onChange: PropTypes.func.isRequired,
 };
 
-class AddProduct extends React.Component {
-
+class ProductEdit extends React.Component {
   state = {
     product: {
       name: '',
@@ -118,6 +120,44 @@ class AddProduct extends React.Component {
     message: null,
     valid: false,
   }
+
+
+  componentDidUpdate(prevProps,prevState){
+    if(prevState.message !== this.state.message){
+      setTimeout(() =>{
+        this.setState(currentState => ({message: null}))
+      }, 3000)
+    }
+    if(prevState.error !== this.state.error){
+      setTimeout(() =>{
+        this.setState(currentState => ({error: null}))
+      }, 3000)
+    }
+  }
+
+  handleClose = () => {
+        this.props.onClose();
+      };
+  handleSave = () => {
+        this.props.onClose();
+      };
+
+      submitToServer = async () => {
+        if (this.state.imageFS !== undefined && this.state.imageFS !== null) {
+          let product = { ...this.state.product };
+          //delete current product image and then upload the new one api.deleteFromS3(this.state.product.imageUrl, 'product');
+          let url = await api.uploadToS3(this.state.image, 'product');
+          product.imageUrl = url.data.Location;
+    
+          this.setState(currentState => ({ product }), async () => {
+            let data = await api.editProduct(this.state.product);
+            this.setState({productId:data.data.product._id,message:data.data.message})
+          });
+          return;
+        }
+        let data = await api.editProduct(this.state.product);
+        this.setState({productId:data.data.product._id,message:data.data.message})
+      }    
 
   handleChange = name => event => {
     if (name !== 'image') {
@@ -148,76 +188,39 @@ class AddProduct extends React.Component {
 
       reader.readAsDataURL(file);
     }
+    this.props.onClose();
   };
 
-  submitToServer = async () => {
-    if (this.state.imageFS !== undefined && this.state.imageFS !== null) {
-      let product = { ...this.state.product };
-      let url = await api.uploadToS3(this.state.image, 'product');
-      product.imageUrl = url.data.Location;
-
-      this.setState(currentState => ({ product }), async () => {
-        let data = await api.addProduct(this.state.product);
-        this.setState({productId:data.data.product._id,message:data.data.message})
-      });
-      return;
-    }
-    let data = await api.addProduct(this.state.product);
-    this.setState({productId:data.data.product._id,message:data.data.message})
-  }
-  unvalidFormHandler = () => {
-    this.setState({ message: 'fill all the fields!' })
-  }
-
-  handleClick = (e) => {
-    e.preventDefault()
-    this.state.valid ? this.submitToServer() : this.unvalidFormHandler();
-  }
-  getUser = async () => {
-    let info = await api.getUserInfo();
-    let user = info.data.user.username;
-    this.setState({ user });
-  }
-  deleteFile = async (e) => {
-    e.preventDefault()
-    let deleted = await api.deleteFromS3(this.state.product.imageUrl, 'product');
-    if(deleted.data.message){
-      this.setState(currentState => ({message:deleted.data.message}))
-    }
-    if(deleted.data.error){
-      this.setState(currentState => ({error:deleted.data.error}))
-    }
-    let product = { ...this.state.product };
-    product.imageUrl = "";
-    this.setState({ product })
-  }
-
-  componentDidUpdate(prevProps,prevState){
-    if(prevState.message !== this.state.message){
-      setTimeout(() =>{
-        this.setState(currentState => ({message: null}))
-      }, 3000)
-    }
-    if(prevState.error !== this.state.error){
-      setTimeout(() =>{
-        this.setState(currentState => ({error: null}))
-      }, 3000)
-    }
-  }
 
   render() {
     const { classes } = this.props;
-
     return (
-      <div className={classes.root}>
-        <h2>Add a Product</h2>
-        <form className={classes.form} noValidate autoComplete="off">
-
+        <Dialog
+          fullScreen
+          open={this.props.open}
+          onClose={this.handleClose}
+          TransitionComponent={Transition}
+          
+        >
+          <AppBar className={classes.appBar}>
+            <Toolbar>
+              <IconButton color="inherit" onClick={this.handleClose} aria-label="Close">
+                <CloseIcon />
+              </IconButton>
+              <Typography variant="h6" color="inherit" className={classes.flex}>
+                Edit Product Details
+              </Typography>
+              <Button color="inherit" onClick={this.handleSave}>
+                save
+              </Button>
+            </Toolbar>
+          </AppBar>
+          <div className={classes.container}>
           <TextField
             id="productName"
             label="Product Name"
             className={classNames(classes.margin, classes.textField)}
-            value={this.state.product.name}
+            value={this.state.name}
             onChange={this.handleChange('name')}
             margin="normal"
             variant="outlined"
@@ -225,7 +228,7 @@ class AddProduct extends React.Component {
           <TextField
           className={classes.priceField}
           label="Price"
-          value={this.state.product.price}
+          value={this.state.price}
           onChange={this.handleChange('price')}
           id="formatted-numberformat-input"
           variant="outlined"
@@ -252,39 +255,11 @@ class AddProduct extends React.Component {
           </label>
           <Button variant="contained" component="span" className={classes.button} onClick={this.deleteFile}>Delete</Button>
 
-          {/* <FormControl variant="outlined" className={classes.formControl}>
-          <InputLabel
-            ref={ref => {
-              this.InputLabelRef = ref;
-            }}
-            htmlFor="outlined-category-simple"
-          >
-            Category
-          </InputLabel>
-          <Select
-            value={this.state.user.category}
-            onChange={this.handleChange('category')}
-            input={
-              <OutlinedInput
-                labelWidth={this.state.labelWidth}
-                name="category"
-                id="outlined-age-simple"
-              />
-            }
-          >
-            <MenuItem value="">
-              <em>None</em>
-            </MenuItem>
-            <MenuItem value={'beauty'}>Beauty</MenuItem>
-            <MenuItem value={'clothing'}>Clothing</MenuItem>
-            <MenuItem value={'food'}>Food</MenuItem>
-          </Select>
-        </FormControl> */}
           <TextField
             id="productDescription"
             label="Product Description"
             className={classNames(classes.textarea, classes.textField)}
-            value={this.state.product.description}
+            value={this.state.description}
             onChange={this.handleChange('description')}
             margin="normal"
             variant="outlined"
@@ -301,17 +276,16 @@ class AddProduct extends React.Component {
           {this.state.error && <div className="info info-danger">
           {this.state.error}
         </div>}
-          <Button variant="contained" component="span" className={classes.button} onClick={this.handleClick} disabled={!this.state.valid}>Update</Button>
-        </form>
-        
-      </div>
-
+            <Divider />
+          </div>
+          
+        </Dialog>
     );
   }
 }
 
-AddProduct.propTypes = {
+ProductEdit.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(AddProduct);
+export default withStyles(styles)(ProductEdit);

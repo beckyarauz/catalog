@@ -36,13 +36,25 @@
       padding:0,
       width: 27
     },
+    bookmark:{
+      color: '#32c3ff',
+      fontSize:36
+    },
+    bookmarkButton:{
+      width: 27,
+      position: 'absolute',
+      right: 0,
+      top: 0,
+      padding:0,
+    },
     edit:{
       color: 'green',
       padding:0,
       width: 27
     },
     actionIcons:{
-      textAlign: 'center',
+      display:'flex',
+      justifyContent:'flex-end',
     }
   };
   
@@ -57,9 +69,7 @@
       props.contactSeller(productId);
     }
     let handleEditProduct = (e) => {
-      let productId = props.dbid;
-      console.log(productId)
-      props.edit(productId);
+      props.edit({name: props.name, id:props.dbid, description: props.description});
     }
     let handleDeleteProduct = (e) => {
       let productId = props.dbid;
@@ -74,7 +84,7 @@
       <Card className={classes.card}>
         <CardActionArea>
           {props.image ?
-         ( <CardMedia
+         (<CardMedia
           className={classes.media}
           image={props.image}
           title="Contemplative Reptile"
@@ -83,8 +93,7 @@
         className={classes.media}
         image='http://saveabandonedbabies.org/wp-content/uploads/2015/08/default.png'
         title="Contemplative Reptile"
-      />)
-          }
+      />)}
           <CardContent className={classes.content}>
           <Typography className={classes.title} color="textSecondary" gutterBottom>
          {props.name}
@@ -92,19 +101,20 @@
             <Typography gutterBottom component="p">
               ${props.price}
             </Typography>
-            {props.isOwner ? (
-            <div className={classes.actionIcons}>
-            <ButtonBase className={classes.edit} onClick={handleEditProduct}>
-              <Icon>create</Icon>
-            </ButtonBase>
-            <ButtonBase className={classes.trash} onClick={handleDeleteProduct}>
-              <Icon>delete</Icon>
-            </ButtonBase>
-              </div>) :
-              (<ButtonBase className={classes.trash} onClick={handleSaveProduct}>
-              <Icon>bookmark</Icon>
-            </ButtonBase>)
-          }
+            {props.isOwner ? 
+            (<div className={classes.actionIcons}>
+              <ButtonBase className={classes.edit} onClick={handleEditProduct}>
+                <Icon>create</Icon>
+              </ButtonBase>
+              <ButtonBase className={classes.trash} onClick={handleDeleteProduct}>
+                <Icon>delete</Icon>
+              </ButtonBase>
+            </div>) :
+            (<div className={classes.actionIcons}>
+              <ButtonBase className={classes.bookmarkButton} onClick={handleSaveProduct}>
+                <Icon className={classes.bookmark}>bookmark</Icon>
+              </ButtonBase>
+            </div>)}
           </CardContent>
         </CardActionArea>
         {!props.isOwner &&
