@@ -24,6 +24,24 @@ router.get('/:user/all', async (req,res) => {
     console.log(e.message)
   }
 })
+router.post('/edit', async (request, res) => {
+  try{
+    let product = request.body.product;
+    console.log('request product',product)
+    let dbProduct = await Product.findOneAndUpdate({_id: request.body.product._id},{
+      name: request.body.product.name,
+      description: request.body.product.description,
+      price: request.body.product.price,
+      tags: request.body.product.tags,
+      imageUrl: request.body.product.imageUrl,
+    })
+    res.status(200).json({message:'Product Updated',product: dbProduct})
+  } catch(e){
+    console.log(e.message);
+    res.status(400).json({message:'Bad Request'})
+  }
+ 
+});
 router.post('/add', async (request, res) => {
   try{
     let product = request.body.product;
@@ -53,6 +71,16 @@ router.post('/delete', async (request, res) => {
   try{
     let product = request.body.product;
     let deletedProduct = await Product.findOneAndRemove({_id: product})
+
+    let user = await User.findOne({_id:request.user._id});
+
+    let products = [...user.products];
+
+    let found = products.filter(product => product._id === deletedProduct._id).map(product => products.indexOf(product));
+   
+    products.splice(found[0],1);
+    
+    let updateUser = await User.findOneAndUpdate({_id:request.user._id},{products})
 
     res.status(200).json({message: `Product has been deleted: ${deletedProduct.name}`})
   } catch(e){

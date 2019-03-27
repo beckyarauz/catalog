@@ -32,7 +32,7 @@
       fontSize: '0.7rem'
     },
     trash:{
-      color: 'red',
+      color:'#ab003c',
       padding:0,
       width: 27
     },
@@ -48,7 +48,7 @@
       padding:0,
     },
     edit:{
-      color: 'green',
+      color: '#8bc34a',
       padding:0,
       width: 27
     },
@@ -61,45 +61,39 @@
   function ProductCard(props) {
     const { classes } = props;
     let handleDetail = (e) => {
-      props.detailHandler({name: props.name, id:props.dbid})
+      props.detailHandler({name: props.product.name, id:props.product._id, description: props.product.description})
     }
     let handleContactSeller = (e) => {
-      let productId = props.dbid;
-      console.log(productId)
-      props.contactSeller(productId);
+      props.contactSeller(props.product._id);
     }
     let handleEditProduct = (e) => {
-      props.edit({name: props.name, id:props.dbid, description: props.description});
+      props.edit({product: props.product});
     }
     let handleDeleteProduct = (e) => {
-      let productId = props.dbid;
-      props.delete(props.image,productId);
+        props.delete(props.product.imageUrl,props.product._id);
     }
     let handleSaveProduct = (e) => {
-      let productId = props.dbid;
-      props.save(productId);
+      props.save(props.product._id);
     }
 
     return (
       <Card className={classes.card}>
-        <CardActionArea>
-          {props.image ?
+        {/* <CardActionArea> */}
+          {props.product.imageUrl ?
          (<CardMedia
           className={classes.media}
-          image={props.image}
-          title="Contemplative Reptile"
+          image={props.product.imageUrl}
         />) : 
         (<CardMedia
         className={classes.media}
         image='http://saveabandonedbabies.org/wp-content/uploads/2015/08/default.png'
-        title="Contemplative Reptile"
       />)}
           <CardContent className={classes.content}>
           <Typography className={classes.title} color="textSecondary" gutterBottom>
-         {props.name}
+         {props.product.name}
         </Typography>
             <Typography gutterBottom component="p">
-              ${props.price}
+              ${props.product.price}
             </Typography>
             {props.isOwner ? 
             (<div className={classes.actionIcons}>
@@ -116,7 +110,7 @@
               </ButtonBase>
             </div>)}
           </CardContent>
-        </CardActionArea>
+        {/* </CardActionArea> */}
         {!props.isOwner &&
         <CardActions>
           <Button size="small" className={classes.actionText} color="primary" onClick={e => handleDetail(e)}>

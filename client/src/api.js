@@ -137,6 +137,11 @@ export default {
     return savedProd;
 
   },
+  async editProduct(product){
+    let editedProd = await service.post('/product/edit',{product});
+    return editedProd;
+
+  },
   async getProducts(user){
     let products = await service.get(`/product/${user}/all`);
     return products;

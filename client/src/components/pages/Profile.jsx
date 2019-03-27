@@ -1,9 +1,7 @@
 import React,{Component} from 'react';
-// import ReactDOM from 'react-dom';
-import { Link } from 'react-router-dom';
-import { Route, Switch } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
+
 import Avatar from '@material-ui/core/Avatar';
 import Grid from '@material-ui/core/Grid';
 import Tabs from '@material-ui/core/Tabs';
@@ -13,6 +11,7 @@ import PhoneIcon from '@material-ui/icons/Phone';
 // import PersonPinIcon from '@material-ui/icons/PersonPin';
 import Paper from '@material-ui/core/Paper';
 import Icon from '@material-ui/core/Icon';
+
 import Products from './Products';
 import Contact from './Contact';
 
@@ -66,6 +65,12 @@ const styles = theme => ({
     flexGrow: 1,
     maxWidth: 500,
     // borderRadius: '25px'
+  },
+  messages:{
+    display:'flex',
+    flexDirection:'column',
+    justifyContent:'center',
+    alignItems:'center',
   }
 });
 
@@ -162,11 +167,23 @@ class Profile extends Component {
     }
   }
 
+  updateProducts = async () => {
+    let user = {...this.state.user};
+    
+    let data = await api.getProducts(user.username);
+    if(data.data.error){
+      this.setState(state=> ({error:data.data.error}))
+    }
+    let products = data.data.products;
+    user.products = products;
+
+    this.setState(currentState => ({user}))
+  }
+
   render() {
     const { value } = this.state;
     const { classes } = this.props;
-    return (
-      this.state.user.username && (
+    return (this.state.user.username && (
       <div className={classNames(classes.root ,classes.margin)}>
       
             <div className={classNames(classes.header)}>
@@ -195,23 +212,24 @@ class Profile extends Component {
               textColor="primary"
               centered={true}
             >
-              <Tab icon={<Link to={`/profile/${this.state.user.username}/products`}><Icon>shopping_cart</Icon></Link>} />
-              <Tab icon={<Link to={`/profile/${this.state.user.username}/contact`}><PhoneIcon/></Link>} />
+              <Tab icon={<Icon>shopping_cart</Icon>} />
+              <Tab icon={<PhoneIcon/>} />
               {/* <Tab icon={<FavoriteIcon />} />
               <Tab icon={<PersonPinIcon />} /> */}
             </Tabs>
           </Paper>
           <div className={classNames(classes.container)}>
-          {this.state.message && <h1>{this.state.message}</h1> }
-          {this.state.error && <h1>{this.state.error}</h1>}
-            <Switch>
-              <Route path={`/profile/${this.state.user.username}/contact`} exact render={(props) => <Contact {...props} phone={this.state.user.phone} email={this.state.user.email} address={this.state.user.address} name={`${this.state.user.firstName} ${this.state.user.lastName}`}/>} />
-              <Route path={`/profile/${this.state.user.username}/products`} exact render={(props)=> <Products {...props} products={this.state.user.products}  user={this.state.user.username} isOwner={this.state.isOwner} handleDelete={this.handleDeleteProduct}/>} />
-              {/* <Route render={() => <h2>404</h2>} /> */}
-            </Switch>
+          <div className={classNames(classes.messages)}>
+            {this.state.message && <div className="info">
+            {this.state.message}
+          </div>}
+            {this.state.error && <div className="info info-danger">
+            {this.state.error}
+          </div>}
           </div>
-            
-        
+          {this.state.value === 1 && <Contact phone={this.state.user.phone} email={this.state.user.email} address={this.state.user.address} name={`${this.state.user.firstName} ${this.state.user.lastName}`}/>}
+          {this.state.value === 0 && <Products  products={this.state.user.products}  user={this.state.user.username} isOwner={this.state.isOwner} handleDelete={this.handleDeleteProduct} handleUpdate={this.updateProducts}/>}
+          </div>
       </div>
       ) 
     );

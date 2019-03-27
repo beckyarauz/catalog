@@ -110,7 +110,6 @@ class AddProduct extends React.Component {
       description: '',
       imageUrl:'',
     },
-    user: null,
     productId: null,
     image: null,
     imageFS: null,
@@ -172,11 +171,6 @@ class AddProduct extends React.Component {
   handleClick = (e) => {
     e.preventDefault()
     this.state.valid ? this.submitToServer() : this.unvalidFormHandler();
-  }
-  getUser = async () => {
-    let info = await api.getUserInfo();
-    let user = info.data.user.username;
-    this.setState({ user });
   }
   deleteFile = async (e) => {
     e.preventDefault()
@@ -301,7 +295,7 @@ class AddProduct extends React.Component {
           {this.state.error && <div className="info info-danger">
           {this.state.error}
         </div>}
-          <Button variant="contained" component="span" className={classes.button} onClick={this.handleClick} disabled={!this.state.valid}>Update</Button>
+          <Button variant="contained" component="span" className={classes.button} onClick={this.handleClick} disabled={!this.state.valid}>Save Product</Button>
         </form>
         
       </div>

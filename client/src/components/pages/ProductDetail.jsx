@@ -40,12 +40,12 @@ class ProductDetail extends React.Component {
                 <CloseIcon />
               </IconButton>
         <DialogTitle id="simple-dialog-title">Product Details</DialogTitle>
-        <DialogTitle id="simple-dialog-title">{this.props.name}</DialogTitle>
+        <DialogTitle id="simple-dialog-title">{this.props.product.name}</DialogTitle>
         <DialogContent>
         <DialogContentText className={classes.details}>
           There should be specifications in this dialog.
           <br></br>
-          {this.props.dbid}
+          {this.props.product._id}
         </DialogContentText>
         </DialogContent>
         <DialogActions>

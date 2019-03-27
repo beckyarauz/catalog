@@ -4,9 +4,8 @@ import React, { Component } from 'react';
 import ProductCard from './ProductCard';
 import ProductDetail from './ProductDetail';
 import ProductEdit from './ProductEdit';
+import Confirmation from './Confirmation';
 import { withStyles } from '@material-ui/core/styles';
-import api from '../../api';
-
 
 const styles = {
   productContainer :{
@@ -26,12 +25,12 @@ class Products extends Component {
     this.state = {
       products:null,
       openDetail: false,
+      openEdit: false,
+      openConfirmation:false,
+      delete:{},
       message:'',
       error:'',
-      selectedProduct:{
-        name:'',
-        id:''
-      }     
+      selectedProduct:{}     
     }
   }
 
@@ -39,7 +38,7 @@ class Products extends Component {
     this.setState(currentState => ({products: this.props.products}))
   }
 
-    componentDidUpdate(prevProps,prevState){
+  componentDidUpdate(prevProps,prevState){
     if(prevState.message !== this.state.message){
       setTimeout(() =>{
         this.setState(currentState => ({message: null}))
@@ -61,7 +60,6 @@ class Products extends Component {
     }));
   };
   handleClickOpenEdit = (value) => {
-    // console.log(value)
     this.setState(currentState => ({
       openEdit: true,
       selectedProduct:value
@@ -70,12 +68,15 @@ class Products extends Component {
   handleClose = (value) => {
     this.setState({ openDetail: false});
   };
+  handleCloseConfirmation = (value) => {
+    this.setState({ openConfirmation: false});
+  };
   handleCloseEdit = (value) => {
     this.setState({ openEdit: false});
   };
 
   handleDeleteProduct = async (image,id) => {
-    await this.props.handleDelete(image,id);
+    this.setState(state => ({openConfirmation:true, delete:{image,id}}));
   }
   handleSaveProduct = async (id) => {
     console.log(id)
@@ -83,22 +84,35 @@ class Products extends Component {
   handleEditProduct = async (value) => {
     this.handleClickOpenEdit(value);
   }
+  handleConfirmation = async (value) => {
+    if(value){
+        await this.props.handleDelete(this.state.delete.image,this.state.delete.id);
+        this.props.handleUpdate();
+    } else {
+      console.log('you said no')
+    }
+  }
 
   render() {
     return (
       <div className={this.props.classes.productContainer}>
+      
+        <Confirmation
+          open={this.state.openConfirmation}
+          onClose={this.handleCloseConfirmation}
+          product={this.state.delete}
+          onConfirm={this.handleConfirmation}
+        />
         <ProductDetail
-          name={this.state.selectedProduct.name}
-          dbid={this.state.selectedProduct.id}
+          product={this.state.selectedProduct}
           open={this.state.openDetail}
           onClose={this.handleClose}
         />
         <ProductEdit
-          name={this.state.selectedProduct.name}
-          description={this.state.selectedProduct.description}
-          dbid={this.state.selectedProduct.id}
+          product={this.state.selectedProduct}
           open={this.state.openEdit}
           onClose={this.handleCloseEdit}
+          onSave={this.props.handleUpdate}
         />
         {this.state.message && <div className="info">
           {this.state.message}
@@ -109,20 +123,15 @@ class Products extends Component {
         {
           this.state.products && (this.state.products.length > 0) && this.state.products.map((product,idx) => {
             return <ProductCard 
-                      name={product.name} 
+                      product={product}
                       save={this.handleSaveProduct} 
                       edit={this.handleEditProduct} 
                       contactSeller={this.handleContactSeller}
                       delete={this.handleDeleteProduct} 
                       className={this.props.classes.card}
                       isOwner={this.props.isOwner}
-                      
-                      dbid={product._id}
-                      key={idx}
-                      description={product.description} 
-                      detailHandler={this.handleClickOpen}  
-                      image={product.imageUrl} 
-                      price={product.price}/>
+                      key={product._id}
+                      detailHandler={this.handleClickOpen}/>
                       
           })
         }

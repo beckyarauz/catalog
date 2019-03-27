@@ -23,13 +23,19 @@ import api from '../../api';
 
 const styles = theme => ({
   container:{
-    padding: '0 15px',
+    padding: '15px 15px',
+    display:'flex',
+    flexDirection:'column',
+    alignItems:'center',
+    height: '100%',
+    justifyContent: 'space-evenly',
   },
   appBar: {
     position: 'relative',
   },
   flex: {
     flex: 1,
+    fontSize: 14
   },
   root: {
     width:'100%',
@@ -67,10 +73,13 @@ const styles = theme => ({
   },
   button: {
     margin: theme.spacing.unit,
-    width: 200
   },
   textarea: {
     width: 200
+  },
+  imageActions:{
+    display:'flex',
+    justifyContent:'space-between'
   }
 });
 
@@ -111,6 +120,7 @@ class ProductEdit extends React.Component {
       price: '',
       description: '',
       imageUrl:'',
+      tags:'',
     },
     user: null,
     productId: null,
@@ -120,7 +130,6 @@ class ProductEdit extends React.Component {
     message: null,
     valid: false,
   }
-
 
   componentDidUpdate(prevProps,prevState){
     if(prevState.message !== this.state.message){
@@ -133,19 +142,26 @@ class ProductEdit extends React.Component {
         this.setState(currentState => ({error: null}))
       }, 3000)
     }
+    if(prevProps.product !== this.props.product){
+      this.setState(state => ({product: {...this.props.product.product}}))
+    }
   }
 
   handleClose = () => {
         this.props.onClose();
-      };
-  handleSave = () => {
-        this.props.onClose();
-      };
+  };
+  handleSave = async () => {
+    await this.submitToServer()
+    this.props.onSave();
+    this.props.onClose();
+  };
 
-      submitToServer = async () => {
+  submitToServer = async () => {
         if (this.state.imageFS !== undefined && this.state.imageFS !== null) {
           let product = { ...this.state.product };
           //delete current product image and then upload the new one api.deleteFromS3(this.state.product.imageUrl, 'product');
+          let deletedImage = await api.deleteFromS3(this.state.product.imageUrl, 'product');
+          console.log('deleted image data:', deletedImage)
           let url = await api.uploadToS3(this.state.image, 'product');
           product.imageUrl = url.data.Location;
     
@@ -156,25 +172,15 @@ class ProductEdit extends React.Component {
           return;
         }
         let data = await api.editProduct(this.state.product);
-        this.setState({productId:data.data.product._id,message:data.data.message})
-      }    
+        this.setState({productId:data.data.product._id,message:data.data.message});
+        return;
+  }    
 
   handleChange = name => event => {
     if (name !== 'image') {
       let product = { ...this.state.product }
       product[name] = event.target.value;
-      this.setState(currentState => ({ product }), () => {
-        let info, imageUrl;
-        ({ imageUrl,...info } = this.state.product)
-
-        let stateValues = Object.values(info);
-        this.setState({ valid: stateValues.every(isNotEmpty) });
-
-        function isNotEmpty(currentValue) {
-          //I'm not evaluating the logo yet but I still put the File validation
-          return currentValue.length > 0 || currentValue instanceof File;
-        }
-      })
+      this.setState(currentState => ({ product }))
     } else if(event.target.files.length > 0){
       var file = event.target.files[0];
       this.setState({ image: file });
@@ -185,22 +191,18 @@ class ProductEdit extends React.Component {
           imageFS: reader.result
         })
       }
-
       reader.readAsDataURL(file);
     }
-    this.props.onClose();
   };
-
-
+  
   render() {
     const { classes } = this.props;
     return (
         <Dialog
-          fullScreen
+          // fullScreen
           open={this.props.open}
           onClose={this.handleClose}
           TransitionComponent={Transition}
-          
         >
           <AppBar className={classes.appBar}>
             <Toolbar>
@@ -220,7 +222,7 @@ class ProductEdit extends React.Component {
             id="productName"
             label="Product Name"
             className={classNames(classes.margin, classes.textField)}
-            value={this.state.name}
+            value={this.state.product.name}
             onChange={this.handleChange('name')}
             margin="normal"
             variant="outlined"
@@ -228,7 +230,7 @@ class ProductEdit extends React.Component {
           <TextField
           className={classes.priceField}
           label="Price"
-          value={this.state.price}
+          value={this.state.product.price}
           onChange={this.handleChange('price')}
           id="formatted-numberformat-input"
           variant="outlined"
@@ -239,6 +241,7 @@ class ProductEdit extends React.Component {
         />
           
           {this.state.imageFS && <div className={classes.imageSection}><img src={this.state.imageFS} width="100" height="100" alt="product sample" /></div>}
+          {(this.state.product.imageUrl && !this.state.imageFS) && <div className={classes.imageSection}><img src={this.state.product.imageUrl} width="100" height="100" alt="product sample" /></div>}
           <input
             accept="image/*"
             className={classes.input}
@@ -248,18 +251,20 @@ class ProductEdit extends React.Component {
             type="file"
             onChange={this.handleChange('image')}
           />
-          <label htmlFor="raised-button-file">
-            <Button variant="contained" component="span" className={classes.button}>
-              Upload Image
-          </Button>
-          </label>
-          <Button variant="contained" component="span" className={classes.button} onClick={this.deleteFile}>Delete</Button>
+          <div className={classNames(classes.imageActions)}>
+            <label htmlFor="raised-button-file">
+              <Button variant="contained" component="span" className={classes.button}>
+                Select Image
+              </Button>
+            </label>
+            {/* <Button variant="contained" component="span" className={classes.button} color='secondary' onClick={this.deleteFile}>Delete</Button> */}
+          </div>
 
           <TextField
             id="productDescription"
             label="Product Description"
             className={classNames(classes.textarea, classes.textField)}
-            value={this.state.description}
+            value={this.state.product.description}
             onChange={this.handleChange('description')}
             margin="normal"
             variant="outlined"
