@@ -264,6 +264,7 @@ class Companies extends Component {
           ({image, icon } = this.backImage(company.category));
             return (
               <Paper className={classNames(classes.paper)} key={company._id}>
+              <ButtonBase className={classNames(classes.buttonBase)} onClick={e => this.handleClick(e,company.username)}>
                 <Grid className={classNames(classes.gridContainer)} container spacing={16} direction='column'>
                       <Paper className={classNames(classes.gridImage,classes.gridItem)} elevation={18} style={{ backgroundImage: `url(${image})`}}>
                         <Grid container style={{height:'100%', width:'100%',position:'relative'}}>
@@ -287,6 +288,7 @@ class Companies extends Component {
                             
                       </Paper>
                 </Grid>
+                </ButtonBase>
             </Paper>
             )
         }))}
