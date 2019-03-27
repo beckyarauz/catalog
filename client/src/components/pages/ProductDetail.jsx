@@ -22,6 +22,9 @@ const styles = {
   details :{
     textAlign: 'center',
     fontSize: 14
+  },
+  root:{
+    width:'80%'
   }
 };
 
@@ -35,17 +38,17 @@ class ProductDetail extends React.Component {
     const { classes, onClose, selectedValue, ...other } = this.props;
 
     return (
-      <Dialog onClose={this.handleClose} aria-labelledby="simple-dialog-title" {...other}>
+      <Dialog fullScreen onClose={this.handleClose} aria-labelledby="simple-dialog-title" {...other}>
       <IconButton color="inherit" onClick={this.handleClose} aria-label="Close">
                 <CloseIcon />
               </IconButton>
-        <DialogTitle id="simple-dialog-title">Product Details</DialogTitle>
         <DialogTitle id="simple-dialog-title">{this.props.product.name}</DialogTitle>
         <DialogContent>
         <DialogContentText className={classes.details}>
-          There should be specifications in this dialog.
-          <br></br>
-          {this.props.product._id}
+        <b>{this.props.product.price}</b>
+        <br></br>
+        {this.props.product.description}
+          
         </DialogContentText>
         </DialogContent>
         <DialogActions>

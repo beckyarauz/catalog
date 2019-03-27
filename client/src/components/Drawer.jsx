@@ -49,7 +49,7 @@ class NavDrawer extends React.Component {
     const sideList = (
       <div className={classes.list}>
       <List>
-        <Link to="/" className={classes.link} exact="true">
+        <Link to="/" className={classes.link}>
             <ListItem button>
               <ListItemIcon><Icon>home</Icon></ListItemIcon>
               <ListItemText primary='Home' />
@@ -61,7 +61,7 @@ class NavDrawer extends React.Component {
               <ListItemText primary='Profile' />
             </ListItem>
         </Link>}
-        <Link to="/browse" className={classes.link} exact>
+        <Link to="/browse" className={classes.link}>
             <ListItem button>
               <ListItemIcon><Icon>search</Icon></ListItemIcon>
               <ListItemText primary='Browse' />

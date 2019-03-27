@@ -18,6 +18,7 @@
       maxWidth: 150,
       minWidth: 150,
       marginBottom: '20px',
+      position:'relative'
     },
     media: {
       height: 150,
@@ -40,12 +41,12 @@
       color: '#32c3ff',
       fontSize:36
     },
-    bookmarkButton:{
+    actionBookmark:{
       width: 27,
       position: 'absolute',
-      right: 0,
+      right: '5px',
       top: 0,
-      padding:0,
+      // padding:2,
     },
     edit:{
       color: '#8bc34a',
@@ -61,7 +62,7 @@
   function ProductCard(props) {
     const { classes } = props;
     let handleDetail = (e) => {
-      props.detailHandler({name: props.product.name, id:props.product._id, description: props.product.description})
+      props.detailHandler({...props.product})
     }
     let handleContactSeller = (e) => {
       props.contactSeller(props.product._id);
@@ -104,7 +105,7 @@
                 <Icon>delete</Icon>
               </ButtonBase>
             </div>) :
-            (<div className={classes.actionIcons}>
+            (<div className={classes.actionBookmark}>
               <ButtonBase className={classes.bookmarkButton} onClick={handleSaveProduct}>
                 <Icon className={classes.bookmark}>bookmark</Icon>
               </ButtonBase>

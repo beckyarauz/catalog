@@ -81,6 +81,9 @@ class Products extends Component {
   handleSaveProduct = async (id) => {
     console.log(id)
   }
+  handleContactSeller = async (id) => {
+    console.log(id)
+  }
   handleEditProduct = async (value) => {
     this.handleClickOpenEdit(value);
   }
