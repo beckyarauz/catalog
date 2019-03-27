@@ -192,27 +192,25 @@ class Companies extends Component {
         }
       });
     }
-    if(this.props.search !== prevProps.search){
-      if(this.state.filteredCompanies.length > 0 && this.props.search.length <= 0){
+
+    let str = this.props.search;
+    if(str !== prevProps.search){
+      if(this.state.filteredCompanies.length > 0 && str.length <= 0){
         this.setState(state =>({ filteredCompanies:[] }));
         return;
       }
-      let str = this.props.search;
+      
       let reg = new RegExp('^'+str, 'i');
 
-      let filteredCompanies = this.state.companies.filter(company => (
+      let filteredCompanies = this.state.companies
+        .filter(company => (
         company.tags.length > 0
-        ));
-      
-        filteredCompanies = filteredCompanies.filter( company => (() => {
+        ))
+        .filter( company => (() => {
           return company.tags.filter(tag => reg.test(tag.text)).length > 0
         })())
 
-        console.log(filteredCompanies)
-
-      if(filteredCompanies.length > 0){
         this.setState(state =>({ filteredCompanies }));
-      } 
     }
   }
 
