@@ -2,7 +2,7 @@ import React from 'react';
 
 import Tag from './Tagify';
 
-import ReactMapGL, { NavigationControl, Popup, Marker } from 'react-map-gl';
+import ReactMapGL, { NavigationControl, Marker } from 'react-map-gl';
 
 import PropTypes from 'prop-types';
 import classNames from 'classnames';

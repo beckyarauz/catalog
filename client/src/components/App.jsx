@@ -7,8 +7,10 @@ import Icon from '@material-ui/core/Icon';
 import Chip from '@material-ui/core/Chip';
 import FaceIcon from '@material-ui/icons/Face';
 import Avatar from '@material-ui/core/Avatar';
+import Button from '@material-ui/core/Button';
 
-import NavBar from './NavBar';
+// import NavBar from './NavBar';
+import NavDrawer from './Drawer';
 
 import Home from './pages/Home';
 import AddProduct from './pages/AddProduct';
@@ -27,8 +29,15 @@ export default class App extends Component {
       isLogged: false,
       isSeller: false,
       user:null,
+      right: false,
     }
   }
+
+  toggleDrawer = (side, open) => () => {
+    this.setState({
+      [side]: open,
+    });
+  };
   componentWillMount(){
     (async (e) => {
       let response = await api.isLoggedIn();
@@ -68,22 +77,27 @@ export default class App extends Component {
       
         <div className="App-bod">
         <header className="App-header" style={{ textAlign: 'center' }}>
-          <Icon fontSize='large'>shopping_cart</Icon>
+        <Button  onClick={this.toggleDrawer('right', true)}><Icon style={{fontSize:'48px', color:'white'}}>view_headline</Icon></Button>
+        <div className="App-headerItems">
           <h1 className="App-title">Local Market</h1>
-          {this.state.user && (
-          // <Link to={`/profile/${this.props.user}`} >
-          <Link to={`/profile/${this.state.user}`} >
-          <Chip
-            avatar={
-              <Avatar>
-                <FaceIcon />
-              </Avatar>
-            }
-            label={this.state.user}
-            style={{marginBottom:'20px'}}
-          />
-          </Link>)}
-          <NavBar isLogged={this.state.isLogged} inLogout={this.handleLogout} user={this.state.user}/>
+          
+            {this.state.user && (
+            <Link to={`/profile/${this.state.user}`} >
+            <Chip
+              avatar={
+                <Avatar>
+                  <FaceIcon />
+                </Avatar>
+              }
+              label={this.state.user}
+              style={{marginTop:'10px'}}
+            />
+            </Link>)}
+            
+          </div>
+                    
+        <NavDrawer toggle={this.toggleDrawer} isLogged={this.state.isLogged} inLogout={this.handleLogout} user={this.state.user} open={this.state.right}/>
+        
         </header>
         <div className="App-content">
         <Switch>
