@@ -205,8 +205,10 @@ class Companies extends Component {
         ));
       
         filteredCompanies = filteredCompanies.filter( company => (() => {
-          return company.tags.filter(tag => reg.test(tag)).length > 0
+          return company.tags.filter(tag => reg.test(tag.text)).length > 0
         })())
+
+        console.log(filteredCompanies)
 
       if(filteredCompanies.length > 0){
         this.setState(state =>({ filteredCompanies }));
@@ -280,7 +282,7 @@ class Companies extends Component {
                             <div className={classes.tagsContainer}>
                             {company.tags && company.tags !== undefined && company.tags.length > 0 && (
                               company.tags.map((tag,idx) => (
-                              <Paper key={idx} className={classes.tags}>{tag}</Paper>
+                              <Paper key={idx} className={classes.tags}>{tag.text}</Paper>
                               ))
                             )}
                             </div>
