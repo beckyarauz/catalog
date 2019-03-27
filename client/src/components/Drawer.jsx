@@ -49,7 +49,7 @@ class NavDrawer extends React.Component {
     const sideList = (
       <div className={classes.list}>
       <List>
-        <Link to="/" className={classes.link} exact>
+        <Link to="/" className={classes.link} exact="true">
             <ListItem button>
               <ListItemIcon><Icon>home</Icon></ListItemIcon>
               <ListItemText primary='Home' />
@@ -70,7 +70,7 @@ class NavDrawer extends React.Component {
         <Divider />
         {!this.props.isLogged && <Link to="/login" className={classes.link}>
             <ListItem button>
-              <ListItemIcon><Icon>key</Icon></ListItemIcon>
+              <ListItemIcon><Icon>vpn_key</Icon></ListItemIcon>
               <ListItemText primary='Log In' />
             </ListItem>
         </Link>}

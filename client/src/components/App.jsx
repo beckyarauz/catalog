@@ -77,7 +77,7 @@ export default class App extends Component {
       
         <div className="App-bod">
         <header className="App-header" style={{ textAlign: 'center' }}>
-        <Button  onClick={this.toggleDrawer('right', true)}><Icon style={{fontSize:'48px', color:'white'}}>view_headline</Icon></Button>
+        <Button  onClick={this.toggleDrawer('right', true)}><Icon className='App-menu'>view_headline</Icon></Button>
         <div className="App-headerItems">
           <h1 className="App-title">Local Market</h1>
           
