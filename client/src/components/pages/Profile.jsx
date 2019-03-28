@@ -104,6 +104,7 @@ class Profile extends Component {
 
   getUser = async (username) => {
     let info = await api.getUserInfo(username);
+    console.log(info)
     let user = info.data.user;
     let isOwner = info.data.isOwner;
     this.setState(currentState => ({user,isOwner}))

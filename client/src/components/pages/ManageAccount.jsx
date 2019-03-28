@@ -119,17 +119,27 @@ class ManageAccount extends React.Component {
   }
 
   isNotEmpty = (currentValue) => {
-    return currentValue instanceof Object || currentValue.length > 0 || currentValue instanceof File;
+    return currentValue && (currentValue instanceof Object || currentValue.length > 0 || currentValue instanceof File);
   }
 
   componentWillMount() {
-
-    
     (async () => {
       try {
         let user = await this.getUser(this.props.user);
-        let password, info;
-        ({ password, ...info } = user);
+        let { username, email, phone, logoUrl, about, address, category, company, firstName, lastName } = user;
+
+        let info = {
+          username,
+          email,
+          phone,
+          logoUrl,
+          about,
+          address,
+          category,
+          company,
+          firstName,
+          lastName,
+        }
 
         let stateValues = Object.values(info);
 
@@ -183,30 +193,48 @@ class ManageAccount extends React.Component {
 
     this.setState({ user })
   }
+  validateFields = () => {
+    let { username, email, phone, about, address, category, company, firstName, lastName, } = this.state.user;
+    let image = this.state.image !== null ? this.state.image : this.state.user.logoUrl;
+
+    let info = {
+      username,
+      email,
+      phone,
+      about,
+      address,
+      category,
+      company,
+      firstName,
+      lastName,
+      image,
+    }
+    let stateValues = Object.values(info);
+
+    this.setState({ valid: stateValues.every(this.isNotEmpty) });
+  }
 
   handleChange = name => event => {
-    let info, password, logoUrl, geolocation;
     if (name !== 'logo') {
       if (name === 'tags') {
         let user = { ...this.state.user };
-        let tags = event;
+        let tags = [...event];
 
-        user.tags.push(tags);
-        
+        user.tags = tags;
+
         this.setState({ user })
         return;
       }
       var user = { ...this.state.user }
       user[name] = event.target.value;
       this.setState(currentState => ({ user }), () => {
-        ({ password, logoUrl, geolocation, ...info } = this.state.user)
-
-        let stateValues = Object.values(info);
-        this.setState({ valid: stateValues.every(this.isNotEmpty) });
+        this.validateFields();
       });
     } else if (event.target.files.length > 0) {
       var file = event.target.files[0];
-      this.setState({ image: file });
+      this.setState(state => ({ image: file }), () => {
+        this.validateFields();
+      });
       var reader = new FileReader();
       const scope = this;
       reader.onload = function () {
@@ -230,7 +258,10 @@ class ManageAccount extends React.Component {
       user.logoUrl = url.data.Location;
 
       this.setState(currentState => ({ user }), async () => {
-        await api.updateUser(this.state.user);
+        let data = await api.updateUser(this.state.user);
+        if (data.data.message) {
+          this.setState(state => ({ message: data.data.message }))
+        }
       });
       return;
     }
@@ -377,7 +408,7 @@ class ManageAccount extends React.Component {
             </FormControl>
             <h3>Location</h3>
             <p>Move the pointer to set your bussiness location</p>
-            <ReactMapGL
+            {/* <ReactMapGL
               {...this.state.viewport}
               mapStyle="mapbox://styles/beckyarauz/cjtisim0s272e1fubskpzz1om"
               mapboxApiAccessToken={TOKEN}
@@ -390,7 +421,7 @@ class ManageAccount extends React.Component {
               {this.state.user.geolocation.longitude && <Marker latitude={this.state.user.geolocation.latitude} longitude={this.state.user.geolocation.longitude} offsetLeft={-20} offsetTop={-10} draggable={true} onDragEnd={e => this.handleMarkerDrag(e)}>
                 <div ><Icon>location_on</Icon></div>
               </Marker>}
-            </ReactMapGL>
+            </ReactMapGL> */}
             <h2>Company Info</h2>
             {
               (this.state.user.logoUrl &&

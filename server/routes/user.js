@@ -25,6 +25,7 @@ router.get('/info', async (request, res) => {
       _id: request.user._id
     }).select('username about phone email category logoUrl firstName lastName company address geolocation tags bookmarks').populate('bookmarks')
     
+    
     res.status(200).json({
       user: dbUser,
       isOwner
@@ -78,12 +79,18 @@ router.get('/profile/:user', async (request, res) => {
     .populate('bookmarks','name price seller description imageUrl')
     .populate('products','name price seller description imageUrl')
     .select('username about phone email category logoUrl firstName lastName company address geolocation tags bookmarks')
-
+    
+    let message = null;
+    console.log(dbUser.products.length)
+    if(dbUser.products.length === 0){
+      message = `There are no products to be displayed`;
+    }
     // console.log(dbUser)
     let isOwner = request.user && request.user.username === username;
     res.status(200).json({
       user: dbUser,
-      isOwner
+      isOwner,
+      message
     })
   } catch (e) {
     console.log(e.message);
