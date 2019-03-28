@@ -253,6 +253,9 @@ class Companies extends Component {
       }, 2000)
     }
   }
+  componentWillUnmount(){
+    this.mounted = false;
+  }
   render() {
     const { classes } = this.props;
 

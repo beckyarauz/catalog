@@ -191,19 +191,27 @@ class Browse extends Component {
       error: null,
       spacing: '16',
       selectedCategory:null,
-      searchInput:''
+      searchInput:'',
+      mounted: false,
+
     }
   }
 
   handleChange = (event, value) => {
     if(this.state.searchInput.length > 0){
-      this.setState(state => ({searchInput: ''}))
+      // if(this.state.mounted){
+        this.setState(state => ({searchInput: ''}))
+      // }
     }
+    // if(this.state.mounted){
     this.setState({ selectedCategory: value });
+    // }
   };
   handleSearchChange = (e) => {
     let value = e.target.value;
+    // if(this.state.mounted){
     this.setState(state => ({searchInput: value}))
+    // }
   }
 
   handleCardClick = (username) => {
@@ -214,8 +222,8 @@ class Browse extends Component {
     const { spacing } = this.state;
     const { classes } = this.props;
     return (
-      // this.state.loaded && (
-      <div className={classNames(classes.root ,classes.margin)}>
+      // this.state.mounted ? 
+      (<div className={classNames(classes.root ,classes.margin)}>
       <TextField
               id="search"
               label="Search Bussines by tags"
@@ -270,8 +278,8 @@ class Browse extends Component {
         </Grid>
         
         <Companies category={this.state.selectedCategory} search={this.state.searchInput} handleCardClick={this.handleCardClick}/>
-      </div>
-      // ) 
+      </div>) 
+      // : <h1>Loading</h1>
     );
   }
 }
