@@ -10,8 +10,6 @@
   import Typography from '@material-ui/core/Typography';
   import Icon from '@material-ui/core/Icon';
   import ButtonBase from '@material-ui/core/ButtonBase';
-
- 
   
   const styles = {
     card: {
@@ -38,7 +36,7 @@
       width: 27
     },
     bookmark:{
-      color: '#32c3ff',
+      color: 'rgba(255,255,255,0.5)',
       fontSize:36
     },
     actionBookmark:{
@@ -107,7 +105,7 @@
             </div>) :
             (<div className={classes.actionBookmark}>
               <ButtonBase className={classes.bookmarkButton} onClick={handleSaveProduct}>
-                <Icon className={classes.bookmark}>bookmark</Icon>
+                <Icon className={classes.bookmark}>bookmark_border</Icon>
               </ButtonBase>
             </div>)}
           </CardContent>

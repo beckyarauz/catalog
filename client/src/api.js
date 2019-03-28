@@ -106,14 +106,18 @@ export default {
     }
   },
   async updateUser(stateInfo){
-    return await service.post(`/user/update`,{stateInfo})
+    return await service.post(`/user/info/update`,{stateInfo})
   },
   async deleteProduct(id){
     let data = await service.post('/product/delete',{product:id})
     return data;
   },
-  async bookmarkProduct(id){
-    let data = await service.post('/product/bookmark',{product:id})
+  async addBookmark(id){
+    let data = await service.post('/user/bookmark/add',{product:id})
+    return {...data};
+  },
+  async removeBookmark(id){
+    let data = await service.post('/user/bookmark/remove',{product:id})
     return {...data};
   },
   async addProduct(product){

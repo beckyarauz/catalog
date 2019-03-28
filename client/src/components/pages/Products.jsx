@@ -7,6 +7,8 @@ import ProductEdit from './ProductEdit';
 import Confirmation from './Confirmation';
 import { withStyles } from '@material-ui/core/styles';
 
+import api from '../../api';
+
 const styles = {
   productContainer :{
     marginTop:'20px',
@@ -79,7 +81,15 @@ class Products extends Component {
     this.setState(state => ({openConfirmation:true, delete:{image,id}}));
   }
   handleSaveProduct = async (id) => {
-    console.log(id)
+    console.log(id);
+    (async ()=>{
+      
+      let data = await api.addBookmark(id);
+      let message = data.data.message;
+      if(message){
+        this.setState({message})
+      }
+    })()
   }
   handleContactSeller = async (id) => {
     console.log(id)

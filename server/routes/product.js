@@ -41,33 +41,6 @@ router.post('/edit', async (request, res) => {
     res.status(400).json({message:'Bad Request'})
   }
 });
-router.post('/bookmark', async (request, res) => {
-  try{
-    let productId = request.body.product;
-    console.log('request product',product)
-    let userId =  req.user._id;
-    let bdUser = await User.findOne({_id: userId})
-    if(!dbUser.bookmarks){
-      console.log('bookmarks does not exist')
-      // User.findOneAndUpdate({_id: userId},{bookmarks:[]})
-    }
-
-
-
-    // User.findOneAndUpdate({_id: userId},{bookmarks})
-    // let dbProduct = await Product.findOneAndUpdate({_id: request.body.product._id},{
-    //   name: request.body.product.name,
-    //   description: request.body.product.description,
-    //   price: request.body.product.price,
-    //   tags: request.body.product.tags,
-    //   imageUrl: request.body.product.imageUrl,
-    // })
-    res.status(200).json({message:'Product Updated',product: dbProduct})
-  } catch(e){
-    console.log(e.message);
-    res.status(400).json({message:'Bad Request'})
-  }
-});
 
 router.post('/add', async (request, res) => {
   try{

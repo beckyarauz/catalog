@@ -12,6 +12,10 @@ const productSchema = new Schema({
   price: Number,
   imageUrl: String,
   tags: [String],
+  bookmarkedBy: {
+    type: [Schema.Types.ObjectId],
+    ref: 'User'
+  },
 }, {
     timestamps: {
       createdAt: 'created_at',
