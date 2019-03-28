@@ -21,6 +21,10 @@ const userSchema = new Schema({
   email:String,
   tags:[Object],
   phone:String,
+  bookmarks:{
+    type: [Schema.Types.ObjectId],
+    ref: 'Product'
+  },
   about:String,
   logoUrl:String,
   userPictureUrl: String,

@@ -112,25 +112,9 @@ export default {
     let data = await service.post('/product/delete',{product:id})
     return data;
   },
-
-  getSecret() {
-    return service
-      .get('/secret')
-      .then(res => res.data)
-      .catch(errHandler)
-  },
-
-  addPicture(file) {
-    const formData = new FormData()
-    formData.append("picture", file)
-    return service
-      .post('/endpoint/to/add/a/picture', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      })
-      .then(res => res.data)
-      .catch(errHandler)
+  async bookmarkProduct(id){
+    let data = await service.post('/product/bookmark',{product:id})
+    return {...data};
   },
   async addProduct(product){
     let savedProd = await service.post('/product/add',{product});

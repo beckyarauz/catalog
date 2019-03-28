@@ -88,44 +88,6 @@ class Companies extends Component {
   handleClick = (e, username) => {
     this.props.handleCardClick(username);
   }
-  }
-
-  companyCard = (classes, array) => {
-    return (
-      array.map((company, idx) => {
-        let { image, icon } = this.backImage(company.category);
-        return (
-          <Paper className={classNames(classes.paper)} key={company._id}>
-            <ButtonBase className={classNames(classes.buttonBase)} onClick={e => this.handleClick(e, company.username)}>
-              <Grid className={classNames(classes.gridContainer)} container spacing={16} direction='column'>
-                <Paper className={classNames(classes.gridImage, classes.gridItem)} elevation={18} style={{ backgroundImage: `url(${image})` }}>
-                  <Grid container style={{ height: '100%', width: '100%', position: 'relative' }}>
-                    <Avatar style={{ backgroundColor: 'rgba(0,0,0,0.5)', position: 'absolute', bottom: 5, right: 5 }}><Icon>{icon}</Icon></Avatar>
-                  </Grid>
-                </Paper>
-                <Paper className={classNames(classes.gridContent, classes.gridItem)} elevation={4}>
-                  <Typography variant="h5" component="h3">
-                    {company.company}
-                  </Typography>
-                  <Typography component="p">
-                    {company.about}
-                  </Typography>
-                  <div className={classes.tagsContainer}>
-                    {company.tags && company.tags !== undefined && company.tags.length > 0 && (
-                      company.tags.map((tag, idx) => (
-                        <Paper key={idx} className={classes.tags}>{tag.text}</Paper>
-                      ))
-                    )}
-                  </div>
-                </Paper>
-              </Grid>
-            </ButtonBase>
-          </Paper>
-        )
-      })
-    )
-  }
-
   backImage = (category) => {
     let image;
     let icon;
@@ -168,6 +130,44 @@ class Companies extends Component {
       icon
     }
   }
+
+  companyCard = (classes, array) => {
+    return (
+      array.map((company, idx) => {
+        let { image, icon } = this.backImage(company.category);
+        return (
+          <Paper className={classNames(classes.paper)} key={company._id}>
+            <ButtonBase className={classNames(classes.buttonBase)} onClick={e => this.handleClick(e, company.username)}>
+              <Grid className={classNames(classes.gridContainer)} container spacing={16} direction='column'>
+                <Paper className={classNames(classes.gridImage, classes.gridItem)} elevation={18} style={{ backgroundImage: `url(${image})` }}>
+                  <Grid container style={{ height: '100%', width: '100%', position: 'relative' }}>
+                    <Avatar style={{ backgroundColor: 'rgba(0,0,0,0.5)', position: 'absolute', bottom: 5, right: 5 }}><Icon>{icon}</Icon></Avatar>
+                  </Grid>
+                </Paper>
+                <Paper className={classNames(classes.gridContent, classes.gridItem)} elevation={4}>
+                  <Typography variant="h5" component="h3">
+                    {company.company}
+                  </Typography>
+                  <Typography component="p">
+                    {company.about}
+                  </Typography>
+                  <div className={classes.tagsContainer}>
+                    {company.tags && company.tags !== undefined && company.tags.length > 0 && (
+                      company.tags.map((tag, idx) => (
+                        <Paper key={idx} className={classes.tags}>{tag.text}</Paper>
+                      ))
+                    )}
+                  </div>
+                </Paper>
+              </Grid>
+            </ButtonBase>
+          </Paper>
+        )
+      })
+    )
+  }
+
+
   componentDidMount() {
     if (this.props.category && this.props.category !== null) {
       this.setState({ category: this.props.category })

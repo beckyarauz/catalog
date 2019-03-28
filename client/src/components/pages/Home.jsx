@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import api from '../../api';
 export default class Home extends Component {
   constructor(props) {
     super(props);
@@ -15,6 +16,7 @@ export default class Home extends Component {
     };
   }
   componentWillMount(){
+    api.bookmarkProduct('5c9b7cee12a4f11b2c95f148');
     if ("geolocation" in navigator) {
       let self = this;
       navigator.geolocation.getCurrentPosition(function(position) {
