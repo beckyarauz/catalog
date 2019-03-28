@@ -50,6 +50,7 @@ router.post('/info/update', async (request, response) => {
         email: updatedUser.email,
         about: updatedUser.about,
         logoUrl: updatedUser.logoUrl,
+        userPictureUrl: updatedUser.userPictureUrl,
         category: updatedUser.category,
         geolocation: updatedUser.geolocation,
         tags: updatedUser.tags
@@ -70,7 +71,7 @@ router.post('/info/update', async (request, response) => {
     console.log(e.message)
   }
 });
-router.get('/profile/:user', async (request, res) => {
+router.get('/profile/company/:user', async (request, res) => {
   let username = request.params.user;
   try {
     let dbUser = await User.findOne({
@@ -78,18 +79,46 @@ router.get('/profile/:user', async (request, res) => {
     })
     .populate('bookmarks','name price seller description imageUrl')
     .populate('products','name price seller description imageUrl')
-    .select('username about phone email category logoUrl firstName lastName company address geolocation tags bookmarks')
+    .select('username about phone email category logoUrl userPictureUrl firstName lastName company address geolocation tags bookmarks role')
     
     let message = null;
-    console.log(dbUser.products.length)
     if(dbUser.products.length === 0){
       message = `There are no products to be displayed`;
     }
     // console.log(dbUser)
     let isOwner = request.user && request.user.username === username;
+    let isSeller = dbUser.role === 'SELLER';
     res.status(200).json({
       user: dbUser,
       isOwner,
+      isSeller,
+      message
+    })
+  } catch (e) {
+    console.log(e.message);
+  }
+});
+router.get('/profile/user/:user', async (request, res) => {
+  let username = request.params.user;
+  try {
+    let dbUser = await User.findOne({
+      username
+    })
+    .populate('bookmarks','name price seller description imageUrl')
+    .populate('products','name price seller description imageUrl')
+    .select('username about phone email category logoUrl userPictureUrl firstName lastName company address geolocation tags bookmarks role')
+    
+    let message = null;
+    if(dbUser.products.length === 0){
+      message = `There are no products to be displayed`;
+    }
+    // console.log(dbUser)
+    let isOwner = request.user && request.user.username === username;
+    let isSeller = dbUser.role === 'SELLER';
+    res.status(200).json({
+      user: dbUser,
+      isOwner,
+      isSeller,
       message
     })
   } catch (e) {

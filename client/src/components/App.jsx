@@ -15,6 +15,7 @@ import NavDrawer from './Drawer';
 import Home from './pages/Home';
 import AddProduct from './pages/AddProduct';
 import Profile from './pages/Profile';
+import ProfileBuyer from './pages/ProfileBuyer';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import ManageAccount from './pages/ManageAccount';
@@ -45,7 +46,7 @@ export default class App extends Component {
         this.setState({
                     user: response.user,
                     isLogged: response.isLogged,
-                    isSeller: response.seller
+                    isSeller: response.isSeller
                   })
       }
         
@@ -96,7 +97,7 @@ export default class App extends Component {
             
           </div>
                     
-        <NavDrawer toggle={this.toggleDrawer} isLogged={this.state.isLogged} inLogout={this.handleLogout} user={this.state.user} open={this.state.right}/>
+        <NavDrawer toggle={this.toggleDrawer} isLogged={this.state.isLogged} inLogout={this.handleLogout} user={this.state.user} isSeller={this.state.isSeller} open={this.state.right}/>
         
         </header>
         <div className="App-content">
@@ -117,19 +118,28 @@ export default class App extends Component {
             <Redirect to={`/profile/${this.state.user}`}/> :
              <Login {...props} inLogin={this.handleLogin}/>
              } />
-          <Route path={`/profile/${this.state.user}`} render={(props) => (
-                !this.state.isLogged ? (
+          {this.state.isSeller && <Route path={`/profile/${this.state.user}`} render={(props) => (
+                (!this.state.isLogged && this.state.isSeller) ? (
                   <Redirect to="/"/>
                 ) : (
-                  <Profile {...props}/>
+                  <Profile {...props} isSeller={this.state.isSeller}/>
                 )
-              )} />
-          <Route path={`/profile/:user`} render={(props) => (<Profile {...props}/>)} />
+              )} />}
+          {!this.state.isSeller && <Route path={`/profile/${this.state.user}`} render={(props) => (
+                (!this.state.isLogged) ? (
+                  <Redirect to="/"/>
+                ) : (
+                  <ProfileBuyer {...props} />
+                )
+              )} />}
+          <Route path={`/profile/company/:user`} render={(props) => (<Profile {...props}/>)} />
+          <Route path={`/profile/user/:user`} render={(props) => (<ProfileBuyer {...props}/>)} />
+
           <Route path="/manage-account" render={(props) => (
                 !this.state.isLogged ? (
                   <Redirect to="/login"/>
                 ) : (
-                  <ManageAccount {...props} user={this.state.user}/>
+                  <ManageAccount {...props} user={this.state.user} isSeller={this.state.isSeller}/>
                 )
               )} />
           {/* <Route path="/manage-account" component={ManageAccount} /> */}

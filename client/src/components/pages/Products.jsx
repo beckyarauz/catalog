@@ -6,7 +6,7 @@ import ProductEdit from './ProductEdit';
 import Confirmation from './Confirmation';
 
 import { withStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
+
 
 const styles = theme => ({
   productContainer :{
@@ -20,11 +20,6 @@ const styles = theme => ({
   },
   button: {
     margin: theme.spacing.unit,
-  },
-  buttonContainer: {
-    width:'100%',
-    display:'flex',
-    justifyContent:'center'
   }
 })
   
@@ -151,14 +146,7 @@ class Products extends Component {
                       
           })
         }
-        {(this.state.products === null || this.state.products.length === 0) && this.props.isOwner && 
-        (
-          <div className={classes.buttonContainer}>
-            <Button variant="contained" color="primary" className={classes.button}>
-              Add a Product
-            </Button>
-          </div>
-      ) }
+       
       </div>
     );
   }

@@ -101,7 +101,7 @@
             <Typography gutterBottom component="p">
               ${props.product.price}
             </Typography>
-            {(props.isOwner && !props.bookmarked) ? 
+            { (props.isOwner && !props.bookmarked) ? 
             (<div className={classes.actionIcons}>
               <ButtonBase className={classes.edit} onClick={handleEditProduct}>
                 <Icon>create</Icon>
@@ -112,7 +112,7 @@
             </div>) :
             (<div className={classes.actionBookmark}>
               <ButtonBase className={classes.bookmarkButton} onClick={handleBookmark}>
-                <Avatar className={classes.bookmark}><Icon>bookmark_border</Icon></Avatar>
+                <Avatar className={classes.bookmark}><Icon>{!props.bookmarked ? 'bookmark_border': 'clear'}</Icon></Avatar>
               </ButtonBase>
             </div>)}
           </CardContent>

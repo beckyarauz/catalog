@@ -54,10 +54,15 @@ const styles = theme => ({
   },
   textarea: {
     width: 200
+  },
+  flexContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
   }
 });
 
-// const TOKEN = 'pk.eyJ1IjoiYmVja3lhcmF1eiIsImEiOiJjanRpb2kyc3cwbjVkM3luem42bW5ydHJ2In0.4-rDIk32b4VkF9Y_g9oLqg';
 const TOKEN = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
 
 function TextMaskCustom(props) {
@@ -96,6 +101,7 @@ class ManageAccount extends React.Component {
       category: "food",
       about: "Write What's your coumpany about, the inspiration and what makes you unique! :D",
       logoUrl: "",
+      userPictureUrl: "",
       geolocation: {
         latitude: 0,
         longitude: 0
@@ -126,12 +132,13 @@ class ManageAccount extends React.Component {
     (async () => {
       try {
         let user = await this.getUser(this.props.user);
-        let { username, email, phone, logoUrl, about, address, category, company, firstName, lastName } = user;
+        let { username, email, phone, logoUrl,userPictureUrl, about, address, category, company, firstName, lastName } = user;
 
         let info = {
           username,
           email,
           phone,
+          userPictureUrl,
           logoUrl,
           about,
           address,
@@ -145,7 +152,7 @@ class ManageAccount extends React.Component {
 
         this.setState(prevState => ({ user, valid: stateValues.every(this.isNotEmpty) }), () => {
 
-          if ((this.state.user.geolocation.latitude === 0 && this.state.user.geolocation.longitude === 0) && "geolocation" in navigator) {
+          if ((!this.state.user.geolocation && "geolocation" in navigator) || (this.state.user.geolocation.latitude === 0 && this.state.user.geolocation.longitude === 0 && "geolocation" in navigator)) {
             let self = this;
             navigator.geolocation.getCurrentPosition(function (position) {
               let user = { ...self.state.user };
@@ -195,27 +202,40 @@ class ManageAccount extends React.Component {
   }
   validateFields = () => {
     let { username, email, phone, about, address, category, company, firstName, lastName, } = this.state.user;
-    let image = this.state.image !== null ? this.state.image : this.state.user.logoUrl;
+    let info, image;
 
-    let info = {
-      username,
-      email,
-      phone,
-      about,
-      address,
-      category,
-      company,
-      firstName,
-      lastName,
-      image,
+    if (this.props.isSeller) {
+      image = this.state.image !== null ? this.state.image : this.state.user.logoUrl;
+
+      info = {
+        username,
+        email,
+        phone,
+        about,
+        address,
+        category,
+        company,
+        firstName,
+        lastName,
+        image,
+      }
+    } else {
+      // image = this.state.image !== null ? this.state.image : this.state.user.userPictureUrl;
+
+      info = {
+        username,
+        email,
+      }
     }
+
+
     let stateValues = Object.values(info);
 
     this.setState({ valid: stateValues.every(this.isNotEmpty) });
   }
 
   handleChange = name => event => {
-    if (name !== 'logo') {
+    if (name !== 'image') {
       if (name === 'tags') {
         let user = { ...this.state.user };
         let tags = [...event];
@@ -253,10 +273,18 @@ class ManageAccount extends React.Component {
 
   submitToServer = async () => {
     if (this.state.imageFS !== undefined && this.state.imageFS !== null) {
+      
       let user = { ...this.state.user };
-      let url = await api.uploadToS3(this.state.image, 'logo');
-      user.logoUrl = url.data.Location;
-
+      let url;
+      if(this.props.isSeller){
+        url = await api.uploadToS3(this.state.image, 'logo');
+        await this.deleteFile();
+        user.logoUrl = url.data.Location;
+      } else {
+        url = await api.uploadToS3(this.state.image, 'userPicture');
+        await this.deleteFile();
+        user.userPictureUrl = url.data.Location;
+      }
       this.setState(currentState => ({ user }), async () => {
         let data = await api.updateUser(this.state.user);
         if (data.data.message) {
@@ -284,14 +312,17 @@ class ManageAccount extends React.Component {
     return user;
   }
   deleteFile = async (e) => {
-    e.preventDefault()
-    let deleted = await api.deleteFromS3(this.state.user.logoUrl, 'logo');
-    if (deleted.data.message) {
-      this.setState(currentState => ({ message: deleted.data.message, imageFS: null, image: null }))
+    // e.preventDefault()
+    let deleted,user;
+    user = { ...this.state.user };
+    if(this.props.isSeller){
+      user.logoUrl = "";
+      deleted = await api.deleteFromS3(this.state.user.logoUrl, 'logo');
+    } else {
+      user.userPictureUrl = "";
+      deleted = await api.deleteFromS3(this.state.user.userPictureUrl, 'userPicture');
     }
-    let user = { ...this.state.user };
-    user.logoUrl = "";
-    this.setState({ user })
+    
   }
 
   handleViewportChange = (viewport) => {
@@ -326,7 +357,38 @@ class ManageAccount extends React.Component {
         <h2>Account</h2>
         {this.state.user.username && (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+            {!this.props.isSeller &&
+              <div className={classes.flexContainer}>
+                {
+                  (this.state.user.userPictureUrl &&
+                    <div className={classes.imageSection}><img src={this.state.user.userPictureUrl} width="100" height="100" alt="User from DB" /></div>)
+                  || (this.state.imageFS &&
+                    <div className={classes.imageSection}><img src={this.state.imageFS} width="100" height="100" alt="User" /></div>)
+                }
 
+                {this.state.message && <div className="info info-danger">
+                  {this.state.message}
+                </div>}
+                <br></br>
+                <input
+                  accept="image/*"
+                  className={classes.input}
+                  style={{ display: 'none' }}
+                  id="raised-button-file"
+                  multiple
+                  type="file"
+                  onChange={this.handleChange('image')}
+                />
+                <label htmlFor="raised-button-file">
+                  <Button variant="contained" component="span" className={classes.button}>
+                    Upload Picture
+            </Button>
+                </label>
+                <Button variant="contained" component="span" className={classes.button} onClick={this.deleteFile}>Delete</Button>
+
+              </div>
+
+            }
             <TextField
               id="username"
               label="Username"
@@ -339,7 +401,7 @@ class ManageAccount extends React.Component {
                 startAdornment: <InputAdornment position="start">@</InputAdornment>,
               }}
             />
-            <TextField
+            {this.props.isSeller && <TextField
               id="company"
               label="Company Name"
               className={classNames(classes.margin, classes.textField)}
@@ -347,7 +409,7 @@ class ManageAccount extends React.Component {
               onChange={this.handleChange('company')}
               margin="normal"
               variant="outlined"
-            />
+            />}
             <TextField
               id="outlined-adornment-password"
               className={classNames(classes.margin, classes.textField)}
@@ -406,96 +468,100 @@ class ManageAccount extends React.Component {
                 inputComponent={TextMaskCustom}
               />
             </FormControl>
-            <h3>Location</h3>
-            <p>Move the pointer to set your bussiness location</p>
-            {/* <ReactMapGL
-              {...this.state.viewport}
-              mapStyle="mapbox://styles/beckyarauz/cjtisim0s272e1fubskpzz1om"
-              mapboxApiAccessToken={TOKEN}
-              onViewportChange={(viewport) => this.handleViewportChange(viewport)}
+            {this.props.isSeller && (
+              <div className={classes.flexContainer}>
+                <h3>Location</h3>
+                <p>Move the pointer to set your bussiness location</p>
+                {/* <ReactMapGL
+                {...this.state.viewport}
+                mapStyle="mapbox://styles/beckyarauz/cjtisim0s272e1fubskpzz1om"
+                mapboxApiAccessToken={TOKEN}
+                onViewportChange={(viewport) => this.handleViewportChange(viewport)}
 
-            >
-              <div style={{ position: 'absolute' }}>
-                <NavigationControl onViewportChange={(viewport) => this.setState({ viewport })} />
-              </div>
-              {this.state.user.geolocation.longitude && <Marker latitude={this.state.user.geolocation.latitude} longitude={this.state.user.geolocation.longitude} offsetLeft={-20} offsetTop={-10} draggable={true} onDragEnd={e => this.handleMarkerDrag(e)}>
-                <div ><Icon>location_on</Icon></div>
-              </Marker>}
-            </ReactMapGL> */}
-            <h2>Company Info</h2>
-            {
-              (this.state.user.logoUrl &&
-                <div className={classes.imageSection}><img src={this.state.user.logoUrl} width="100" height="100" alt="logo from db" /></div>)
-              || (this.state.imageFS &&
-                <div className={classes.imageSection}><img src={this.state.imageFS} width="100" height="100" alt="company logo" /></div>)
-            }
-
-            {this.state.message && <div className="info info-danger">
-              {this.state.message}
-            </div>}
-            <br></br>
-            <input
-              accept="image/*"
-              className={classes.input}
-              style={{ display: 'none' }}
-              id="raised-button-file"
-              multiple
-              type="file"
-              onChange={this.handleChange('logo')}
-            />
-            <label htmlFor="raised-button-file">
-              <Button variant="contained" component="span" className={classes.button}>
-                Upload Logo
-          </Button>
-            </label>
-            <Button variant="contained" component="span" className={classes.button} onClick={this.deleteFile}>Delete</Button>
-
-            <FormControl variant="outlined" className={classes.formControl}>
-              <InputLabel
-                ref={ref => {
-                  this.InputLabelRef = ref;
-                }}
-                htmlFor="outlined-category-simple"
               >
-                Category
-          </InputLabel>
-              <Select
-                value={this.state.user.category}
-                onChange={this.handleChange('category')}
-                input={
-                  <OutlinedInput
-                    labelWidth={this.state.labelWidth}
-                    name="category"
-                    id="outlined-category-simple"
-                  />
+                <div style={{ position: 'absolute' }}>
+                  <NavigationControl onViewportChange={(viewport) => this.setState({ viewport })} />
+                </div>
+                {this.state.user.geolocation.longitude && <Marker latitude={this.state.user.geolocation.latitude} longitude={this.state.user.geolocation.longitude} offsetLeft={-20} offsetTop={-10} draggable={true} onDragEnd={e => this.handleMarkerDrag(e)}>
+                  <div ><Icon>location_on</Icon></div>
+                </Marker>}
+              </ReactMapGL>  */}
+                <h2>Company Info</h2>
+                {
+                  (this.state.user.logoUrl &&
+                    <div className={classes.imageSection}><img src={this.state.user.logoUrl} width="100" height="100" alt="logo from db" /></div>)
+                  || (this.state.imageFS &&
+                    <div className={classes.imageSection}><img src={this.state.imageFS} width="100" height="100" alt="company logo" /></div>)
                 }
-              >
-                <MenuItem value="">
-                  <em>None</em>
-                </MenuItem>
-                <MenuItem value={'beauty'}>Beauty</MenuItem>
-                <MenuItem value={'clothing'}>Clothing</MenuItem>
-                <MenuItem value={'food'}>Food</MenuItem>
-              </Select>
-            </FormControl>
 
-            <Tag handleTagChange={this.handleChange('tags')} initialTags={this.state.user.tags} />
+                {this.state.message && <div className="info info-danger">
+                  {this.state.message}
+                </div>}
+                <br></br>
+                <input
+                  accept="image/*"
+                  className={classes.input}
+                  style={{ display: 'none' }}
+                  id="raised-button-file"
+                  multiple
+                  type="file"
+                  onChange={this.handleChange('image')}
+                />
+                <label htmlFor="raised-button-file">
+                  <Button variant="contained" component="span" className={classes.button}>
+                    Upload Logo
+          </Button>
+                </label>
+                <Button variant="contained" component="span" className={classes.button} onClick={this.deleteFile}>Delete</Button>
 
-            <TextField
-              id="standard-description"
-              label="About"
-              className={classNames(classes.textarea, classes.textField)}
-              value={this.state.user.about}
-              onChange={this.handleChange('about')}
-              margin="normal"
-              variant="outlined"
-              multiline={true}
-              rows={4}
-              rowsMax={4}
-              InputProps={{
-                startAdornment: <InputAdornment position="start"> </InputAdornment>,
-              }}
-            />
+                <FormControl variant="outlined" className={classes.formControl}>
+                  <InputLabel
+                    ref={ref => {
+                      this.InputLabelRef = ref;
+                    }}
+                    htmlFor="outlined-category-simple"
+                  >
+                    Category
+          </InputLabel>
+                  <Select
+                    value={this.state.user.category}
+                    onChange={this.handleChange('category')}
+                    input={
+                      <OutlinedInput
+                        labelWidth={this.state.labelWidth}
+                        name="category"
+                        id="outlined-category-simple"
+                      />
+                    }
+                  >
+                    <MenuItem value="">
+                      <em>None</em>
+                    </MenuItem>
+                    <MenuItem value={'beauty'}>Beauty</MenuItem>
+                    <MenuItem value={'clothing'}>Clothing</MenuItem>
+                    <MenuItem value={'food'}>Food</MenuItem>
+                  </Select>
+                </FormControl>
+
+                <Tag handleTagChange={this.handleChange('tags')} initialTags={this.state.user.tags} />
+
+                <TextField
+                  id="standard-description"
+                  label="About"
+                  className={classNames(classes.textarea, classes.textField)}
+                  value={this.state.user.about}
+                  onChange={this.handleChange('about')}
+                  margin="normal"
+                  variant="outlined"
+                  multiline={true}
+                  rows={4}
+                  rowsMax={4}
+                  InputProps={{
+                    startAdornment: <InputAdornment position="start"> </InputAdornment>,
+                  }}
+                />
+              </div>
+            )}
             <Button variant="contained" component="span" className={classes.button} onClick={this.handleClick} disabled={!this.state.valid}>Update</Button>
           </div>
         )}

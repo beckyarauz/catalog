@@ -49,6 +49,8 @@ export default {
       .get('/logout')
   },
   async deleteFromS3(url,type){
+    console.log(url)
+    console.log(type)
     return await service
     .post(`/upload/delete`,{url,type:type})
   },
@@ -71,29 +73,21 @@ export default {
       // console.log('uploadtoS3 async', data);
       return data;
   },
-  // async getUserInfo(){
-  //   // console.log('getUserInfocalled')
-  //   let data = await service.get('/user/info');
-  //   // console.log('api getUserInfo response:', data)
-  //   return data;
-  // },
   async getUserInfo(username){
-    let data = await service.get(`/user/profile/${username}`);
+    let data = await service.get(`/user/profile/user/${username}`);
+    return data;
+  },
+  async getCompanyInfo(username){
+    let data = await service.get(`/user/profile/company/${username}`);
     return data;
   },
   async getCompanies(category,location,dist){
-    // console.log('get Companies! location:',location)
-    // console.log('get Companies! category:',category)
     if(category !== 'all' && category !== null){
-      // console.log('category is set')
       let data = await service.get(`/company/${category}/all`);
-      // console.log('get Companies! data:',data)
       return data;
     } else {
       if(location && location !== undefined){
-        // console.log('getting server')
       let data = await service.get(`/company/all?latitude=${location.latitude}&longitude=${location.longitude}`);
-      // console.log('get Companies with location! data:',data)
       return data;
       } else {
         return {data: {

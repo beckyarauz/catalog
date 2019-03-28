@@ -207,7 +207,7 @@ class Browse extends Component {
   }
 
   handleCardClick = (username) => {
-    this.props.history.push(`/profile/${username}`)
+    this.props.history.push(`/profile/company/${username}`)
   }
 
   render() {

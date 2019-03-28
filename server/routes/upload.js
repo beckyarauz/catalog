@@ -42,26 +42,19 @@ const deleteFile = (name) => {
 };
 
 router.post('/delete', async (req,res)=>{
-  // console.log('pic url',req.body.url);
   let url = req.body.url;
   let type = req.body.type;
+  console.log(url)
   if(type === 'logo'){
-    // console.log('index', url.search('logo'));
-    // console.log('substring', url.substring(url.search('logo')))
-
     await deleteFile(url.substring(url.search('logo')));
-
-  
     await User.findOneAndUpdate({username: req.user.username},{ logoUrl: ''})
   } else if (type === 'product'){
-    // console.log('hey')
-    // console.log(url.substring(url.search('productImage')))
     await deleteFile(url.substring(url.search('productImage')));
-    // await Product.findOneAndUpdate()
+  } else if(type === 'userPicture'){
+    console.log('userPicture')
+    await deleteFile(url.substring(url.search('userPicture')));
+    await User.findOneAndUpdate({username: req.user.username},{ userPictureUrl: ''})
   }
-  
-  
-
   res.status(200).json({message:'Image deleted'})
 
 })
@@ -103,6 +96,12 @@ router.post('/', (request, response) => {
             .toBuffer();
 
             fileName = `logos/${request.user.username}/${timestamp}-${name}-${request.user.username}`;
+          } else if(myType === 'userPicture'){
+            sharpBuffer = await sharp(path)
+            .resize(100, 100)
+            .toBuffer();
+
+            fileName = `userPictures/${request.user.username}/${timestamp}-${name}-${request.user.username}`;
           }
 
           data = await uploadFile(sharpBuffer, fileName, type);

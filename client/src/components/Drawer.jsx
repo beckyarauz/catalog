@@ -81,13 +81,13 @@ class NavDrawer extends React.Component {
             </ListItem>
         </Link>}
         <Divider />
-        {this.props.isLogged && <Link to="/manage-account" className={classes.link}>
+        {this.props.isLogged  && <Link to="/manage-account" className={classes.link}>
             <ListItem button>
               <ListItemIcon><Icon>build</Icon></ListItemIcon>
               <ListItemText primary='Manage Account' />
             </ListItem>
         </Link>}
-        {this.props.isLogged && <Link to="/add-product" className={classes.link}>
+        {this.props.isLogged && this.props.isSeller && <Link to="/add-product" className={classes.link}>
             <ListItem button>
               <ListItemIcon><Icon>store</Icon></ListItemIcon>
               <ListItemText primary='Add a Product' />

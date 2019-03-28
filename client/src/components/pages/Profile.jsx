@@ -103,17 +103,23 @@ class Profile extends Component {
   mounted = false;
 
   getUser = async (username) => {
-    let info = await api.getUserInfo(username);
-    console.log(info)
+    let info = await api.getCompanyInfo(username);
     let user = info.data.user;
     let isOwner = info.data.isOwner;
     this.setState(currentState => ({user,isOwner}))
   }
 
   componentWillMount(){
-      let path = this.props.location.pathname;
-      let link = path.substring(path.search('profile'));
-      let user = link.substring(link.search('/')+1);
+    let path,link,user;
+      path = this.props.location.pathname;
+      if(path.includes('company')){
+        link = path.substring(path.search('company'));
+        user = link.substring(link.search('/')+1);
+      } else {
+        link = path.substring(path.search('profile'));
+        user = link.substring(link.search('/')+1);
+      }
+
     (async ()=>{
       await this.getUser(user);
     })()
@@ -219,7 +225,7 @@ class Profile extends Component {
   }
   updateBookmarks = async () => {
     if(this.mounted){
-      let info = await api.getUserInfo(this.state.user.username);
+      let info = await api.getCompanyInfo(this.state.user.username);
       let user = info.data.user;
 
       let bookmarks = [...user.bookmarks];

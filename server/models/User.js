@@ -11,7 +11,7 @@ const userSchema = new Schema({
   role: {
     type: String,
     enum: ['ADMIN','BUYER','SELLER'],
-    default:'SELLER'
+    default:'BUYER'
   },
   firstName: String,
   geolocation: Object,
