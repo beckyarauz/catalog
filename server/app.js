@@ -41,15 +41,6 @@ app.use(cookieParser())
 // Example: http://localhost:5000/favicon.ico => Display "~/client/build/favicon.ico"
 app.use(express.static(path.join(__dirname, '../client/build')))
 
-
-// Enable authentication using session + passport
-// app.use(session({
-//   secret: process.env.SESSION_SECRET || 'irongenerator',
-//   resave: true,
-//   saveUninitialized: true,
-//   store: new MongoStore({ mongooseConnection: mongoose.connection })
-// }))
-// require('./passport')(app)
 const LocalStrategy = require('passport-local').Strategy;
 const flash = require('connect-flash');
 
@@ -59,7 +50,6 @@ app.use(session({
   saveUninitialized: true,
   store: new MongoStore({ mongooseConnection: mongoose.connection })
 }))
-// require('./passport')(app)
 
 passport.serializeUser((user, cb) => {
   cb(null, user._id);
@@ -79,7 +69,7 @@ passport.use(new LocalStrategy(
     User.findOne({ username: username }, function (err, user) {
       if (err) { return done(err); }
       if (!user) {
-        console.log('user does not exits')
+        console.log('user does not exist')
         return done(null, false, { message: 'Incorrect username.' });
       }
       if (!bcrypt.compareSync(password, user.password)) {
@@ -96,9 +86,7 @@ app.use(passport.session());
 
 app.use('/api', require('./routes/index'))
 app.use('/api', require('./routes/auth'))
-app.use('/api/countries', require('./routes/countries'))
 app.use('/api/upload', require('./routes/upload'))
-app.use('/api/update', require('./routes/update'))
 app.use('/api/user', require('./routes/user'))
 app.use('/api/product', require('./routes/product'))
 app.use('/api/company', require('./routes/company'))

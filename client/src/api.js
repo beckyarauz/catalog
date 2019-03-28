@@ -106,7 +106,7 @@ export default {
     }
   },
   async updateUser(stateInfo){
-    return await service.post(`/update/company-info`,{stateInfo})
+    return await service.post(`/user/update`,{stateInfo})
   },
   async deleteProduct(id){
     let data = await service.post('/product/delete',{product:id})

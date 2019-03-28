@@ -1,4 +1,4 @@
-import React,{Component} from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
@@ -16,7 +16,7 @@ const styles = theme => ({
   root: {
     display: 'flex',
     flexWrap: 'wrap',
-    flexDirection:'column',
+    flexDirection: 'column',
   },
   margin: {
     margin: theme.spacing.unit,
@@ -24,45 +24,50 @@ const styles = theme => ({
   },
   paper: {
     height: 200,
-    display:'flex',
+    display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    fontSize:14,
-    padding:15,
+    fontSize: 14,
+    padding: 15,
     borderRadius: '15px 50px 30px',
-    marginTop:20,
+    marginTop: 20,
   },
-  buttonBase :{
-    flex:1,
-    height:'100%',
-    display:'block',
+  buttonBase: {
+    flex: 1,
+    height: '100%',
+    display: 'block',
   },
-  gridContainer:{
-    height:'100%',
-    borderRadius:4,
+  gridContainer: {
+    height: '100%',
+    borderRadius: 4,
   },
-  gridImage:{
+  gridImage: {
     borderRadius: '15px 50px 0px 0px',
-    flex:1,
+    flex: 1,
   },
-  gridContent:{
+  gridContent: {
     borderRadius: '0px 0px 30px 50px'
   },
-  gridItem:{
-    flex:1,
-    display:'flex',
+  gridItem: {
+    flex: 1,
+    display: 'flex',
     flexDirection: 'column',
-    alignItems:'center',
-    justifyContent:'center'
+    alignItems: 'center',
+    justifyContent: 'center'
   },
-  tagsContainer:{
+  tagsContainer: {
     width: '100%',
     display: 'flex',
-    justifyContent: 'space-evenly',
-    padding: '10px 0 10px 0'
+    justifyContent: 'center',
+    padding: '10px 0 10px 0',
+    flexWrap: 'wrap',
+    maxWidth: '230px',
+    maxHeight: '80px',
   },
   tags: {
-    padding:'5px',
+    padding: '5px',
+    margin: '0 3px',
+    marginBottom: '3px',
     backgroundColor: '#eee',
   }
 });
@@ -71,22 +76,60 @@ class Companies extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      category:'all',
-      companies:null,
+      category: 'all',
+      companies: null,
       message: null,
       error: null,
       spacing: '16',
-      location:null,
-      filteredCompanies:[]
+      location: null,
+      filteredCompanies: []
     }
   }
+  handleClick = (e, username) => {
+    this.props.handleCardClick(username);
+  }
+  }
 
-  backImage = (category) =>{
-    // console.log('backimage',category)
-    let myCat;
+  companyCard = (classes, array) => {
+    return (
+      array.map((company, idx) => {
+        let { image, icon } = this.backImage(company.category);
+        return (
+          <Paper className={classNames(classes.paper)} key={company._id}>
+            <ButtonBase className={classNames(classes.buttonBase)} onClick={e => this.handleClick(e, company.username)}>
+              <Grid className={classNames(classes.gridContainer)} container spacing={16} direction='column'>
+                <Paper className={classNames(classes.gridImage, classes.gridItem)} elevation={18} style={{ backgroundImage: `url(${image})` }}>
+                  <Grid container style={{ height: '100%', width: '100%', position: 'relative' }}>
+                    <Avatar style={{ backgroundColor: 'rgba(0,0,0,0.5)', position: 'absolute', bottom: 5, right: 5 }}><Icon>{icon}</Icon></Avatar>
+                  </Grid>
+                </Paper>
+                <Paper className={classNames(classes.gridContent, classes.gridItem)} elevation={4}>
+                  <Typography variant="h5" component="h3">
+                    {company.company}
+                  </Typography>
+                  <Typography component="p">
+                    {company.about}
+                  </Typography>
+                  <div className={classes.tagsContainer}>
+                    {company.tags && company.tags !== undefined && company.tags.length > 0 && (
+                      company.tags.map((tag, idx) => (
+                        <Paper key={idx} className={classes.tags}>{tag.text}</Paper>
+                      ))
+                    )}
+                  </div>
+                </Paper>
+              </Grid>
+            </ButtonBase>
+          </Paper>
+        )
+      })
+    )
+  }
+
+  backImage = (category) => {
     let image;
     let icon;
-    switch(category){
+    switch (category) {
       case 'beauty':
         image = 'https://img3.stockfresh.com/files/b/balabolka/m/95/5959516_stock-vector-seamless-pattern-with-beauty-and-cosmetics-background.jpg';
         icon = 'spa';
@@ -116,182 +159,101 @@ class Companies extends Component {
         icon = 'wc'
         break;
       default:
-      image = 'http://www.freechristmaswallpapers.net/web/wallpapers/thumbnail/Christmas-Tree-Nature_lg.jpeg';
-      icon = 'redeem'
+        image = 'http://www.freechristmaswallpapers.net/web/wallpapers/thumbnail/Christmas-Tree-Nature_lg.jpeg';
+        icon = 'redeem'
     }
 
-    myCat = {
+    return {
       image,
       icon
     }
-    return myCat;
   }
-  componentDidMount(){
-    // console.log('mounted Companies')
-    if(this.props.category && this.props.category !== null){
-      this.setState({category:this.props.category})
-    } 
+  componentDidMount() {
+    if (this.props.category && this.props.category !== null) {
+      this.setState({ category: this.props.category })
+    }
     if ("geolocation" in navigator) {
       let self = this;
       navigator.geolocation.getCurrentPosition(async function (position) {
-        
-        let currentLocation = {
-          latitude: position.coords.latitude,
-          longitude:position.coords.longitude
-        }
-        let data = await api.getCompanies(self.state.category,currentLocation);
-        self.setState(prevState =>( { currentLocation, companies:data.data.companies,message:'Companies near you' }));
-        setTimeout(() =>{
-          self.setState({message:null})
-        }, 2000)
+        let { latitude,longitude } = position.coords
+        let currentLocation = { latitude,longitude }
+        let data = await api.getCompanies(self.state.category, currentLocation);
+        self.setState(prevState => ({ currentLocation, companies: data.data.companies, message: 'Companies near you' }));
       })
     } else {
       console.log('geolocation not available');
-      this.setState({message:'Turn location on to browse companies near you'});
+      this.setState({ message: 'Turn location on to browse companies near you' });
     }
-    
-  }
-  componentDidUpdate(prevProps, prevState, snapshot){
-    if(prevProps.category !== this.props.category ){
-      this.setState(currentState => ({category:this.props.category}), ()=>{
-        if(this.state.filteredCompanies.length > 0){
-          this.setState(state => ({filteredCompanies:[]}))
-        }
-        let category = this.state.category;
-        let location = this.state.currentLocation;
-        if(category && category !== 'all' && category !== null){
-          category = category.toLowerCase();
-          (async ()=>{
-            // console.log('async',category);
-            let data = await api.getCompanies(category,location);
 
-            if(data.data.companies && data.data.companies !== undefined && data.data.companies !== null && data.data.companies.length > 0){
-              let companies = data.data.companies;
-              this.setState(currentState => ({companies}))
-            } else if(data.statusText){
-              if(this.state.companies !== null){
-                this.setState(currentState => ({companies:null}))
+  }
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (prevProps.category !== this.props.category) {
+      this.setState(currentState => ({ category: this.props.category }), () => {
+        if (this.state.filteredCompanies.length > 0) {
+          this.setState(state => ({ filteredCompanies: [] }));
+        }
+        let {category, currentLocation:location} = this.state;
+
+        if (category && category !== 'all' && category !== null) {
+          category = category.toLowerCase();
+          (async () => {
+            // console.log('async',category);
+            let data = await api.getCompanies(category, location);
+            let companies = data.data.companies;
+            let message = data.data.message;
+            let error = data.statusText;
+
+            if (companies && companies !== undefined && companies !== null && companies.length > 0) {
+              this.setState(currentState => ({ companies }));
+            } else if (error) {
+              if (this.state.companies !== null) {
+                this.setState(currentState => ({ companies: null }));
               }
-              let error = data.statusText;
-              this.setState(currentState => ({error}))
-              setTimeout(() =>{
-                this.setState(currentState => ({error: null}))
-              }, 2000)
-            } else if(data.data.message){
-              if(this.state.companies !== null){
-                this.setState(currentState => ({companies:null}))
+              this.setState(currentState => ({ error }));
+            } else if (message) {
+              if (this.state.companies !== null) {
+                this.setState(currentState => ({ companies: null }));
               }
-              let message = data.data.message;
-              this.setState(currentState => ({message}))
-              setTimeout(() =>{
-                this.setState(currentState => ({message: null}))
-              }, 3000)
+              this.setState(currentState => ({ message }));
             }
-            
           })()
         }
       });
     }
-
-    let str = this.props.search;
-    if(str !== prevProps.search){
-      if(this.state.filteredCompanies.length > 0 && str.length <= 0){
-        this.setState(state =>({ filteredCompanies:[] }));
+    
+    if (this.props.search !== prevProps.search) {
+      let str = this.props.search;
+      let reg = new RegExp('^' + str, 'i');
+      if (this.state.filteredCompanies.length > 0 && str.length <= 0) {
+        this.setState(state => ({ filteredCompanies: [] }));
         return;
       }
-      
-      let reg = new RegExp('^'+str, 'i');
+      let filteredCompanies = [...this.state.companies]
+        .filter(company => (company.tags.length > 0) && (company.tags.filter(tag => reg.test(tag.text)).length > 0))
 
-      let filteredCompanies = this.state.companies
-        .filter(company => (
-        company.tags.length > 0
-        ))
-        .filter( company => (() => {
-          return company.tags.filter(tag => reg.test(tag.text)).length > 0
-        })())
+      this.setState(state => ({ filteredCompanies }));
+    }
 
-        this.setState(state =>({ filteredCompanies }));
+    if(prevState.message !== this.state.message){
+      setTimeout(() => {
+        this.setState(currentState => ({ message: null }))
+      }, 3000)
+    }
+    if(prevState.error !== this.state.error){
+      setTimeout(() => {
+        this.setState(currentState => ({ error: null }))
+      }, 2000)
     }
   }
-
-  handleClick = (e,username) => {
-    this.props.handleCardClick(username);
-  }
-
   render() {
     const { classes } = this.props;
 
     return (
-      <div className={classNames(classes.root ,classes.margin)}>
-        {this.state.error && <div className="info info-danger" style={{textAlign:'center'}}>{this.state.error}</div>}
-        {this.state.message && <div className="info alert-info" style={{textAlign:'center'}}>{this.state.message}</div>}
-        {(this.props.search.length <= 0) && this.state.companies && (this.state.companies.length > 0) && (this.state.companies.map((company,idx) => {
-          let image, icon;
-          ({image, icon } = this.backImage(company.category));
-            return (
-              
-                <Paper className={classNames(classes.paper)} key={company._id}>
-                  <ButtonBase className={classNames(classes.buttonBase)} onClick={e => this.handleClick(e,company.username)}>
-                    <Grid className={classNames(classes.gridContainer)} container spacing={16} direction='column'>
-                      <Paper className={classNames(classes.gridImage,classes.gridItem)} elevation={18} style={{ backgroundImage: `url(${image})`}}>
-                        <Grid container style={{height:'100%', width:'100%',position:'relative'}}>
-                          <Avatar style={{backgroundColor:'rgba(0,0,0,0.5)', position:'absolute',bottom:5,right:5}}><Icon>{icon}</Icon></Avatar>
-                        </Grid>
-                      </Paper>
-                      <Paper className={classNames(classes.gridContent,classes.gridItem)} elevation={4}>
-                          <Typography variant="h5" component="h3">
-                          {company.company}
-                          </Typography>
-                          <Typography component="p">
-                            {company.about}
-                          </Typography>
-                          <div className={classes.tagsContainer}>
-                          {company.tags && company.tags !== undefined && company.tags.length > 0 && (
-                            company.tags.map((tag,idx) => (
-                            <Paper key={idx} className={classes.tags}>{tag.text}</Paper>
-                            ))
-                          )}
-                          </div>
-                      </Paper>
-                    </Grid>
-                  </ButtonBase>
-                </Paper>
-              
-            )
-        }))}
-        {(this.props.search.length > 0) && (this.state.filteredCompanies.length > 0) && (this.state.filteredCompanies.map((company,idx) => {
-          let image, icon;
-          ({image, icon } = this.backImage(company.category));
-            return (
-              <Paper className={classNames(classes.paper)} key={company._id}>
-              <ButtonBase className={classNames(classes.buttonBase)} onClick={e => this.handleClick(e,company.username)}>
-                <Grid className={classNames(classes.gridContainer)} container spacing={16} direction='column'>
-                      <Paper className={classNames(classes.gridImage,classes.gridItem)} elevation={18} style={{ backgroundImage: `url(${image})`}}>
-                        <Grid container style={{height:'100%', width:'100%',position:'relative'}}>
-                          <Avatar style={{backgroundColor:'rgba(0,0,0,0.5)', position:'absolute',bottom:5,right:5}}><Icon>{icon}</Icon></Avatar>
-                        </Grid>
-                      </Paper>
-                      <Paper className={classNames(classes.gridContent,classes.gridItem)} elevation={4}>
-                            <Typography variant="h5" component="h3">
-                              {company.company}
-                            </Typography>
-                            <Typography component="p">
-                              {company.about}
-                            </Typography>
-                            <div className={classes.tagsContainer}>
-                            {company.tags && company.tags !== undefined && company.tags.length > 0 && (
-                              company.tags.map((tag,idx) => (
-                              <Paper key={idx} className={classes.tags}>{tag.text}</Paper>
-                              ))
-                            )}
-                            </div>
-                            
-                      </Paper>
-                </Grid>
-                </ButtonBase>
-            </Paper>
-            )
-        }))}
+      <div className={classNames(classes.root, classes.margin)}>
+        {this.state.error && <div className="info info-danger" style={{ textAlign: 'center' }}>{this.state.error}</div>}
+        {this.state.message && <div className="info alert-info" style={{ textAlign: 'center' }}>{this.state.message}</div>}
+        {(this.props.search.length <= 0) && this.state.companies && (this.state.companies.length > 0) && this.companyCard(classes, this.state.companies)}
+        {(this.props.search.length > 0) && (this.state.filteredCompanies.length > 0) && this.companyCard(classes, this.state.filteredCompanies)}
       </div>
     );
   }

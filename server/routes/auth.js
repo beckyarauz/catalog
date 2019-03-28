@@ -5,88 +5,108 @@ const User = require("../models/User")
 const bcrypt = require('bcrypt');
 const bcryptSalt = 10;
 
-// Bcrypt to encrypt passwords
-// const bcrypt = require("bcrypt")
-// const bcryptSalt = 10
-
 router.post("/signup", async (req, res, next) => {
-  try{
+  try {
 
-    const { username, password} = req.body
+    const {
+      username,
+      password
+    } = req.body
     if (!username || !password) {
-      res.status(400).json({ message: "Indicate username and password" })
+      res.status(400).json({
+        message: "Indicate username and password"
+      })
       return
     }
 
-    let userDoc = await User.findOne({ username });
+    let userDoc = await User.findOne({
+      username
+    });
 
     if (userDoc !== null) {
-      res.status(409).json({ message: "The username already exists" })
+      res.status(409).json({
+        message: "The username already exists"
+      })
       return
     } else {
-      console.log('creating new user')
 
       const salt = bcrypt.genSaltSync(bcryptSalt)
       const hashPass = bcrypt.hashSync(password, salt)
-      const newUser = await User({ username, password: hashPass})
+      const newUser = await User({
+        username,
+        password: hashPass
+      })
 
       let savedUser = await newUser.save();
 
-      console.log(savedUser);
-      
-      passport.authenticate('local')(req,res,function(){
+      passport.authenticate('local')(req, res, function () {
 
-        res.status(200).json({message:"succesfully signed Up!", user: req.user})
+        res.status(200).json({
+          message: "succesfully signed Up!",
+          user: req.user
+        })
       })
     }
-      
-
-
-  } catch(e){
+  } catch (e) {
     console.log(e);
     next(e)
   }
 })
 // )
-router.post("/login",passport.authenticate('local',{ 
+router.post("/login", passport.authenticate('local', {
   successRedirect: '/login-success',
   failureRedirect: '/login-fail',
-  failureFlash: true 
+  failureFlash: true
 }))
 
-router.get('/login-success',(req,res)=>{
+router.get('/login-success', (req, res) => {
   // console.log('file: auth.js message:login success');
-  res.status(200).json({message:'You are logged in'})
+  res.status(200).json({
+    message: 'You are logged in'
+  })
 })
-router.get('/login-fail',(req,res)=>{
+router.get('/login-fail', (req, res) => {
   // console.log('file: auth.js message: login failed');
-  res.status(400).json({message:'You cant Log out'})
-  
-})
-router.get('/logout-success',(req,res)=>{
-  // console.log('file: auth.js message: user logged out');
-  res.status(200).json({message:'You logged out succesfully'})
+  res.status(400).json({
+    message: 'You cant Log out'
+  })
+
 })
 
 router.get('/logout', (req, res, next) => {
   // console.log('file: auth.js message:current session about to log out',req.session);
   req.session.destroy((err) => {
-    res.redirect('/logout-success');
+    res.status(200).json({
+      message: 'You logged out succesfully'
+    })
   });
 });
 router.get("/isLogged", (req, res) => {
-  if(req.user !== undefined && req.user !== null){
-    if(req.user.role === 'SELLER'){
-      res.status(200).json({message:'You are logged in',isLogged:true, isSeller:true,user:req.user.username})
+  if (req.user !== undefined && req.user !== null) {
+    if (req.user.role === 'SELLER') {
+      res.status(200).json({
+        message: 'You are logged in',
+        isLogged: true,
+        isSeller: true,
+        user: req.user.username
+      })
     } else {
-      res.status(200).json({message:'You are logged in',isLogged:true, isSeller:false,user:req.user.username})
+      res.status(200).json({
+        message: 'You are logged in',
+        isLogged: true,
+        isSeller: false,
+        user: req.user.username
+      })
     }
-    
+
   } else {
     console.log('file:auth.js GET/isLogged user not logged in')
-    res.status(200).json({message:'not logged in',isLogged:false})
+    res.status(200).json({
+      message: 'not logged in',
+      isLogged: false
+    })
   }
-  
+
 })
 
 module.exports = router

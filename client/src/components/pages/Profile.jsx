@@ -18,9 +18,6 @@ import Contact from './Contact';
 import api from '../../api';
 
 import { withStyles } from '@material-ui/core/styles';
-// import Button from '@material-ui/core/Button'
-
-// import api from '../../api';
 
 const styles = theme => ({
   root: {
@@ -45,12 +42,16 @@ const styles = theme => ({
     // backgroundColor: 'blue'
   },
   bigAvatar: {
-    margin: 10,
     width: 100,
     height: 100,
   },
   avatarContainer:{
     // backgroundColor:'green'
+    display:'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection:'column'
+    // textAlign:'center'
   },
   infoContainer:{
     // backgroundColor:'pink',

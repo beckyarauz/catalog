@@ -12,6 +12,8 @@ import TextField from '@material-ui/core/TextField';
 import InputAdornment from '@material-ui/core/InputAdornment';
 
 import allCategoryBG from '../../images/all-category.png';
+import beautyCategoryBG from '../../images/beauty-category.jpg';
+import foodCategoryBG from '../../images/food-category.jpg';
 
 import Companies from './Companies';
 
@@ -151,12 +153,12 @@ class Browse extends Component {
         },
         {
           name: 'Beauty',
-          image:'https://img3.stockfresh.com/files/b/balabolka/m/95/5959516_stock-vector-seamless-pattern-with-beauty-and-cosmetics-background.jpg',
+          image:beautyCategoryBG,
           icon:'spa'
         },
         {
           name: 'Food',
-          image:'https://i.pinimg.com/564x/f7/23/7c/f7237c933b705e9b4383b1d31e200d3c.jpg?b=t',
+          image:foodCategoryBG,
           icon:'restaurant'
         },
         {
@@ -194,6 +196,9 @@ class Browse extends Component {
   }
 
   handleChange = (event, value) => {
+    if(this.state.searchInput.length > 0){
+      this.setState(state => ({searchInput: ''}))
+    }
     this.setState({ selectedCategory: value });
   };
   handleSearchChange = (e) => {
