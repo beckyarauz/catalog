@@ -21,23 +21,14 @@ const userSchema = new Schema({
   email:String,
   tags:[Object],
   phone:String,
-  bookmarks:{
-    type: [Schema.Types.ObjectId],
-    ref: 'Product'
-  },
+  bookmarks:[{ type: Schema.Types.ObjectId, ref: 'Product' }],
   about:String,
   logoUrl:String,
   userPictureUrl: String,
   rating: Number,
   category:String,
-  clients:{
-    type: [Schema.Types.ObjectId],
-    ref: 'User'
-  },
-  products: {
-    type: [Schema.Types.ObjectId],
-    ref: 'Product'
-  },
+  clients:[{ type: Schema.Types.ObjectId, ref: 'User' }],
+  products: [{ type: Schema.Types.ObjectId, ref: 'Product' }],
   policy:String
 }, {
     timestamps: {

@@ -10,6 +10,7 @@
   import Typography from '@material-ui/core/Typography';
   import Icon from '@material-ui/core/Icon';
   import ButtonBase from '@material-ui/core/ButtonBase';
+  import Avatar from '@material-ui/core/Avatar';
   
   const styles = {
     card: {
@@ -36,14 +37,13 @@
       width: 27
     },
     bookmark:{
-      color: 'rgba(255,255,255,0.5)',
-      fontSize:36
+      color: 'rgba(255,255,255,1)',
+      backgroundColor:'rgba(224,224,224,0.7)'
     },
     actionBookmark:{
-      width: 27,
       position: 'absolute',
-      right: '5px',
-      top: 0,
+      right: '2px',
+      top: '2px',
       // padding:2,
     },
     edit:{
@@ -71,8 +71,15 @@
     let handleDeleteProduct = (e) => {
         props.delete(props.product.imageUrl,props.product._id);
     }
+
+    let handleBookmark = (e) =>{
+      props.bookmarked ? handleRemoveProduct() : handleSaveProduct();
+    }
     let handleSaveProduct = (e) => {
       props.save(props.product._id);
+    }
+    let handleRemoveProduct = (e) => {
+      props.remove(props.product._id);
     }
 
     return (
@@ -94,7 +101,7 @@
             <Typography gutterBottom component="p">
               ${props.product.price}
             </Typography>
-            {props.isOwner ? 
+            {(props.isOwner && !props.bookmarked) ? 
             (<div className={classes.actionIcons}>
               <ButtonBase className={classes.edit} onClick={handleEditProduct}>
                 <Icon>create</Icon>
@@ -104,13 +111,13 @@
               </ButtonBase>
             </div>) :
             (<div className={classes.actionBookmark}>
-              <ButtonBase className={classes.bookmarkButton} onClick={handleSaveProduct}>
-                <Icon className={classes.bookmark}>bookmark_border</Icon>
+              <ButtonBase className={classes.bookmarkButton} onClick={handleBookmark}>
+                <Avatar className={classes.bookmark}><Icon>bookmark_border</Icon></Avatar>
               </ButtonBase>
             </div>)}
           </CardContent>
         {/* </CardActionArea> */}
-        {!props.isOwner &&
+        {(!props.isOwner || props.bookmarked) &&
         <CardActions>
           <Button size="small" className={classes.actionText} color="primary" onClick={e => handleDetail(e)}>
             Details

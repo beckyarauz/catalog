@@ -23,7 +23,7 @@ router.get('/info', async (request, res) => {
   try {
     let dbUser = await User.findOne({
       _id: request.user._id
-    }).select('username about phone email category logoUrl firstName lastName company address geolocation tags')
+    }).select('username about phone email category logoUrl firstName lastName company address geolocation tags bookmarks').populate('bookmarks')
     
     res.status(200).json({
       user: dbUser,
@@ -74,7 +74,12 @@ router.get('/profile/:user', async (request, res) => {
   try {
     let dbUser = await User.findOne({
       username
-    }).select('username about phone email category logoUrl firstName lastName company address geolocation tags bookmarks')
+    })
+    .populate('bookmarks','name price seller description imageUrl')
+    .populate('products')
+    .select('username about phone email category logoUrl firstName lastName company address geolocation tags bookmarks')
+
+    // console.log(dbUser)
     let isOwner = request.user && request.user.username === username;
     res.status(200).json({
       user: dbUser,

@@ -25,7 +25,7 @@ class Confirmation extends React.Component {
           aria-describedby="alert-dialog-slide-description"
         >
           <DialogTitle id="alert-dialog-slide-title">
-            {"Are you sure you want to delete this item?"}
+            {this.props.message}
           </DialogTitle>
           <DialogActions>
             <Button onClick={(e) => this.handleClick(false)} color="primary">

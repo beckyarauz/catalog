@@ -5,14 +5,14 @@ const service = axios.create({
   withCredentials: true
 })
 
-const errHandler = err => {
-  console.error(err)
-  if (err.response && err.response.data) {
-    console.error("API response", err.response.data)
-    throw err.response.data.message
-  }
-  throw err
-}
+// const errHandler = err => {
+//   console.error(err)
+//   if (err.response && err.response.data) {
+//     console.error("API response", err.response.data)
+//     throw err.response.data.message
+//   }
+//   throw err
+// }
 
 export default {
   service: service,
@@ -78,10 +78,7 @@ export default {
   //   return data;
   // },
   async getUserInfo(username){
-    // console.log('getUserInfocalled')
-    // console.log(username)
     let data = await service.get(`/user/profile/${username}`);
-    // console.log('api getUserInfo response:', data)
     return data;
   },
   async getCompanies(category,location,dist){

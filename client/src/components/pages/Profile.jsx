@@ -7,12 +7,13 @@ import Grid from '@material-ui/core/Grid';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import PhoneIcon from '@material-ui/icons/Phone';
-// import FavoriteIcon from '@material-ui/icons/Favorite';
+import FavoriteIcon from '@material-ui/icons/Favorite';
 // import PersonPinIcon from '@material-ui/icons/PersonPin';
 import Paper from '@material-ui/core/Paper';
 import Icon from '@material-ui/core/Icon';
 
 import Products from './Products';
+import Bookmarks from './Bookmarks';
 import Contact from './Contact';
 
 import api from '../../api';
@@ -86,6 +87,7 @@ class Profile extends Component {
         about: 'my description',
         phone:'my phone',
         email: 'my email',
+        bookmarks: [],
         address: 'my address',
         logoUrl: 'https://www.freepngimg.com/thumb/kiss_smiley/30518-9-kiss-smiley-transparent-image-thumb.png',
         firstName:'First Name',
@@ -98,20 +100,12 @@ class Profile extends Component {
       value:0, //value of the Tabs
     }
   }
+  mounted = false;
 
   getUser = async (username) => {
     let info = await api.getUserInfo(username);
     let user = info.data.user;
-    
-    let data = await api.getProducts(user.username);
-    if(data.data.error){
-      this.setState(state=> ({error:data.data.error}))
-    }
-    let products = data.data.products;
-
     let isOwner = info.data.isOwner;
-
-    user.products = products;
     this.setState(currentState => ({user,isOwner}))
   }
 
@@ -125,14 +119,21 @@ class Profile extends Component {
     
   }
 
+  componentDidMount(){
+    this.mounted = true;
+  }
+
   componentDidUpdate(prevProps,prevState){
-    let path = this.props.location.pathname;
+    if(this.mounted){
+      let path = this.props.location.pathname;
       let link = path.substring(path.search('profile'));
       let user = link.substring(link.search('/')+1);
       if(prevProps.location.pathname !== this.props.location.pathname){
-        (async ()=>{
-        await this.getUser(user);
-        })()
+        if(this.mounted){
+          (async ()=>{
+            await this.getUser(user);
+            })()
+        }
       }
       if(prevState.message !== this.state.message){
         setTimeout(() =>{
@@ -144,11 +145,13 @@ class Profile extends Component {
           this.setState(currentState => ({error: null}))
         }, 3000)
       }
-    
+    }
   }
 
   handleChange = (event, value) => {
-    this.setState({ value });
+    if(this.mounted){
+      this.setState({ value });
+    }
   };
   handleDeleteProduct = async (image,id) => {
     if(image && image.length > 0){
@@ -164,12 +167,44 @@ class Profile extends Component {
     user.products = products;
 
     if(response.data.message){
-      this.setState(state => ({user,message:response.data.message}))
+      if(this.mounted){
+        this.setState(state => ({user,message:response.data.message}))
+      }
     }
+  }
+  handleRemoveBookmark = async (id) => {
+    let response = await  api.removeBookmark(id);
+    let user = {...this.state.user};
+    let bookmarks = [...user.bookmarks];
+    let found = bookmarks.filter(product => product._id === id).map(product => bookmarks.indexOf(product));
+   
+    bookmarks.splice(found[0],1);
+
+    user.bookmarks = bookmarks;
+
+    if(response.data.message){
+      if(this.mounted){
+        this.setState(state => ({user,message:response.data.message}))
+      }
+    }
+  }
+  handleAddBookmark = async (id) => {
+    console.log(id);
+    (async ()=>{
+      
+      let data = await api.addBookmark(id);
+      let message = data.data.message;
+      if(message){
+        if(this.mounted){
+          this.setState({message})
+        }
+      }
+    })()
   }
 
   updateProducts = async () => {
-    let user = {...this.state.user};
+    if(this.mounted){
+      let user = {...this.state.user};
     
     let data = await api.getProducts(user.username);
     if(data.data.error){
@@ -179,6 +214,19 @@ class Profile extends Component {
     user.products = products;
 
     this.setState(currentState => ({user}))
+    }
+  }
+  updateBookmarks = async () => {
+    if(this.mounted){
+      let info = await api.getUserInfo(this.state.user.username);
+      let user = info.data.user;
+
+      let bookmarks = [...user.bookmarks];
+
+      user.bookmarks = bookmarks;
+
+      this.setState(currentState => ({user}))
+    }
   }
 
   render() {
@@ -215,8 +263,8 @@ class Profile extends Component {
             >
               <Tab icon={<Icon>shopping_cart</Icon>} />
               <Tab icon={<PhoneIcon/>} />
-              {/* <Tab icon={<FavoriteIcon />} />
-              <Tab icon={<PersonPinIcon />} /> */}
+              {this.state.isOwner && <Tab icon={<FavoriteIcon />} />}
+              {/* <Tab icon={<PersonPinIcon />} /> */}
             </Tabs>
           </Paper>
           <div className={classNames(classes.container)}>
@@ -228,8 +276,9 @@ class Profile extends Component {
             {this.state.error}
           </div>}
           </div>
+          {this.state.value === 2 && <Bookmarks products={this.state.user.bookmarks}  user={this.state.user._id} isOwner={this.state.isOwner} handleRemove={this.handleRemoveBookmark} handleUpdate={this.updateBookmarks}/>}
           {this.state.value === 1 && <Contact phone={this.state.user.phone} email={this.state.user.email} address={this.state.user.address} name={`${this.state.user.firstName} ${this.state.user.lastName}`}/>}
-          {this.state.value === 0 && <Products  products={this.state.user.products}  user={this.state.user.username} isOwner={this.state.isOwner} handleDelete={this.handleDeleteProduct} handleUpdate={this.updateProducts}/>}
+          {this.state.value === 0 && <Products  products={this.state.user.products}  user={this.state.user.username} isOwner={this.state.isOwner} handleDelete={this.handleDeleteProduct} handleAdd={this.handleAddBookmark} handleUpdate={this.updateProducts}/>}
           </div>
       </div>
       ) 
