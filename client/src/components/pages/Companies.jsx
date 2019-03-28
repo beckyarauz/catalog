@@ -85,6 +85,8 @@ class Companies extends Component {
       filteredCompanies: []
     }
   }
+
+  mounted = false;
   handleClick = (e, username) => {
     this.props.handleCardClick(username);
   }
@@ -167,8 +169,8 @@ class Companies extends Component {
     )
   }
 
-
   componentDidMount() {
+    this.mounted = true;
     if (this.props.category && this.props.category !== null) {
       this.setState({ category: this.props.category })
     }
@@ -178,15 +180,21 @@ class Companies extends Component {
         let { latitude,longitude } = position.coords
         let currentLocation = { latitude,longitude }
         let data = await api.getCompanies(self.state.category, currentLocation);
-        self.setState(prevState => ({ currentLocation, companies: data.data.companies, message: 'Companies near you' }));
+        if(self.mounted){
+          self.setState(prevState => ({ currentLocation, companies: data.data.companies, message: 'Companies near you' }));
+        }
       })
     } else {
       console.log('geolocation not available');
-      this.setState({ message: 'Turn location on to browse companies near you' });
+      if(this.mounted){
+        this.setState({ message: 'Turn location on to browse companies near you' });
+      }
     }
-
   }
   componentDidUpdate(prevProps, prevState, snapshot) {
+    if(!this.mounted){
+      return;
+    }
     if (prevProps.category !== this.props.category) {
       this.setState(currentState => ({ category: this.props.category }), () => {
         if (this.state.filteredCompanies.length > 0) {

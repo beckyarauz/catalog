@@ -76,7 +76,7 @@ router.get('/profile/:user', async (request, res) => {
       username
     })
     .populate('bookmarks','name price seller description imageUrl')
-    .populate('products')
+    .populate('products','name price seller description imageUrl')
     .select('username about phone email category logoUrl firstName lastName company address geolocation tags bookmarks')
 
     // console.log(dbUser)

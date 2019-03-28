@@ -82,9 +82,9 @@ class Products extends Component {
     this.props.handleAdd(id);
   }
   handleContactSeller = async (id) => {
-    console.log(id)
+    console.log('contact Seller')
   }
-  handleEditProduct = async (value) => {
+  handleEditProduct = (value) => {
     this.handleClickOpenEdit(value);
   }
   handleConfirmation = async (value) => {
