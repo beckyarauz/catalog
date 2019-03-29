@@ -196,7 +196,6 @@ class Profile extends Component {
     }
   }
   handleAddBookmark = async (id) => {
-    console.log(id);
     (async ()=>{
       
       let data = await api.addBookmark(id);

@@ -19,6 +19,7 @@ import ProfileBuyer from './pages/ProfileBuyer';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import ManageAccount from './pages/ManageAccount';
+import ManageAccountBuyer from './pages/ManageAccountBuyer';
 import Browse from './pages/Browse';
 
 import api from '../api';
@@ -135,14 +136,20 @@ export default class App extends Component {
           <Route path={`/profile/company/:user`} render={(props) => (<Profile {...props}/>)} />
           <Route path={`/profile/user/:user`} render={(props) => (<ProfileBuyer {...props}/>)} />
 
-          <Route path="/manage-account" render={(props) => (
+          {this.state.isSeller && <Route path="/manage-account" render={(props) => (
                 !this.state.isLogged ? (
                   <Redirect to="/login"/>
                 ) : (
                   <ManageAccount {...props} user={this.state.user} isSeller={this.state.isSeller}/>
                 )
-              )} />
-          {/* <Route path="/manage-account" component={ManageAccount} /> */}
+              )} />}
+          {!this.state.isSeller && <Route path="/manage-account" render={(props) => (
+                !this.state.isLogged ? (
+                  <Redirect to="/login"/>
+                ) : (
+                  <ManageAccountBuyer {...props} user={this.state.user} isSeller={this.state.isSeller}/>
+                )
+              )} />}
           <Route path="/browse" component={Browse} />
           <Route render={() => <h2>404</h2>} />
         </Switch>

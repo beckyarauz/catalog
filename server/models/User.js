@@ -24,6 +24,8 @@ const userSchema = new Schema({
   bookmarks:[{ type: Schema.Types.ObjectId, ref: 'Product' }],
   about:String,
   logoUrl:String,
+  followers:[{ type: Schema.Types.ObjectId, ref: 'User' }],
+  following:[{ type: Schema.Types.ObjectId, ref: 'User' }],
   userPictureUrl: String,
   rating: Number,
   category:String,

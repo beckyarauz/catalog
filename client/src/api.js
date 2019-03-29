@@ -25,14 +25,6 @@ export default {
       })
       .catch(e => console.log(e));     
   },
-
-  // This method returns the user from the localStorage
-  // Be careful, the value is the one when the user logged in for the last time
-  getLocalStorageUser() {
-    return JSON.parse(localStorage.getItem('user'))
-  },
-
-  // This method signs up and logs in the user
   async signup(userInfo) {
     return await service
       .post('/signup', userInfo);
@@ -49,10 +41,8 @@ export default {
       .get('/logout')
   },
   async deleteFromS3(url,type){
-    console.log(url)
-    console.log(type)
     return await service
-    .post(`/upload/delete`,{url,type:type})
+    .post(`/file/delete`,{url,type:type})
   },
   async uploadToS3(file,type) {
     if(!file){
@@ -65,7 +55,7 @@ export default {
       formData.append('myType', type);
       // console.log('formdata',formData);
       let data = await service
-                      .post(`/upload`, formData, {
+                      .post(`/file/upload`, formData, {
                         headers: {
                           'Content-Type': 'multipart/form-data'
                         }

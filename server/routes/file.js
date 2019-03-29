@@ -60,7 +60,7 @@ router.post('/delete', async (req,res)=>{
 })
 
 // Define POST route
-router.post('/', (request, response) => {
+router.post('/upload', (request, response) => {
   
   const form = new multiparty.Form();
     form.parse(request, async (error, fields, files) => {
