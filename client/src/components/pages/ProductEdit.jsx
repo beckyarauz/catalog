@@ -151,35 +151,23 @@ class ProductEdit extends React.Component {
         this.props.onClose();
   };
   handleSave = async () => {
-    let data = await this.submitToServer();
-    console.log(data)
+    if (this.state.imageFS !== undefined && this.state.imageFS !== null) {
+      let product = { ...this.state.product };
+      if(this.state.image){
+        await api.deleteFromS3(this.state.product.imageUrl, 'product',this.state.product._id);
+      }
+      let url = await api.uploadToS3(this.state.image, 'product');
+      product.imageUrl = url.data.Location;
+      let data = await api.editProduct(product);
+      this.setState({message:data.data.message,product})
+    } else { //if there is no image to upload then just sabe product details
+      let data = await api.editProduct(this.state.product);
+      this.setState({message:data.data.message});
+    }
+    
     this.props.onSave();
     this.props.onClose();
   };
-
-  submitToServer = async () => {
-        if (this.state.imageFS !== undefined && this.state.imageFS !== null) {
-          let product = { ...this.state.product };
-          //delete current product image and then upload the new one api.deleteFromS3(this.state.product.imageUrl, 'product');
-          if(this.state.image){
-          let deletedImage = await api.deleteFromS3(this.state.product.imageUrl, 'product',this.state.product._id);
-          console.log('deleted image data:', deletedImage)
-          }
-
-          let url = await api.uploadToS3(this.state.image, 'product');
-          product.imageUrl = url.data.Location;
-    
-          this.setState(currentState => ({ product }), async () => {
-            let data = await api.editProduct(this.state.product);
-            this.setState({productId:data.data.product._id,message:data.data.message})
-          });
-          return;
-        }
-        let data = await api.editProduct(this.state.product);
-        this.setState({productId:data.data.product._id,message:data.data.message});
-        return data;
-  }    
-
   handleChange = name => event => {
     if (name !== 'image') {
       let product = { ...this.state.product }

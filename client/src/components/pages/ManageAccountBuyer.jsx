@@ -112,6 +112,15 @@ class ManageAccountBuyer extends React.Component {
   isNotEmpty = (currentValue) => {
     return currentValue && (currentValue instanceof Object || currentValue.length > 0 || currentValue instanceof File);
   }
+  handleDeleteAccount = async () => {
+    if(this.state.user.userPictureUrl){
+      console.log('deleting image');
+      await this.deleteFile();
+    }
+    console.log('deleting account')    
+    await api.deleteAccount();
+    this.props.history.push('/signup')
+  }
 
   componentWillMount() {
     (async () => {
@@ -248,7 +257,6 @@ class ManageAccountBuyer extends React.Component {
   deleteFile = async (e) => {
     let user;
     user = { ...this.state.user };
-
     user.userPictureUrl = "";
     await api.deleteFromS3(this.state.user.userPictureUrl, 'userPicture');
   }
@@ -405,6 +413,7 @@ class ManageAccountBuyer extends React.Component {
             />
 
             <Button variant="contained" component="span" className={classes.button} onClick={this.handleClick} disabled={!this.state.valid}>Update</Button>
+            <Button variant="contained" component="span" className={classes.button} onClick={this.handleDeleteAccount} >Delete Account</Button>
           </div>
         )}
       </div>

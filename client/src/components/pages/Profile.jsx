@@ -211,7 +211,6 @@ class Profile extends Component {
 
   updateProducts = async () => {
     if(this.mounted){
-      console.log('update products')
     let user = {...this.state.user};
     
     let data = await api.getProducts(user.username);

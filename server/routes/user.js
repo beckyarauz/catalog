@@ -22,17 +22,37 @@ const Product = require('../models/Product');
 router.delete('/account/delete', async (request, res) => {
   try {
     let user = request.user._id
+    
+    let userProducts = await User.findOne({ _id: user},{_id:0,products:1});
     let dbUser = await User.findOneAndRemove({
       _id: user
     })
 
     request.session.destroy();
 
-    let products = await Product.deleteMany({seller: user});
-    let followedBy = await User.deleteMany({followers: {$in: [user]}});
-
-    console.log('deleted:',products,followedBy)
-        
+    if(request.user.role === 'SELLER'){
+      let products = await Product.deleteMany({seller: user});
+      await User.updateMany( //this deletes the products from other user's bookmarks
+        {},
+        { $pull: { bookmarks: { $in: userProducts.products } } }
+        )
+      let followedBy = await User.update( //this the user from the list of following of other Users
+        { },
+        { $pull: { following: { $in: [user] } } },
+        { multi: true }
+    )
+    } else {
+      let bookmarkedBy = await Product.update(//deletes the user from the list of users that have bookmarked a product
+        { },
+        { $pull: { bookmarkedBy: { $in: [user] } } },
+        { multi: true }
+      )
+      let following = await User.update( // deletes the user if he/she was following others from their list of followers
+        { },
+        { $pull: { followers: { $in: [user] } } },
+        { multi: true }
+      )
+    }
     res.status(200).json({message:'Account Deleted Succesfully'})
   } catch (e) {
     console.log(e.message);
@@ -128,6 +148,21 @@ router.get('/profile/user/:user', async (request, res) => {
     .populate('products','name price seller description imageUrl')
     .select('username about phone email category logoUrl userPictureUrl firstName lastName company address geolocation tags bookmarks role')
     
+    // console.log('bookmarks',dbUser.bookmarks);
+    let userBook = await User.findOne({
+      username
+    })
+    let filtered = await Product.find({_id:{$in:userBook.bookmarks}},{_id:1});
+    let filteredArray = filtered.map((item) => item._id);
+
+    // if(filtered.length !== userBook.bookmarks){
+    //   //In case a Seller has deleted his account we need to
+    //   //clean the bookmarks of the user
+    //   await User.updateOne(
+    //     {username},
+    //     { $pull: { bookmarks: { $nin: filteredArray } } }
+    //     )
+    // }
     let message = null;
     if(dbUser.products.length === 0){
       message = `There are no products to be displayed`;

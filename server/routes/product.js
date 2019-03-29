@@ -82,7 +82,13 @@ router.post('/delete', async (request, res) => {
    
     products.splice(found[0],1);
     
-    let updateUser = await User.findOneAndUpdate({_id:request.user._id},{products})
+    let updateUser = await User.findOneAndUpdate({_id:request.user._id},{products});
+
+    let bookmarks = await User.update(
+        { },
+        { $pull: { bookmarks: { $in: [product] } } },
+        { multi: true }
+      );
 
     res.status(200).json({message: `Product has been deleted: ${deletedProduct.name}`})
   } catch(e){
