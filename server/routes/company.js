@@ -51,7 +51,7 @@ router.get('/:category/all', async (req, res) => {
 router.get('/all/', async (req, res) => {
   try {
     let location = req.query;
-    let dbUsers = await User.find().select('company about category geolocation tags username');
+    let dbUsers = await User.find({role:'SELLER'}).select('company about category geolocation tags username');
 
     let filtered = dbUsers.filter(user => {
       let dbLocation = user.geolocation;

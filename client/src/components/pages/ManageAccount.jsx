@@ -312,17 +312,15 @@ class ManageAccount extends React.Component {
     return user;
   }
   deleteFile = async (e) => {
-    // e.preventDefault()
-    let deleted,user;
+    let user;
     user = { ...this.state.user };
     if(this.props.isSeller){
       user.logoUrl = "";
-      deleted = await api.deleteFromS3(this.state.user.logoUrl, 'logo');
+      await api.deleteFromS3(this.state.user.logoUrl, 'logo');
     } else {
       user.userPictureUrl = "";
-      deleted = await api.deleteFromS3(this.state.user.userPictureUrl, 'userPicture');
+      await api.deleteFromS3(this.state.user.userPictureUrl, 'userPicture');
     }
-    
   }
 
   handleViewportChange = (viewport) => {
@@ -472,7 +470,7 @@ class ManageAccount extends React.Component {
               <div className={classes.flexContainer}>
                 <h3>Location</h3>
                 <p>Move the pointer to set your bussiness location</p>
-                {/* <ReactMapGL
+                <ReactMapGL
                 {...this.state.viewport}
                 mapStyle="mapbox://styles/beckyarauz/cjtisim0s272e1fubskpzz1om"
                 mapboxApiAccessToken={TOKEN}
@@ -485,7 +483,7 @@ class ManageAccount extends React.Component {
                 {this.state.user.geolocation.longitude && <Marker latitude={this.state.user.geolocation.latitude} longitude={this.state.user.geolocation.longitude} offsetLeft={-20} offsetTop={-10} draggable={true} onDragEnd={e => this.handleMarkerDrag(e)}>
                   <div ><Icon>location_on</Icon></div>
                 </Marker>}
-              </ReactMapGL>  */}
+              </ReactMapGL> 
                 <h2>Company Info</h2>
                 {
                   (this.state.user.logoUrl &&

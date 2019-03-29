@@ -96,7 +96,8 @@ class LogIn extends React.Component {
       this.state = {
         username: "",
         password: "",
-        message: null
+        message: null,
+        error:null
       }
     }
 
@@ -108,8 +109,17 @@ class LogIn extends React.Component {
       }
     
   handleClick = async () => {
-    // e.preventDefault()
-    await api.login(this.state.username, this.state.password)
+    let response = await api.login(this.state.username, this.state.password);
+    if(response.data.message){
+      this.setState(state => ({
+        message: response.data.message,
+      }))
+    }
+    if(response.data.error){
+      this.setState(state => ({
+        error: response.data.error,
+      }))
+    }
     this.props.inLogin();
   }
 
@@ -138,9 +148,12 @@ class LogIn extends React.Component {
             control={<Checkbox value="remember" color="primary" />}
             label="Remember me"
           />
-           {this.state.message && <div className="info info-danger">
-           {this.state.message}
-          </div>}
+           {this.state.message && <div className="info">
+          {this.state.message}
+        </div>}
+        {this.state.error && <div className="info info-danger">
+          {this.state.error}
+        </div>}
           <Button
             // type="submit"
             fullWidth

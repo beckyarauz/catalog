@@ -51,6 +51,7 @@ app.use(session({
   store: new MongoStore({ mongooseConnection: mongoose.connection })
 }))
 
+
 passport.serializeUser((user, cb) => {
   cb(null, user._id);
 });
@@ -69,12 +70,10 @@ passport.use(new LocalStrategy(
     User.findOne({ username: username }, function (err, user) {
       if (err) { return done(err); }
       if (!user) {
-        console.log('user does not exist')
-        return done(null, false, { message: 'Incorrect username.' });
+        return done(null, false, { message: 'Incorrect username' });
       }
       if (!bcrypt.compareSync(password, user.password)) {
-        console.log('incorrect password')
-        return done(null, false, { message: 'Incorrect password' });
+        return done(null,false,{message: 'Incorrect password'});
       }
       return done(null, user);
     });

@@ -7,6 +7,8 @@ import Confirmation from './Confirmation';
 
 import { withStyles } from '@material-ui/core/styles';
 
+import api from '../../api';
+
 
 const styles = theme => ({
   productContainer :{
@@ -33,9 +35,15 @@ class Products extends Component {
       openConfirmation:false,
       delete:{},
       message:'',
+      isLogged:false,
       error:'',
       selectedProduct:{}     
     }
+  }
+
+  async componentWillMount(){
+    let data = await api.isLoggedIn();
+    this.setState(stata => ({isLogged: data.isLogged}))
   }
 
   componentDidMount(){
@@ -103,7 +111,7 @@ class Products extends Component {
   render() {
     const { classes } = this.props;
     return (
-      <div className={this.props.classes.productContainer}>
+      <div className={classes.productContainer}>
       
         <Confirmation
           open={this.state.openConfirmation}
@@ -139,7 +147,7 @@ class Products extends Component {
                       delete={this.handleDeleteProduct} 
                       className={this.props.classes.card}
                       isOwner={this.props.isOwner}
-                      // isOwnProduct={true}
+                      isLogged={this.state.isLogged}
                       bookmarked={false}
                       key={product._id}
                       detailHandler={this.handleClickOpen}/>

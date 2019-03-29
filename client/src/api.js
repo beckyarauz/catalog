@@ -31,8 +31,8 @@ export default {
   },
 
   async login(username, password) {
-    // console.log('file: api.js message: api.login called', `${username},${password}`);
-    await service.post('/login',{username, password});
+    let data = await service.post('/login',{username, password});
+    return data;
   },
 
   logout() {
@@ -74,6 +74,7 @@ export default {
   async getCompanies(category,location,dist){
     if(category !== 'all' && category !== null){
       let data = await service.get(`/company/${category}/all`);
+      console.log(data);
       return data;
     } else {
       if(location && location !== undefined){

@@ -110,7 +110,7 @@
                 <Icon>delete</Icon>
               </ButtonBase>
             </div>) :
-            (<div className={classes.actionBookmark}>
+            (props.isLogged && <div className={classes.actionBookmark}>
               <ButtonBase className={classes.bookmarkButton} onClick={handleBookmark}>
                 <Avatar className={classes.bookmark}><Icon>{!props.bookmarked ? 'bookmark_border': 'clear'}</Icon></Avatar>
               </ButtonBase>

@@ -163,12 +163,12 @@ class ManageAccountBuyer extends React.Component {
   validateFields = () => {
     let { username, email, firstName, lastName } = this.state.user;
     let info;
-      info = {
-        username,
-        email,
-        firstName, 
-        lastName
-      }
+    info = {
+      username,
+      email,
+      firstName,
+      lastName
+    }
     let stateValues = Object.values(info);
 
     this.setState({ valid: stateValues.every(this.isNotEmpty) });
@@ -213,13 +213,13 @@ class ManageAccountBuyer extends React.Component {
 
   submitToServer = async () => {
     if (this.state.imageFS !== undefined && this.state.imageFS !== null) {
-      
+
       let user = { ...this.state.user };
       let url;
 
-        url = await api.uploadToS3(this.state.image, 'userPicture');
-        await this.deleteFile();
-        user.userPictureUrl = url.data.Location;
+      url = await api.uploadToS3(this.state.image, 'userPicture');
+      await this.deleteFile();
+      user.userPictureUrl = url.data.Location;
       this.setState(currentState => ({ user }), async () => {
         let data = await api.updateUser(this.state.user);
         if (data.data.message) {
@@ -246,13 +246,11 @@ class ManageAccountBuyer extends React.Component {
     return user;
   }
   deleteFile = async (e) => {
-    // e.preventDefault()
-    let deleted,user;
+    let user;
     user = { ...this.state.user };
 
-      user.userPictureUrl = "";
-      deleted = await api.deleteFromS3(this.state.user.userPictureUrl, 'userPicture');
-    
+    user.userPictureUrl = "";
+    await api.deleteFromS3(this.state.user.userPictureUrl, 'userPicture');
   }
 
   handleViewportChange = (viewport) => {
@@ -287,38 +285,38 @@ class ManageAccountBuyer extends React.Component {
         <h2>Account</h2>
         {this.state.user.username && (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-            
-              <div className={classes.flexContainer}>
-                {
-                  (this.state.user.userPictureUrl &&
-                    <div className={classes.imageSection}><img src={this.state.user.userPictureUrl} width="100" height="100" alt="User from DB" /></div>)
-                  || (this.state.imageFS &&
-                    <div className={classes.imageSection}><img src={this.state.imageFS} width="100" height="100" alt="User" /></div>)
-                }
 
-                {this.state.message && <div className="info info-danger">
-                  {this.state.message}
-                </div>}
-                <br></br>
-                <input
-                  accept="image/*"
-                  className={classes.input}
-                  style={{ display: 'none' }}
-                  id="raised-button-file"
-                  multiple
-                  type="file"
-                  onChange={this.handleChange('image')}
-                />
-                <label htmlFor="raised-button-file">
-                  <Button variant="contained" component="span" className={classes.button}>
-                    Upload Picture
+            <div className={classes.flexContainer}>
+              {
+                (this.state.user.userPictureUrl &&
+                  <div className={classes.imageSection}><img src={this.state.user.userPictureUrl} width="100" height="100" alt="User from DB" /></div>)
+                || (this.state.imageFS &&
+                  <div className={classes.imageSection}><img src={this.state.imageFS} width="100" height="100" alt="User" /></div>)
+              }
+
+              {this.state.message && <div className="info info-danger">
+                {this.state.message}
+              </div>}
+              <br></br>
+              <input
+                accept="image/*"
+                className={classes.input}
+                style={{ display: 'none' }}
+                id="raised-button-file"
+                multiple
+                type="file"
+                onChange={this.handleChange('image')}
+              />
+              <label htmlFor="raised-button-file">
+                <Button variant="contained" component="span" className={classes.button}>
+                  Upload Picture
             </Button>
-                </label>
-                <Button variant="contained" component="span" className={classes.button} onClick={this.deleteFile}>Delete</Button>
+              </label>
+              <Button variant="contained" component="span" className={classes.button} onClick={this.deleteFile}>Delete</Button>
 
-              </div>
+            </div>
 
-            
+
             <TextField
               id="username"
               label="Username"
@@ -331,7 +329,7 @@ class ManageAccountBuyer extends React.Component {
                 startAdornment: <InputAdornment position="start">@</InputAdornment>,
               }}
             />
-           
+
             <TextField
               id="outlined-adornment-password"
               className={classNames(classes.margin, classes.textField)}
@@ -391,21 +389,21 @@ class ManageAccountBuyer extends React.Component {
               />
             </FormControl>
             <TextField
-                  id="standard-description"
-                  label="About"
-                  className={classNames(classes.textarea, classes.textField)}
-                  value={this.state.user.about}
-                  onChange={this.handleChange('about')}
-                  margin="normal"
-                  variant="outlined"
-                  multiline={true}
-                  rows={4}
-                  rowsMax={4}
-                  InputProps={{
-                    startAdornment: <InputAdornment position="start"> </InputAdornment>,
-                  }}
-                />
-           
+              id="standard-description"
+              label="About"
+              className={classNames(classes.textarea, classes.textField)}
+              value={this.state.user.about}
+              onChange={this.handleChange('about')}
+              margin="normal"
+              variant="outlined"
+              multiline={true}
+              rows={4}
+              rowsMax={4}
+              InputProps={{
+                startAdornment: <InputAdornment position="start"> </InputAdornment>,
+              }}
+            />
+
             <Button variant="contained" component="span" className={classes.button} onClick={this.handleClick} disabled={!this.state.valid}>Update</Button>
           </div>
         )}

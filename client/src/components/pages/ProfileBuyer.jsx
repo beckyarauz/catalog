@@ -10,9 +10,7 @@ import PhoneIcon from '@material-ui/icons/Phone';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 // import PersonPinIcon from '@material-ui/icons/PersonPin';
 import Paper from '@material-ui/core/Paper';
-import Icon from '@material-ui/core/Icon';
 
-import Products from './Products';
 import Bookmarks from './Bookmarks';
 import Contact from './Contact';
 
@@ -214,8 +212,10 @@ class ProfileBuyer extends Component {
             </Grid>
             <Grid item xs={8} className={classNames(classes.infoContainer, classes.text)}>
               <h2>{this.state.user.firstName}</h2>
-              <p><b>Description:</b></p>
-              <p>{this.state.user.about}</p>
+              {this.state.user.about && <div>
+                <p><b>Description:</b></p>
+                <p>{this.state.user.about}</p>
+              </div>}
             </Grid>
           </Grid>
 

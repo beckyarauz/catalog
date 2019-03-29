@@ -123,8 +123,8 @@ class AddProduct extends React.Component {
       let product = { ...this.state.product }
       product[name] = event.target.value;
       this.setState(currentState => ({ product }), () => {
-        let info, imageUrl;
-        ({ imageUrl,...info } = this.state.product)
+        let { name,price,description } = this.state.product;
+        let info = {name,price,description};
 
         let stateValues = Object.values(info);
         this.setState({ valid: stateValues.every(isNotEmpty) });

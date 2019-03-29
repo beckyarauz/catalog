@@ -52,12 +52,18 @@ router.post("/signup", async (req, res, next) => {
     next(e)
   }
 })
-// )
-router.post("/login", passport.authenticate('local', {
-  successRedirect: '/login-success',
-  failureRedirect: '/login-fail',
-  failureFlash: true
-}))
+
+router.post('/login', function(req, res, next) {
+  passport.authenticate('local', function(err, user, info) {
+    if (err) { return next(err); }
+    if (!user) { return res.json({error:info.message}); }
+    req.logIn(user, function(err) {
+      if (err) { return next(err); }
+      return res.redirect('/profile/' + user.username);
+    });
+  })(req, res, next);
+});
+
 
 router.get('/login-success', (req, res) => {
   // console.log('file: auth.js message:login success');
@@ -67,8 +73,8 @@ router.get('/login-success', (req, res) => {
 })
 router.get('/login-fail', (req, res) => {
   // console.log('file: auth.js message: login failed');
-  res.status(400).json({
-    message: 'You cant Log out'
+  res.status(200).json({
+    message: 'You cant Log in'
   })
 
 })
@@ -83,24 +89,15 @@ router.get('/logout', (req, res, next) => {
 });
 router.get("/isLogged", (req, res) => {
   if (req.user !== undefined && req.user !== null) {
-    if (req.user.role === 'SELLER') {
+    // if () {
       res.status(200).json({
         message: 'You are logged in',
         isLogged: true,
-        isSeller: true,
+        isSeller: req.user.role === 'SELLER',
         user: req.user.username
       })
-    } else {
-      res.status(200).json({
-        message: 'You are logged in',
-        isLogged: true,
-        isSeller: false,
-        user: req.user.username
-      })
-    }
 
   } else {
-    console.log('file:auth.js GET/isLogged user not logged in')
     res.status(200).json({
       message: 'not logged in',
       isLogged: false

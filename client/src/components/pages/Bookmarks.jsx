@@ -29,10 +29,15 @@ class Bookmarks extends Component {
       message:'',
       error:'',
       selectedProduct:{},
-      isOwnProduct:false     
+      isOwnProduct:false,
+      isLogged:false    
     }
   }
 
+  async componentWillMount(){
+    let data = await api.isLoggedIn();
+    this.setState(stata => ({isLogged: data.isLogged}))
+  }
   componentDidMount(){
     this.setState(currentState => ({products: this.props.products}))
   }
@@ -112,7 +117,7 @@ class Bookmarks extends Component {
                       remove={this.handleOpenConfirmation} 
                       className={this.props.classes.card}
                       isOwner={this.props.isOwner}
-                      // isOwnProduct={false}
+                      isLogged={this.state.isLogged}
                       key={product._id}
                       bookmarked={true}
                       detailHandler={this.handleClickOpen}/>
