@@ -97,6 +97,7 @@ class ManageAccount extends React.Component {
       address: "something",
       email: "",
       tags: [],
+      products: [],
       phone: '( 49)0000-0000',
       category: "food",
       about: "Write What's your coumpany about, the inspiration and what makes you unique! :D",
@@ -126,6 +127,26 @@ class ManageAccount extends React.Component {
 
   isNotEmpty = (currentValue) => {
     return currentValue && (currentValue instanceof Object || currentValue.length > 0 || currentValue instanceof File);
+  }
+  handleDeleteAccount = async () => {
+    if(this.state.user.logoUrl){
+      console.log('deleting image');
+      await this.deleteFile();
+    }
+     
+    if(this.state.user.products && this.state.user.products.length > 0){
+      await this.state.user.products.map(async (product) => {
+        if(product.imageUrl){
+          console.log('deleting product image');
+          await api.deleteFromS3(product.imageUrl,'product',product._id);
+        } else {
+          console.log('no image to delete')
+        }
+      })
+    }
+    
+    console.log('deleting account')    
+    await api.deleteAccount();
   }
 
   componentWillMount() {
@@ -201,7 +222,7 @@ class ManageAccount extends React.Component {
     this.setState({ user })
   }
   validateFields = () => {
-    let { username, email, phone, about, address, category, company, firstName, lastName, } = this.state.user;
+    let { username, email, phone, about, address, category, company, firstName, lastName } = this.state.user;
     let info, image;
 
     if (this.props.isSeller) {
@@ -276,15 +297,11 @@ class ManageAccount extends React.Component {
       
       let user = { ...this.state.user };
       let url;
-      if(this.props.isSeller){
         url = await api.uploadToS3(this.state.image, 'logo');
-        await this.deleteFile();
+        if(user.logoUrl){
+          await this.deleteFile();
+        }
         user.logoUrl = url.data.Location;
-      } else {
-        url = await api.uploadToS3(this.state.image, 'userPicture');
-        await this.deleteFile();
-        user.userPictureUrl = url.data.Location;
-      }
       this.setState(currentState => ({ user }), async () => {
         let data = await api.updateUser(this.state.user);
         if (data.data.message) {
@@ -314,13 +331,8 @@ class ManageAccount extends React.Component {
   deleteFile = async (e) => {
     let user;
     user = { ...this.state.user };
-    if(this.props.isSeller){
       user.logoUrl = "";
       await api.deleteFromS3(this.state.user.logoUrl, 'logo');
-    } else {
-      user.userPictureUrl = "";
-      await api.deleteFromS3(this.state.user.userPictureUrl, 'userPicture');
-    }
   }
 
   handleViewportChange = (viewport) => {
@@ -561,6 +573,7 @@ class ManageAccount extends React.Component {
               </div>
             )}
             <Button variant="contained" component="span" className={classes.button} onClick={this.handleClick} disabled={!this.state.valid}>Update</Button>
+            <Button variant="contained" component="span" className={classes.button} onClick={this.handleDeleteAccount} >Delete Account</Button>
           </div>
         )}
       </div>

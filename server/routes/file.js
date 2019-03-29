@@ -7,6 +7,7 @@ const fileType = require('file-type');
 const bluebird = require('bluebird');
 const multiparty = require('multiparty');
 const sharp = require('sharp');
+const Product = require('../models/Product');
 
 const User = require('../models/User');
 
@@ -44,11 +45,13 @@ const deleteFile = (name) => {
 router.post('/delete', async (req,res)=>{
   let url = req.body.url;
   let type = req.body.type;
+  let id = req.body.id;
   console.log(url)
   if(type === 'logo'){
     await deleteFile(url.substring(url.search('logo')));
     await User.findOneAndUpdate({username: req.user.username},{ logoUrl: ''})
   } else if (type === 'product'){
+    let product = await Product.findOneAndUpdate({_id: id},{imageUrl:''});
     await deleteFile(url.substring(url.search('productImage')));
   } else if(type === 'userPicture'){
     console.log('userPicture')
@@ -109,7 +112,7 @@ router.post('/upload', (request, response) => {
         }
         return response.status(200).send(data);
       } catch (error) {
-        console.log(error);
+        console.log(error.message);
         return response.status(400).send(error);
       }
     });

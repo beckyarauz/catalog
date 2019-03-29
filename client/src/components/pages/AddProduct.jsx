@@ -157,12 +157,15 @@ class AddProduct extends React.Component {
 
       this.setState(currentState => ({ product }), async () => {
         let data = await api.addProduct(this.state.product);
-        this.setState({productId:data.data.product._id,message:data.data.message})
+        let product = {name:'',description:'',imageUrl:'',price:''};
+        this.setState({message:data.data.message,product, imageFS: null, image:null})
       });
       return;
     }
+
     let data = await api.addProduct(this.state.product);
-    this.setState({productId:data.data.product._id,message:data.data.message})
+    let product = {name:'',description:'',imageUrl:'',price:''};
+    this.setState(state => ({message:data.data.message, product}))
   }
   unvalidFormHandler = () => {
     this.setState({ message: 'fill all the fields!' })
@@ -173,17 +176,7 @@ class AddProduct extends React.Component {
     this.state.valid ? this.submitToServer() : this.unvalidFormHandler();
   }
   deleteFile = async (e) => {
-    e.preventDefault()
-    let deleted = await api.deleteFromS3(this.state.product.imageUrl, 'product');
-    if(deleted.data.message){
-      this.setState(currentState => ({message:deleted.data.message}))
-    }
-    if(deleted.data.error){
-      this.setState(currentState => ({error:deleted.data.error}))
-    }
-    let product = { ...this.state.product };
-    product.imageUrl = "";
-    this.setState({ product })
+    this.setState({imageFS:null,image:null})
   }
 
   componentDidUpdate(prevProps,prevState){
@@ -244,7 +237,7 @@ class AddProduct extends React.Component {
               Upload Image
           </Button>
           </label>
-          <Button variant="contained" component="span" className={classes.button} onClick={this.deleteFile}>Delete</Button>
+          <Button variant="contained" component="span" className={classes.button} onClick={this.deleteFile} disabled={!this.state.image}>Delete</Button>
 
           {/* <FormControl variant="outlined" className={classes.formControl}>
           <InputLabel

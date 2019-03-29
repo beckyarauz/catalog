@@ -4,6 +4,7 @@ import ProductCard from './ProductCard';
 import ProductDetail from './ProductDetail';
 import ProductEdit from './ProductEdit';
 import Confirmation from './Confirmation';
+import Button from '@material-ui/core/Button';
 
 import { withStyles } from '@material-ui/core/styles';
 
@@ -137,6 +138,8 @@ class Products extends Component {
         {this.state.error && <div className="info info-danger">
           {this.state.error}
         </div>}
+
+        {this.state.products && (this.state.products.length === 0) && <Button onClick={(e) => this.props.history.push('/add-product')}>Add Products</Button>}
         {
           this.state.products && (this.state.products.length > 0) && this.state.products.map((product,idx) => {
             return <ProductCard 

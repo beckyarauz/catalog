@@ -11,6 +11,7 @@ import FavoriteIcon from '@material-ui/icons/Favorite';
 // import PersonPinIcon from '@material-ui/icons/PersonPin';
 import Paper from '@material-ui/core/Paper';
 import Icon from '@material-ui/core/Icon';
+import Button from '@material-ui/core/Button';
 
 import Products from './Products';
 import Bookmarks from './Bookmarks';
@@ -210,7 +211,8 @@ class Profile extends Component {
 
   updateProducts = async () => {
     if(this.mounted){
-      let user = {...this.state.user};
+      console.log('update products')
+    let user = {...this.state.user};
     
     let data = await api.getProducts(user.username);
     if(data.data.error){
@@ -240,7 +242,6 @@ class Profile extends Component {
     const { classes } = this.props;
     return (this.state.user.username && (
       <div className={classNames(classes.root ,classes.margin)}>
-      
             <div className={classNames(classes.header)}>
             <Grid container justify="center" alignItems="center">
               <Grid item xs={4} className={classNames(classes.avatarContainer,classes.text)}>
@@ -284,7 +285,7 @@ class Profile extends Component {
           </div>
           {this.state.value === 2 && <Bookmarks products={this.state.user.bookmarks}  user={this.state.user._id} isOwner={this.state.isOwner} handleRemove={this.handleRemoveBookmark} handleUpdate={this.updateBookmarks}/>}
           {this.state.value === 1 && <Contact phone={this.state.user.phone} email={this.state.user.email} address={this.state.user.address} name={`${this.state.user.firstName} ${this.state.user.lastName}`}/>}
-          {this.state.value === 0 && <Products  products={this.state.user.products}  user={this.state.user.username} isOwner={this.state.isOwner} handleDelete={this.handleDeleteProduct} handleAdd={this.handleAddBookmark} handleUpdate={this.updateProducts}/>}
+          {this.state.value === 0 && <Products  products={this.state.user.products} history={this.props.history} user={this.state.user.username} isOwner={this.state.isOwner} handleDelete={this.handleDeleteProduct} handleAdd={this.handleAddBookmark} handleUpdate={this.updateProducts}/>}
           </div>
       </div>
       ) 

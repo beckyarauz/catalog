@@ -151,7 +151,8 @@ class ProductEdit extends React.Component {
         this.props.onClose();
   };
   handleSave = async () => {
-    await this.submitToServer()
+    let data = await this.submitToServer();
+    console.log(data)
     this.props.onSave();
     this.props.onClose();
   };
@@ -160,8 +161,11 @@ class ProductEdit extends React.Component {
         if (this.state.imageFS !== undefined && this.state.imageFS !== null) {
           let product = { ...this.state.product };
           //delete current product image and then upload the new one api.deleteFromS3(this.state.product.imageUrl, 'product');
-          let deletedImage = await api.deleteFromS3(this.state.product.imageUrl, 'product');
+          if(this.state.image){
+          let deletedImage = await api.deleteFromS3(this.state.product.imageUrl, 'product',this.state.product._id);
           console.log('deleted image data:', deletedImage)
+          }
+
           let url = await api.uploadToS3(this.state.image, 'product');
           product.imageUrl = url.data.Location;
     
@@ -173,7 +177,7 @@ class ProductEdit extends React.Component {
         }
         let data = await api.editProduct(this.state.product);
         this.setState({productId:data.data.product._id,message:data.data.message});
-        return;
+        return data;
   }    
 
   handleChange = name => event => {

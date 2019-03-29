@@ -27,7 +27,7 @@ router.get('/:user/all', async (req,res) => {
 router.post('/edit', async (request, res) => {
   try{
     let product = request.body.product;
-    console.log('request product',product)
+    // console.log('request product',product)
     let dbProduct = await Product.findOneAndUpdate({_id: request.body.product._id},{
       name: request.body.product.name,
       description: request.body.product.description,
@@ -35,6 +35,7 @@ router.post('/edit', async (request, res) => {
       tags: request.body.product.tags,
       imageUrl: request.body.product.imageUrl,
     })
+    console.log('edited',dbProduct)
     res.status(200).json({message:'Product Updated',product: dbProduct})
   } catch(e){
     console.log(e.message);

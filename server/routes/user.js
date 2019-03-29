@@ -18,6 +18,26 @@ const Product = require('../models/Product');
 //   newUser.save();
 // }
 
+
+router.delete('/account/delete', async (request, res) => {
+  try {
+    let user = request.user._id
+    let dbUser = await User.findOneAndRemove({
+      _id: user
+    })
+
+    request.session.destroy();
+
+    let products = await Product.deleteMany({seller: user});
+    let followedBy = await User.deleteMany({followers: {$in: [user]}});
+
+    console.log('deleted:',products,followedBy)
+        
+    res.status(200).json({message:'Account Deleted Succesfully'})
+  } catch (e) {
+    console.log(e.message);
+  }
+});
 router.get('/info', async (request, res) => {
   //this is to render information in manage account page
   try {

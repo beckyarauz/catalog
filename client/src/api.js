@@ -40,9 +40,9 @@ export default {
     return service
       .get('/logout')
   },
-  async deleteFromS3(url,type){
+  async deleteFromS3(url,type,id){
     return await service
-    .post(`/file/delete`,{url,type:type})
+    .post(`/file/delete`,{url,type:type,id})
   },
   async uploadToS3(file,type) {
     if(!file){
@@ -74,7 +74,6 @@ export default {
   async getCompanies(category,location,dist){
     if(category !== 'all' && category !== null){
       let data = await service.get(`/company/${category}/all`);
-      console.log(data);
       return data;
     } else {
       if(location && location !== undefined){
@@ -115,6 +114,10 @@ export default {
   async getProducts(user){
     let products = await service.get(`/product/${user}/all`);
     return products;
+  },
+  async deleteAccount(){
+    let data = await service.delete(`/user/account/delete`);
+    return data;
   }
 }
 
