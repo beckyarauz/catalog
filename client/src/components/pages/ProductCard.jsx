@@ -63,7 +63,8 @@
       props.detailHandler({...props.product})
     }
     let handleContactSeller = (e) => {
-      props.contactSeller(props.product._id);
+      // console.log(props.product._id,props.product.name)
+      props.contactSeller({id:props.product._id, name:props.product.name});
     }
     let handleEditProduct = (e) => {
       props.edit({product: props.product});
@@ -122,9 +123,10 @@
           <Button size="small" className={classes.actionText} color="primary" onClick={e => handleDetail(e)}>
             Details
           </Button>
-          <Button size="small" className={classes.actionText} color="primary" onClick={e => handleContactSeller(e)}>
+         { props.isLogged && 
+         <Button size="small" className={classes.actionText} color="primary" onClick={e => handleContactSeller(e)}>
             Contact Seller
-          </Button>
+          </Button>}
         </CardActions>}
       </Card>
     );

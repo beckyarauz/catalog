@@ -94,8 +94,10 @@ class Products extends Component {
   handleSaveProduct = async (id) => {
     this.props.handleAdd(id);
   }
-  handleContactSeller = async (id) => {
-    console.log('contact Seller')
+  handleContactSeller = async (product) => {
+    // console.log('contact Seller')
+    // console.log(product)
+    this.props.handleClickOpenContact(product)
   }
   handleEditProduct = (value) => {
     this.handleClickOpenEdit(value);
@@ -139,7 +141,8 @@ class Products extends Component {
           {this.state.error}
         </div>}
 
-        {this.state.products && (this.state.products.length === 0) && <Button onClick={(e) => this.props.history.push('/add-product')}>Add Products</Button>}
+        {this.state.products && this.props.isOwner && (this.state.products.length === 0) && 
+        <Button onClick={(e) => this.props.history.push('/add-product')}>Add Products</Button>}
         {
           this.state.products && (this.state.products.length > 0) && this.state.products.map((product,idx) => {
             return <ProductCard 

@@ -129,25 +129,19 @@ class ManageAccount extends React.Component {
     return currentValue && (currentValue instanceof Object || currentValue.length > 0 || currentValue instanceof File);
   }
   handleDeleteAccount = async () => {
-    // if(this.state.user.logoUrl){
-    //   console.log('deleting image');
-    //   await this.deleteFile();
-    // }
+    if(this.state.user.logoUrl){
+      await this.deleteFile();
+    }
      
-    // if(this.state.user.products && this.state.user.products.length > 0){
-    //   await this.state.user.products.map(async (product) => {
-    //     if(product.imageUrl){
-    //       console.log('deleting product image');
-    //       await api.deleteFromS3(product.imageUrl,'product',product._id);
-    //     } else {
-    //       console.log('no image to delete')
-    //     }
-    //   })
-    // }
-    
-    // console.log('deleting account')    
+    if(this.state.user.products && this.state.user.products.length > 0){
+      await this.state.user.products.map(async (product) => {
+        if(product.imageUrl){
+          await api.deleteFromS3(product.imageUrl,'product',product._id);
+        } 
+      })
+    }   
     await api.deleteAccount();
-    // this.props.history.push('/signup')
+    this.props.history.push('/signup')
   }
 
   componentWillMount() {

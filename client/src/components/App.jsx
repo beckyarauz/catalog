@@ -133,7 +133,7 @@ export default class App extends Component {
                   <ProfileBuyer {...props} />
                 )
               )} />}
-          <Route path={`/profile/company/:user`} render={(props) => (<Profile {...props}/>)} />
+          <Route path={`/profile/company/:user`} render={(props) => (<Profile loggedUser={this.state.user} {...props}/>)} />
           <Route path={`/profile/user/:user`} render={(props) => (<ProfileBuyer {...props}/>)} />
 
           {this.state.isSeller && <Route path="/manage-account" render={(props) => (

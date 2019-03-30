@@ -85,6 +85,7 @@ app.use(passport.session());
 
 app.use('/api', require('./routes/index'))
 app.use('/api', require('./routes/auth'))
+app.use('/api/message', require('./routes/message'))
 app.use('/api/file', require('./routes/file'))
 app.use('/api/user', require('./routes/user'))
 app.use('/api/product', require('./routes/product'))

@@ -11,7 +11,8 @@ import FavoriteIcon from '@material-ui/icons/Favorite';
 // import PersonPinIcon from '@material-ui/icons/PersonPin';
 import Paper from '@material-ui/core/Paper';
 import Icon from '@material-ui/core/Icon';
-import Button from '@material-ui/core/Button';
+// import Button from '@material-ui/core/Button';
+import ContactForm from './ContactForm';
 
 import Products from './Products';
 import Bookmarks from './Bookmarks';
@@ -95,6 +96,8 @@ class Profile extends Component {
         lastName:'Last Name',
         products:null,
       },
+      open:false,
+      selectedProduct:{},
       message: null,
       error: null,
       isOwner:false,
@@ -236,11 +239,36 @@ class Profile extends Component {
     }
   }
 
+  handleClickOpenContact = (value) => {
+    console.log(value)
+    this.setState(currentState => ({
+      open: true,
+      selectedProduct:value
+    }));
+  };
+
+  handleCloseContact = (value) => {
+    this.setState({ open: false});
+  };
+  handleSend = (mail) => {
+    console.log('send')
+    api.sendMessage(mail);
+  }
+
   render() {
     const { value } = this.state;
     const { classes } = this.props;
     return (this.state.user.username && (
       <div className={classNames(classes.root ,classes.margin)}>
+      <ContactForm
+          product={this.state.selectedProduct}
+          sender={this.props.loggedUser}
+          sellerMail={this.state.user.email}
+          open={this.state.open}
+          onClose={this.handleCloseContact}
+          onSend={this.handleSend}
+        />
+
             <div className={classNames(classes.header)}>
             <Grid container justify="center" alignItems="center">
               <Grid item xs={4} className={classNames(classes.avatarContainer,classes.text)}>
@@ -282,9 +310,29 @@ class Profile extends Component {
             {this.state.error}
           </div>}
           </div>
-          {this.state.value === 2 && <Bookmarks products={this.state.user.bookmarks}  user={this.state.user._id} isOwner={this.state.isOwner} handleRemove={this.handleRemoveBookmark} handleUpdate={this.updateBookmarks}/>}
-          {this.state.value === 1 && <Contact phone={this.state.user.phone} email={this.state.user.email} address={this.state.user.address} name={`${this.state.user.firstName} ${this.state.user.lastName}`}/>}
-          {this.state.value === 0 && <Products  products={this.state.user.products} history={this.props.history} user={this.state.user.username} isOwner={this.state.isOwner} handleDelete={this.handleDeleteProduct} handleAdd={this.handleAddBookmark} handleUpdate={this.updateProducts}/>}
+          {this.state.value === 2 && 
+          <Bookmarks 
+            products={this.state.user.bookmarks}  
+            user={this.state.user._id} 
+            isOwner={this.state.isOwner} 
+            handleRemove={this.handleRemoveBookmark} 
+            handleUpdate={this.updateBookmarks}/>}
+          {this.state.value === 1 && 
+          <Contact 
+            phone={this.state.user.phone} 
+            email={this.state.user.email} 
+            address={this.state.user.address} 
+            name={`${this.state.user.firstName} ${this.state.user.lastName}`}/>}
+          {this.state.value === 0 && 
+          <Products 
+            handleClickOpenContact={this.handleClickOpenContact} 
+            products={this.state.user.products} 
+            history={this.props.history} 
+            user={this.state.user.username} 
+            isOwner={this.state.isOwner} 
+            handleDelete={this.handleDeleteProduct} 
+            handleAdd={this.handleAddBookmark} 
+            handleUpdate={this.updateProducts}/>}
           </div>
       </div>
       ) 

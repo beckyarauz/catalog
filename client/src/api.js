@@ -118,7 +118,12 @@ export default {
   async deleteAccount(){
     let data = await service.delete(`/user/account/delete`);
     return data;
+  },
+  async sendMessage(mail){
+    let response = await service.post('/message/send',{mail})
+    return response;
   }
+
 }
 
 

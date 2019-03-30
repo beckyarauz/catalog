@@ -3,22 +3,6 @@ const router = express.Router();
 const User = require('../models/User');
 const Product = require('../models/Product');
 
-// let saveUser = async (user) => {
-//   const newUser = User({
-//     username: user.username,
-//     password: user.password,
-//     firstName: user.firstName,
-//     lastName: user.lastName,
-//     email: user.email,
-//     phone: user.phone,
-//     about: user.description,
-//     logoUrl: user.logo,
-//   });
-
-//   newUser.save();
-// }
-
-
 router.delete('/account/delete', async (request, res) => {
   try {
     let user = request.user._id
@@ -36,21 +20,18 @@ router.delete('/account/delete', async (request, res) => {
         {},
         { $pull: { bookmarks: { $in: userProducts.products } } }
         )
-      let followedBy = await User.update( //this the user from the list of following of other Users
+      let followedBy = await User.updateMany( //this the user from the list of following of other Users
         { },
-        { $pull: { following: { $in: [user] } } },
-        { multi: true }
+        { $pull: { following: { $in: [user] } } }
     )
     } else {
-      let bookmarkedBy = await Product.update(//deletes the user from the list of users that have bookmarked a product
+      let bookmarkedBy = await Product.updateMany(//deletes the user from the list of users that have bookmarked a product
         { },
-        { $pull: { bookmarkedBy: { $in: [user] } } },
-        { multi: true }
+        { $pull: { bookmarkedBy: { $in: [user] } } }
       )
-      let following = await User.update( // deletes the user if he/she was following others from their list of followers
+      let following = await User.updateMany( // deletes the user if he/she was following others from their list of followers
         { },
-        { $pull: { followers: { $in: [user] } } },
-        { multi: true }
+        { $pull: { followers: { $in: [user] } } }
       )
     }
     res.status(200).json({message:'Account Deleted Succesfully'})
@@ -147,22 +128,7 @@ router.get('/profile/user/:user', async (request, res) => {
     .populate('bookmarks','name price seller description imageUrl')
     .populate('products','name price seller description imageUrl')
     .select('username about phone email category logoUrl userPictureUrl firstName lastName company address geolocation tags bookmarks role')
-    
-    // console.log('bookmarks',dbUser.bookmarks);
-    let userBook = await User.findOne({
-      username
-    })
-    let filtered = await Product.find({_id:{$in:userBook.bookmarks}},{_id:1});
-    let filteredArray = filtered.map((item) => item._id);
 
-    // if(filtered.length !== userBook.bookmarks){
-    //   //In case a Seller has deleted his account we need to
-    //   //clean the bookmarks of the user
-    //   await User.updateOne(
-    //     {username},
-    //     { $pull: { bookmarks: { $nin: filteredArray } } }
-    //     )
-    // }
     let message = null;
     if(dbUser.products.length === 0){
       message = `There are no products to be displayed`;
