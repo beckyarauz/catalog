@@ -128,7 +128,7 @@ class ContactForm extends React.Component {
         from:'',
         to:'',
         subject:'',
-        text:'Write your message here'
+        message:''
       };
       this.setState(state => ({message:response.data.message,mail}))
       setTimeout(()=> {
