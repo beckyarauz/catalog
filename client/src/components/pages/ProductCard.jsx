@@ -63,8 +63,7 @@
       props.detailHandler({...props.product})
     }
     let handleContactSeller = (e) => {
-      // console.log(props.product._id,props.product.name)
-      props.contactSeller({id:props.product._id, name:props.product.name});
+      props.contactSeller({id:props.product._id, name:props.product.name,sellerEmail:props.product.seller.email});
     }
     let handleEditProduct = (e) => {
       props.edit({product: props.product});

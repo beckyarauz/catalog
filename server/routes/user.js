@@ -98,7 +98,15 @@ router.get('/profile/company/:user', async (request, res) => {
     let dbUser = await User.findOne({
       username
     })
-    .populate('bookmarks','name price seller description imageUrl')
+    .populate({
+      path:'bookmarks',
+      select: 'name price seller description imageUrl',
+      populate:{
+        path:'seller',
+        model:'User',
+        select:{'_id':0,'username':1,'logoUrl':1,'company':1,'email':1}
+      }
+    })
     .populate('products','name price seller description imageUrl')
     .select('username about phone email category logoUrl userPictureUrl firstName lastName company address geolocation tags bookmarks role')
     
@@ -125,14 +133,20 @@ router.get('/profile/user/:user', async (request, res) => {
     let dbUser = await User.findOne({
       username
     })
-    .populate('bookmarks','name price seller description imageUrl')
-    .populate('products','name price seller description imageUrl')
-    .select('username about phone email category logoUrl userPictureUrl firstName lastName company address geolocation tags bookmarks role')
+    // .populate('bookmarks','name price seller description imageUrl')
+    .populate({
+      path:'bookmarks',
+      select: 'name price seller description imageUrl',
+      populate:{
+        path:'seller',
+        model:'User',
+        select:{'_id':0,'username':1,'logoUrl':1,'company':1,'email':1}
+      }
+    })
+    .select('username about phone email userPictureUrl firstName lastName address geolocation tags bookmarks role')
 
     let message = null;
-    if(dbUser.products.length === 0){
-      message = `There are no products to be displayed`;
-    }
+    
     // console.log(dbUser)
     let isOwner = request.user && request.user.username === username;
     let isSeller = dbUser.role === 'SELLER';

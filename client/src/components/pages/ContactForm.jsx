@@ -109,9 +109,14 @@ class ContactForm extends React.Component {
       }, 3000)
     }
     if(prevProps.product !== this.props.product){
+      console.log(this.props.product)
       let mail = {...this.state.mail}
       mail.subject = `Product Query: ${this.props.product.name} ${this.props.product.id}`
-      mail.to = this.props.sellerMail;
+      if(this.props.sellerMail){
+        mail.to = this.props.sellerMail;
+      } else {
+        mail.to = this.props.product.sellerEmail
+      }
       mail.from = this.props.sender;
       this.setState(state => ({product: {...this.props.product},mail}))
     }
@@ -184,7 +189,7 @@ class ContactForm extends React.Component {
             label="email"
             type='email'
             className={classNames(classes.margin, classes.textField)}
-            value={this.props.sellerMail}
+            value={this.state.mail.to}
             onChange={this.handleChange('to')}
             margin="normal"
             variant="outlined"

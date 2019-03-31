@@ -13,6 +13,7 @@ import Paper from '@material-ui/core/Paper';
 
 import Bookmarks from './Bookmarks';
 import Contact from './Contact';
+import ContactForm from './ContactForm';
 
 import api from '../../api';
 
@@ -89,6 +90,8 @@ class ProfileBuyer extends Component {
         lastName: 'Last Name',
       },
       message: null,
+      open:false,
+      selectedProduct:{},
       error: null,
       isOwner: false,
       value: 0, //value of the Tabs
@@ -156,6 +159,18 @@ class ProfileBuyer extends Component {
       this.setState({ value });
     }
   };
+  handleClickOpenContact = (value) => {
+    this.setState(currentState => ({
+      open: true,
+      selectedProduct:value
+    }));
+  };
+  handleCloseContact = (value) => {
+    this.setState({ open: false});
+  };
+  handleSend = (mail) => {
+    api.sendMessage(mail);
+  }
   handleRemoveBookmark = async (id) => {
     let response = await api.removeBookmark(id);
     let user = { ...this.state.user };
@@ -203,6 +218,14 @@ class ProfileBuyer extends Component {
     const { classes } = this.props;
     return (this.state.user.username && (
       <div className={classNames(classes.root, classes.margin)}>
+       <ContactForm
+          product={this.state.selectedProduct}
+          sender={this.props.loggedUser}
+          // sellerMail={this.selectedProduct.sellerEmail}
+          open={this.state.open}
+          onClose={this.handleCloseContact}
+          onSend={this.handleSend}
+        />
 
         <div className={classNames(classes.header)}>
           <Grid container justify="center" alignItems="center">
@@ -213,7 +236,7 @@ class ProfileBuyer extends Component {
             <Grid item xs={8} className={classNames(classes.infoContainer, classes.text)}>
               <h2>{this.state.user.firstName}</h2>
               {this.state.user.about && <div>
-                <p><b>Description:</b></p>
+                <p><b>Bio:</b></p>
                 <p>{this.state.user.about}</p>
               </div>}
             </Grid>
@@ -242,7 +265,14 @@ class ProfileBuyer extends Component {
               {this.state.error}
             </div>}
           </div>
-          {this.state.value === 1 && <Bookmarks products={this.state.user.bookmarks} user={this.state.user._id} isOwner={this.state.isOwner} handleRemove={this.handleRemoveBookmark} handleUpdate={this.updateBookmarks} />}
+          {this.state.value === 1 && 
+          <Bookmarks 
+          products={this.state.user.bookmarks} 
+          user={this.state.user._id} 
+          isOwner={this.state.isOwner} 
+          handleClickOpenContact={this.handleClickOpenContact}
+          handleRemove={this.handleRemoveBookmark} 
+          handleUpdate={this.updateBookmarks} />}
           {this.state.value === 0 && <Contact phone={this.state.user.phone} email={this.state.user.email} address={this.state.user.address} name={`${this.state.user.firstName} ${this.state.user.lastName}`} />}
 
         </div>

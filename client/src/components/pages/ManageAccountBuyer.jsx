@@ -302,7 +302,7 @@ class ManageAccountBuyer extends React.Component {
                   <div className={classes.imageSection}><img src={this.state.imageFS} width="100" height="100" alt="User" /></div>)
               }
 
-              {this.state.message && <div className="info info-danger">
+              {this.state.message && <div className="info">
                 {this.state.message}
               </div>}
               <br></br>
@@ -411,7 +411,9 @@ class ManageAccountBuyer extends React.Component {
                 startAdornment: <InputAdornment position="start"> </InputAdornment>,
               }}
             />
-
+            {this.state.message && <div className="info">
+            {this.state.message}
+            </div>}
             <Button variant="contained" component="span" className={classes.button} onClick={this.handleClick} disabled={!this.state.valid}>Update</Button>
             <Button variant="contained" component="span" className={classes.button} onClick={this.handleDeleteAccount} >Delete Account</Button>
           </div>

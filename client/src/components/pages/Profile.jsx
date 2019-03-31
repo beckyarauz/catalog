@@ -240,7 +240,6 @@ class Profile extends Component {
   }
 
   handleClickOpenContact = (value) => {
-    console.log(value)
     this.setState(currentState => ({
       open: true,
       selectedProduct:value
@@ -251,7 +250,6 @@ class Profile extends Component {
     this.setState({ open: false});
   };
   handleSend = (mail) => {
-    console.log('send')
     api.sendMessage(mail);
   }
 
@@ -277,7 +275,7 @@ class Profile extends Component {
               </Grid>
               <Grid item xs={8} className={classNames(classes.infoContainer,classes.text)}>
                 <h2>{this.state.user.company}</h2>
-                <p><b>Description:</b></p>
+                <p><b>Bio:</b></p>
                 <p>{this.state.user.about}</p>
   
                 <p><b>Category:</b></p>
@@ -316,6 +314,7 @@ class Profile extends Component {
             user={this.state.user._id} 
             isOwner={this.state.isOwner} 
             handleRemove={this.handleRemoveBookmark} 
+            handleClickOpenContact={this.handleClickOpenContact} 
             handleUpdate={this.updateBookmarks}/>}
           {this.state.value === 1 && 
           <Contact 

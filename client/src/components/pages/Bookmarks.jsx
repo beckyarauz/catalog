@@ -75,8 +75,9 @@ class Bookmarks extends Component {
   handleCloseEdit = (value) => {
     this.setState({ openEdit: false});
   };
-  handleContactSeller = async (id) => {
-    console.log(id)
+  handleContactSeller = async (product) => {
+    console.log('Bookmarks contact',product)
+    this.props.handleClickOpenContact(product)
   }
   handleConfirmation = async (value) => {
     if(value){

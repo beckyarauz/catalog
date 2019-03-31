@@ -17,24 +17,37 @@ const User = require('../models/User');
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-router.post('/send',async (req, res, next) => {
-  try{
+router.post('/send', async (req, res, next) => {
+  try {
     let mail = req.body.mail;
-    let user = await User.findOne({_id:req.user._id}).select({email:1,_id:0});
+    let user = await User.findOne({
+      _id: req.user._id
+    }).select({
+      email: 1,
+      _id: 0
+    });
 
     let msg = {
       to: mail.to,
-      from: user.email,
+      from: {
+        email: user.email,
+        name: mail.from
+      },
       subject: mail.subject,
       text: mail.message,
       html: `<p>${mail.message}</p><br><strong>Message from Local Market</strong>`,
     };
     let ms = await sgMail.send(msg); //statusMessage ='Accepted'
-    res.status(200).json({message:'Message Sent'})
-  } catch(e){
+    res.status(200).json({
+      message: 'Message Sent'
+    })
+  } catch (e) {
     console.log(e.message)
+    res.json({
+      error: 'Failed to send Message' + e.message
+    })
   }
-  
+
   //statusMessage
   // transporter.verify((error, success) => {
   //   if (error) {

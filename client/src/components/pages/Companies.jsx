@@ -23,12 +23,12 @@ const styles = theme => ({
     marginTop: 20,
   },
   paper: {
-    height: 200,
+    height: 300,
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
     fontSize: 14,
-    padding: 15,
+    padding:'5px 13px',
     borderRadius: '15px 50px 30px',
     marginTop: 20,
   },
@@ -43,6 +43,7 @@ const styles = theme => ({
   },
   gridImage: {
     borderRadius: '15px 50px 0px 0px',
+    // minHeight:'100px',
     flex: 1,
   },
   gridContent: {
