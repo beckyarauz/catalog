@@ -1,6 +1,6 @@
 {
   "name": "local-market-ironhack",
-  "version": "2.0.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "preinstall": "echo --- preinstall --- && cd server && npm install && cd ../client && npm install && npm run build && cd ..",
