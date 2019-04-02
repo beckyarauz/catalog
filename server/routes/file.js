@@ -64,12 +64,10 @@ router.post('/delete', async (req,res)=>{
 
 // Define POST route
 router.post('/upload', (request, response) => {
-  
   const form = new multiparty.Form();
     form.parse(request, async (error, fields, files) => {
-      // console.log(fields);
-      if (error) throw new Error(error);
       try {
+        if (error) throw new Error(error);
         const path = files.file[0].path;
         const name = files.file[0].originalFilename;
         const myType = fields.myType[0];        

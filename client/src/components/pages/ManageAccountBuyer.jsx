@@ -136,33 +136,31 @@ class ManageAccountBuyer extends React.Component {
         }
 
         let stateValues = Object.values(info);
+        let valid = stateValues.every(this.isNotEmpty);
+        if ((!user.geolocation && "geolocation" in navigator) || ((user.geolocation.latitude === 0 && user.geolocation.longitude === 0) && "geolocation" in navigator)) {
+          let self = this;
+          navigator.geolocation.getCurrentPosition(function (position) {
+            let geolocation = {};
 
-        this.setState(prevState => ({ user, valid: stateValues.every(this.isNotEmpty) }), () => {
+            geolocation.latitude = position.coords.latitude;
+            geolocation.longitude = position.coords.longitude;
 
-          if ((!this.state.user.geolocation && "geolocation" in navigator) || (this.state.user.geolocation.latitude === 0 && this.state.user.geolocation.longitude === 0 && "geolocation" in navigator)) {
-            let self = this;
-            navigator.geolocation.getCurrentPosition(function (position) {
-              let user = { ...self.state.user };
-              let geolocation = { ...user.geolocation };
+            user.geolocation = geolocation;
 
-              geolocation.latitude = position.coords.latitude;
-              geolocation.longitude = position.coords.longitude;
-
-              user.geolocation = geolocation;
-
-              let viewport = self.state.viewport;
-              viewport.latitude = user.geolocation.latitude;
-              viewport.longitude = user.geolocation.longitude;
-              self.setState(prevState => ({ user, viewport }), () => {
-                console.log('changed user geolocation:', self.state.user.geolocation)
-              });
-            })
-          } else {
-            /* geolocation IS NOT available */
-
-          }
-        });
-
+            let viewport = { ...self.state.viewport };
+            viewport.latitude = user.geolocation.latitude;
+            viewport.longitude = user.geolocation.longitude;
+            self.setState(prevState => ({ user, viewport, valid }), () => {
+              console.log('changed user geolocation:', self.state.user.geolocation)
+            });
+          })
+        } else {
+          /* geolocation IS NOT available */
+          let viewport = { ...this.state.viewport };
+          viewport.latitude = user.geolocation.latitude;
+          viewport.longitude = user.geolocation.longitude;
+          this.setState(prevState => ({ viewport, user, valid }))
+        }
       } catch (e) {
         console.error(e.message)
       }
@@ -222,12 +220,10 @@ class ManageAccountBuyer extends React.Component {
 
   submitToServer = async () => {
     if (this.state.imageFS !== undefined && this.state.imageFS !== null) {
-
-      let user = { ...this.state.user };
-      let url;
-
-      url = await api.uploadToS3(this.state.image, 'userPicture');
       await this.deleteFile();
+      let user = { ...this.state.user };
+      let url = await api.uploadToS3(this.state.image, 'userPicture');
+      
       user.userPictureUrl = url.data.Location;
       this.setState(currentState => ({ user }), async () => {
         let data = await api.updateUser(this.state.user);
@@ -255,10 +251,10 @@ class ManageAccountBuyer extends React.Component {
     return user;
   }
   deleteFile = async (e) => {
-    let user;
-    user = { ...this.state.user };
-    user.userPictureUrl = "";
-    await api.deleteFromS3(this.state.user.userPictureUrl, 'userPicture');
+    let user = { ...this.state.user };
+    if(user.userPictureUrl){
+      await api.deleteFromS3(user.userPictureUrl, 'userPicture');
+    }
   }
 
   handleViewportChange = (viewport) => {

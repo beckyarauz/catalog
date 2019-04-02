@@ -30,15 +30,17 @@ router.post('/send', async (req, res, next) => {
     let msg = {
       to: mail.to,
       from: {
-        email: user.email,
-        name: mail.from
+        email: 'local.market.catalog@gmail.com',
+        name: `@${req.user.username} from Local Market`
       },
       subject: mail.subject,
       text: mail.message,
-      html: `<p>${mail.message}</p><br><strong>Message from Local Market</strong>`,
+      html: `<p>@${req.user.username} from Local Market:<br><br>Message:<br><br>${mail.message}. <br><br> Please reply to: <a href='mailto:${user.email}'} target="_blank" rel="noopener noreferrer">${user.email}</a></p><br><strong>Message from Local Market</strong>`,
     };
     let ms = await sgMail.send(msg); //statusMessage ='Accepted'
-    res.status(200).json({
+    console.log(ms[0].statusMessage)
+    let statusCode = ms[0].statusCode
+    res.status(statusCode).json({
       message: 'Message Sent'
     })
   } catch (e) {
