@@ -9,7 +9,7 @@ export default {
   service: service,
   // To know if the user is connected, we just check if we have a value for localStorage.getItem('user')
    isLoggedIn() {
-    return service.get(`${process.env.REACT_APP_API_URL}/isLogged`)
+    return service.get(`/isLogged`)
       .then( res => {
         // console.log('console',res.data);
         return res.data;
@@ -18,22 +18,22 @@ export default {
   },
   async signup(userInfo) {
     return await service
-      .post(`${process.env.REACT_APP_API_URL}/signup`, userInfo);
+      .post(`/signup`, userInfo);
   },
 
   async login(username, password) {
-    let data = await service.post(`${process.env.REACT_APP_API_URL}/login`,{username, password});
+    let data = await service.post(`/login`,{username, password});
     return data;
   },
 
   logout() {
     localStorage.removeItem('user')
     return service
-      .get(`${process.env.REACT_APP_API_URL}/logout`)
+      .get(`/logout`)
   },
   async deleteFromS3(url,type,id){
     return await service
-    .post(`${process.env.REACT_APP_API_URL}/file/delete`,{url,type:type,id})
+    .post(`/file/delete`,{url,type:type,id})
   },
   async uploadToS3(file,type) {
     if(!file){
@@ -46,7 +46,7 @@ export default {
       formData.append('myType', type);
       // console.log('formdata',formData);
       let data = await service
-                      .post(`${process.env.REACT_APP_API_URL}/file/upload`, formData, {
+                      .post(`/file/upload`, formData, {
                         headers: {
                           'Content-Type': 'multipart/form-data'
                         }
@@ -55,20 +55,20 @@ export default {
       return data;
   },
   async getUserInfo(username){
-    let data = await service.get(`${process.env.REACT_APP_API_URL}/user/profile/user/${username}`);
+    let data = await service.get(`/user/profile/user/${username}`);
     return data;
   },
   async getCompanyInfo(username){
-    let data = await service.get(`${process.env.REACT_APP_API_URL}/user/profile/company/${username}`);
+    let data = await service.get(`/user/profile/company/${username}`);
     return data;
   },
   async getCompanies(category,location,dist){
     if(category !== 'all' && category !== null){
-      let data = await service.get(`${process.env.REACT_APP_API_URL}/company/${category}/all`);
+      let data = await service.get(`/company/${category}/all`);
       return data;
     } else {
       if(location && location !== undefined){
-      let data = await service.get(`${process.env.REACT_APP_API_URL}/company/all?latitude=${location.latitude}&longitude=${location.longitude}`);
+      let data = await service.get(`/company/all?latitude=${location.latitude}&longitude=${location.longitude}`);
       return data;
       } else {
         return {data: {
@@ -78,40 +78,40 @@ export default {
     }
   },
   async updateUser(stateInfo){
-    return await service.post(`${process.env.REACT_APP_API_URL}/user/info/update`,{stateInfo})
+    return await service.post(`/user/info/update`,{stateInfo})
   },
   async deleteProduct(id){
-    let data = await service.post(`${process.env.REACT_APP_API_URL}/product/delete`,{product:id})
+    let data = await service.post(`/product/delete`,{product:id})
     return data;
   },
   async addBookmark(id){
-    let data = await service.post(`${process.env.REACT_APP_API_URL}/user/bookmark/add`,{product:id})
+    let data = await service.post(`/user/bookmark/add`,{product:id})
     return {...data};
   },
   async removeBookmark(id){
-    let data = await service.post(`${process.env.REACT_APP_API_URL}/user/bookmark/remove`,{product:id})
+    let data = await service.post(`/user/bookmark/remove`,{product:id})
     return {...data};
   },
   async addProduct(product){
-    let savedProd = await service.post(`${process.env.REACT_APP_API_URL}/product/add`,{product});
+    let savedProd = await service.post(`/product/add`,{product});
     return savedProd;
 
   },
   async editProduct(product){
-    let editedProd = await service.post(`${process.env.REACT_APP_API_URL}/product/edit`,{product});
+    let editedProd = await service.post(`/product/edit`,{product});
     return editedProd;
 
   },
   async getProducts(user){
-    let products = await service.get(`${process.env.REACT_APP_API_URL}/product/${user}/all`);
+    let products = await service.get(`/product/${user}/all`);
     return products;
   },
   async deleteAccount(){
-    let data = await service.delete(`${process.env.REACT_APP_API_URL}/user/account/delete`);
+    let data = await service.delete(`/user/account/delete`);
     return data;
   },
   async sendMessage(mail){
-    let response = await service.post(`${process.env.REACT_APP_API_URL}/message/send`,{mail})
+    let response = await service.post(`/message/send`,{mail})
     return response;
   }
 
