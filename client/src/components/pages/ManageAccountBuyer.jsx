@@ -114,10 +114,8 @@ class ManageAccountBuyer extends React.Component {
   }
   handleDeleteAccount = async () => {
     if(this.state.user.userPictureUrl){
-      console.log('deleting image');
       await this.deleteFile();
-    }
-    console.log('deleting account')    
+    }  
     await api.deleteAccount();
     this.props.history.push('/signup')
   }
@@ -151,7 +149,7 @@ class ManageAccountBuyer extends React.Component {
             viewport.latitude = user.geolocation.latitude;
             viewport.longitude = user.geolocation.longitude;
             self.setState(prevState => ({ user, viewport, valid }), () => {
-              console.log('changed user geolocation:', self.state.user.geolocation)
+              // console.log('changed user geolocation:', self.state.user.geolocation)
             });
           })
         } else {

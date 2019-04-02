@@ -23,6 +23,17 @@ const styles = theme => ({
   },
   button: {
     margin: theme.spacing.unit,
+  },
+  addProduct:{
+    backgroundColor:'#5776e9',
+    color:'white',
+    marginBottom:'20px'
+  },
+  buttonContainer:{
+    width:'100%',
+    display:'flex',
+    justifyContent:'center',
+    textAlign:'center'
   }
 })
   
@@ -139,10 +150,15 @@ class Products extends Component {
           {this.state.error}
         </div>}
 
-        {this.state.products && this.props.isOwner && (this.state.products.length === 0) && 
-        <Button onClick={(e) => this.props.history.push('/add-product')}>Add Products</Button>}
+        {this.props.isOwner  && 
+        <div className={this.props.classes.buttonContainer}>
+          <Button className={this.props.classes.addProduct}  onClick={(e) => this.props.history.push('/add-product')}>Add Products</Button>
+        </div>
+        }
         {
-          this.state.products && (this.state.products.length > 0) && this.state.products.map((product,idx) => {
+          this.state.products && 
+          (this.state.products.length > 0) && 
+          this.state.products.map((product,idx) => {
             return <ProductCard 
                       product={product}
                       save={this.handleSaveProduct} 
@@ -155,10 +171,8 @@ class Products extends Component {
                       bookmarked={false}
                       key={product._id}
                       detailHandler={this.handleClickOpen}/>
-                      
           })
         }
-       
       </div>
     );
   }

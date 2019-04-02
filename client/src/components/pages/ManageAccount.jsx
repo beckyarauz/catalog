@@ -181,7 +181,7 @@ class ManageAccount extends React.Component {
             viewport.latitude = user.geolocation.latitude;
             viewport.longitude = user.geolocation.longitude;
             self.setState(prevState => ({ user, viewport, valid }), () => {
-              console.log('changed user geolocation:', self.state.user.geolocation)
+              // console.log('changed user geolocation:', self.state.user.geolocation)
             });
           })
         } else {
@@ -193,7 +193,7 @@ class ManageAccount extends React.Component {
         }
 
       } catch (e) {
-        console.log('ComponentWillMount error:', e.message)
+        console.log(e.message)
       }
     })()
   }
@@ -231,7 +231,6 @@ class ManageAccount extends React.Component {
     } 
 
     let stateValues = Object.values(info);
-    console.log(info)
 
     this.setState({ valid: stateValues.every(this.isNotEmpty) });
   }
