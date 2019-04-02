@@ -76,7 +76,6 @@ class Bookmarks extends Component {
     this.setState({ openEdit: false});
   };
   handleContactSeller = async (product) => {
-    console.log('Bookmarks contact',product)
     this.props.handleClickOpenContact(product)
   }
   handleConfirmation = async (value) => {
@@ -84,7 +83,7 @@ class Bookmarks extends Component {
         await this.props.handleRemove(this.state.delete.id);
         this.props.handleUpdate();
     } else {
-      console.log('you said no')
+      console.log('OkNo')
     }
   }
 
