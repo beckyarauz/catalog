@@ -112,8 +112,7 @@ class ProfileBuyer extends Component {
     path = this.props.location.pathname;
 
     if (path.includes('user')) {
-      link = path.substring(path.search('user'));
-      user = link.substring(link.search('/') + 1);
+      user = this.props.match.params.user;
     } else {
       link = path.substring(path.search('profile'));
       user = link.substring(link.search('/') + 1);

@@ -101,6 +101,8 @@ class Profile extends Component {
       message: null,
       error: null,
       isOwner:false,
+      prevPath:'',
+      showBackButton:false,
       value:0, //value of the Tabs
     }
   }
@@ -114,16 +116,15 @@ class Profile extends Component {
   }
 
   componentWillMount(){
-    let path,link,user;
-      path = this.props.location.pathname;
-      if(path.includes('company')){
-        link = path.substring(path.search('company'));
-        user = link.substring(link.search('/')+1);
-      } else {
-        link = path.substring(path.search('profile'));
-        user = link.substring(link.search('/')+1);
-      }
+    let path, link, user;
+    path = this.props.location.pathname;
 
+    if (path.includes('company')) {
+      user = this.props.match.params.user;
+    } else {
+      link = path.substring(path.search('profile'));
+      user = link.substring(link.search('/') + 1);
+    }
     (async ()=>{
       await this.getUser(user);
     })()

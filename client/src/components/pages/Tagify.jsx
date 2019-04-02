@@ -43,15 +43,14 @@ export default class Tag extends React.Component {
         this.setState(state => ({
          tags: tags.filter((tag, index) => index !== i),
         }),() => {
-            let tags = this.state.tags.map(tag => tag.text);
-            this.props.handleTagChange(tags);
+            this.props.handleTagChange(this.state.tags);
         });
     }
  
     handleAddition(tag) {
-        this.setState(state => ({ tags: [...state.tags, tag] }),() => {
-            // let tags = this.state.tags.map(tag => tag);
-            // let tagObject = {id: tag, text: tag}
+        const { tags } = this.state;
+        tags.push(tag)
+        this.setState(state => ({ tags }),() => {
             this.props.handleTagChange(this.state.tags);
         });
     }

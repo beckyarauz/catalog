@@ -69,6 +69,8 @@ router.post('/info/update', async (request, response) => {
         firstName: updatedUser.firstName,
         phone: updatedUser.phone,
         email: updatedUser.email,
+        address: updatedUser.address,
+        company: updatedUser.company,
         about: updatedUser.about,
         logoUrl: updatedUser.logoUrl,
         userPictureUrl: updatedUser.userPictureUrl,
@@ -114,7 +116,7 @@ router.get('/profile/company/:user', async (request, res) => {
     if(dbUser.products.length === 0){
       message = `There are no products to be displayed`;
     }
-    // console.log(dbUser)
+    
     let isOwner = request.user && request.user.username === username;
     let isSeller = dbUser.role === 'SELLER';
     res.status(200).json({

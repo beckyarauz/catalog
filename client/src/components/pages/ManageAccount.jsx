@@ -102,7 +102,6 @@ class ManageAccount extends React.Component {
       category: "food",
       about: "Write What's your coumpany about, the inspiration and what makes you unique! :D",
       logoUrl: "",
-      userPictureUrl: "",
       geolocation: {
         latitude: 0,
         longitude: 0
@@ -129,17 +128,17 @@ class ManageAccount extends React.Component {
     return currentValue && (currentValue instanceof Object || currentValue.length > 0 || currentValue instanceof File);
   }
   handleDeleteAccount = async () => {
-    if(this.state.user.logoUrl){
+    if (this.state.user.logoUrl) {
       await this.deleteFile();
     }
-     
-    if(this.state.user.products && this.state.user.products.length > 0){
+
+    if (this.state.user.products && this.state.user.products.length > 0) {
       await this.state.user.products.map(async (product) => {
-        if(product.imageUrl){
-          await api.deleteFromS3(product.imageUrl,'product',product._id);
-        } 
+        if (product.imageUrl) {
+          await api.deleteFromS3(product.imageUrl, 'product', product._id);
+        }
       })
-    }   
+    }
     await api.deleteAccount();
     this.props.history.push('/signup')
   }
@@ -148,13 +147,15 @@ class ManageAccount extends React.Component {
     (async () => {
       try {
         let user = await this.getUser(this.props.user);
-        let { username, email, phone, logoUrl,userPictureUrl, about, address, category, company, firstName, lastName } = user;
+        if (user.category === undefined) {
+          user.category = "beauty"
+        }
+        let { username, email, phone, logoUrl, about, address, category, company, firstName, lastName } = user;
 
         let info = {
           username,
           email,
           phone,
-          userPictureUrl,
           logoUrl,
           about,
           address,
@@ -165,42 +166,34 @@ class ManageAccount extends React.Component {
         }
 
         let stateValues = Object.values(info);
+        let valid = stateValues.every(this.isNotEmpty);
+        if ((!user.geolocation && "geolocation" in navigator) || ((user.geolocation.latitude === 0 && user.geolocation.longitude === 0) && "geolocation" in navigator)) {
+          let self = this;
+          navigator.geolocation.getCurrentPosition(function (position) {
+            let geolocation = {};
 
-        this.setState(prevState => ({ user, valid: stateValues.every(this.isNotEmpty) }), () => {
+            geolocation.latitude = position.coords.latitude;
+            geolocation.longitude = position.coords.longitude;
 
-          if ((!this.state.user.geolocation && "geolocation" in navigator) || (this.state.user.geolocation.latitude === 0 && this.state.user.geolocation.longitude === 0 && "geolocation" in navigator)) {
-            let self = this;
-            navigator.geolocation.getCurrentPosition(function (position) {
-              let user = { ...self.state.user };
-              let geolocation = { ...user.geolocation };
+            user.geolocation = geolocation;
 
-              geolocation.latitude = position.coords.latitude;
-              geolocation.longitude = position.coords.longitude;
-
-              user.geolocation = geolocation;
-
-              let viewport = self.state.viewport;
-              viewport.latitude = user.geolocation.latitude;
-              viewport.longitude = user.geolocation.longitude;
-
-              // this.setState(prevState => ({viewport}))
-
-              self.setState(prevState => ({ user, viewport }), () => {
-                console.log('changed user geolocation:', self.state.user.geolocation)
-              });
-            })
-          } else {
-            /* geolocation IS NOT available */
-            let viewport = this.state.viewport;
-            viewport.latitude = this.state.user.geolocation.latitude;
-            viewport.longitude = this.state.user.geolocation.longitude;
-
-            this.setState(prevState => ({ viewport }))
-          }
-        });
+            let viewport = { ...self.state.viewport };
+            viewport.latitude = user.geolocation.latitude;
+            viewport.longitude = user.geolocation.longitude;
+            self.setState(prevState => ({ user, viewport, valid }), () => {
+              console.log('changed user geolocation:', self.state.user.geolocation)
+            });
+          })
+        } else {
+          /* geolocation IS NOT available */
+          let viewport = { ...this.state.viewport };
+          viewport.latitude = user.geolocation.latitude;
+          viewport.longitude = user.geolocation.longitude;
+          this.setState(prevState => ({ viewport, user, valid }))
+        }
 
       } catch (e) {
-        console.log(e.message)
+        console.log('ComponentWillMount error:', e.message)
       }
     })()
   }
@@ -235,17 +228,10 @@ class ManageAccount extends React.Component {
         lastName,
         image,
       }
-    } else {
-      // image = this.state.image !== null ? this.state.image : this.state.user.userPictureUrl;
-
-      info = {
-        username,
-        email,
-      }
-    }
-
+    } 
 
     let stateValues = Object.values(info);
+    console.log(info)
 
     this.setState({ valid: stateValues.every(this.isNotEmpty) });
   }
@@ -289,14 +275,14 @@ class ManageAccount extends React.Component {
 
   submitToServer = async () => {
     if (this.state.imageFS !== undefined && this.state.imageFS !== null) {
-      
+
       let user = { ...this.state.user };
       let url;
-        url = await api.uploadToS3(this.state.image, 'logo');
-        if(user.logoUrl){
-          await this.deleteFile();
-        }
-        user.logoUrl = url.data.Location;
+      url = await api.uploadToS3(this.state.image, 'logo');
+      if (user.logoUrl) {
+        await this.deleteFile();
+      }
+      user.logoUrl = url.data.Location;
       this.setState(currentState => ({ user }), async () => {
         let data = await api.updateUser(this.state.user);
         if (data.data.message) {
@@ -319,15 +305,15 @@ class ManageAccount extends React.Component {
     this.state.valid ? this.submitToServer() : this.unvalidFormHandler();
   }
   getUser = async (username) => {
-    let info = await api.getUserInfo(username);
+    let info = await api.getCompanyInfo(username);
     let user = info.data.user;
     return user;
   }
   deleteFile = async (e) => {
     let user;
     user = { ...this.state.user };
-      user.logoUrl = "";
-      await api.deleteFromS3(this.state.user.logoUrl, 'logo');
+    user.logoUrl = "";
+    await api.deleteFromS3(this.state.user.logoUrl, 'logo');
   }
 
   handleViewportChange = (viewport) => {
@@ -478,19 +464,34 @@ class ManageAccount extends React.Component {
                 <h3>Location</h3>
                 <p>Move the pointer to set your bussiness location</p>
                 <ReactMapGL
-                {...this.state.viewport}
-                mapStyle="mapbox://styles/beckyarauz/cjtisim0s272e1fubskpzz1om"
-                mapboxApiAccessToken={TOKEN}
-                onViewportChange={(viewport) => this.handleViewportChange(viewport)}
+                  {...this.state.viewport}
+                  mapStyle="mapbox://styles/beckyarauz/cjtisim0s272e1fubskpzz1om"
+                  mapboxApiAccessToken={TOKEN}
+                  onViewportChange={(viewport) => this.handleViewportChange(viewport)}
 
-              >
-                <div style={{ position: 'absolute' }}>
-                  <NavigationControl onViewportChange={(viewport) => this.setState({ viewport })} />
-                </div>
-                {this.state.user.geolocation.longitude && <Marker latitude={this.state.user.geolocation.latitude} longitude={this.state.user.geolocation.longitude} offsetLeft={-20} offsetTop={-10} draggable={true} onDragEnd={e => this.handleMarkerDrag(e)}>
-                  <div ><Icon>location_on</Icon></div>
-                </Marker>}
-              </ReactMapGL> 
+                >
+                  <div style={{ position: 'absolute' }}>
+                    <NavigationControl onViewportChange={(viewport) => this.setState({ viewport })} />
+                  </div>
+                  {this.state.user.geolocation.longitude && <Marker latitude={this.state.user.geolocation.latitude} longitude={this.state.user.geolocation.longitude} offsetLeft={-20} offsetTop={-10} draggable={true} onDragEnd={e => this.handleMarkerDrag(e)}>
+                    <div ><Icon>location_on</Icon></div>
+                  </Marker>}
+                </ReactMapGL>
+                <TextField
+                  id="standard-description"
+                  label="Address"
+                  className={classNames(classes.textarea, classes.textField)}
+                  value={this.state.user.address}
+                  onChange={this.handleChange('address')}
+                  margin="normal"
+                  variant="outlined"
+                  multiline={true}
+                  rows={2}
+                  rowsMax={4}
+                  InputProps={{
+                    startAdornment: <InputAdornment position="start"> </InputAdornment>,
+                  }}
+                />
                 <h2>Company Info</h2>
                 {
                   (this.state.user.logoUrl &&
@@ -545,6 +546,10 @@ class ManageAccount extends React.Component {
                     <MenuItem value={'beauty'}>Beauty</MenuItem>
                     <MenuItem value={'clothing'}>Clothing</MenuItem>
                     <MenuItem value={'food'}>Food</MenuItem>
+                    <MenuItem value={'tattoo'}>Tattoo</MenuItem>
+                    <MenuItem value={'art'}>Art</MenuItem>
+                    <MenuItem value={'furniture'}>Furniture</MenuItem>
+                    <MenuItem value={'gifts'}>Gifts</MenuItem>
                   </Select>
                 </FormControl>
 
@@ -568,8 +573,8 @@ class ManageAccount extends React.Component {
               </div>
             )}
             {this.state.message && <div className="info">
-                {this.state.message}
-              </div>}
+              {this.state.message}
+            </div>}
             <Button variant="contained" component="span" className={classes.button} onClick={this.handleClick} disabled={!this.state.valid}>Update</Button>
             <Button variant="contained" component="span" className={classes.button} onClick={this.handleDeleteAccount} >Delete Account</Button>
           </div>
