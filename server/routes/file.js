@@ -20,6 +20,8 @@ AWS.config.update({
 // configure AWS to work with promises
 AWS.config.setPromisesDependency(bluebird);
 
+AWS.config.region = 'eu-central-1'
+
 // create S3 instance
 const s3 = new AWS.S3();
 
