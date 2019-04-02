@@ -11,7 +11,6 @@ export default {
    isLoggedIn() {
     return service.get(`/isLogged`)
       .then( res => {
-        // console.log('console',res.data);
         return res.data;
       })
       .catch(e => console.log(e));     
