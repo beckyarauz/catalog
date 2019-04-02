@@ -337,6 +337,7 @@ class ManageAccountBuyer extends React.Component {
             <TextField
               id="outlined-adornment-password"
               className={classNames(classes.margin, classes.textField)}
+              autocomplete="new-password"
               variant="outlined"
               type={this.state.showPassword ? 'text' : 'password'}
               label="Password"
