@@ -5,15 +5,6 @@ const service = axios.create({
   withCredentials: true
 })
 
-// const errHandler = err => {
-//   console.error(err)
-//   if (err.response && err.response.data) {
-//     console.error("API response", err.response.data)
-//     throw err.response.data.message
-//   }
-//   throw err
-// }
-
 export default {
   service: service,
   // To know if the user is connected, we just check if we have a value for localStorage.getItem('user')
