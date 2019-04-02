@@ -402,7 +402,7 @@ class ManageAccount extends React.Component {
             />}
             <TextField
               id="outlined-adornment-password"
-              autocomplete="new-password"
+              autoComplete="new-password"
               className={classNames(classes.margin, classes.textField)}
               variant="outlined"
               type={this.state.showPassword ? 'text' : 'password'}
