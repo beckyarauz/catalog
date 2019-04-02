@@ -86,6 +86,30 @@ router.post('/info/update', async (request, response) => {
       });
     } else {
       console.log('password will be updated', updatedUser.password);
+      let dbUser = await User.findOne({
+        'username': updatedUser.username
+      });
+      await dbUser.set({
+        username: updatedUser.username,
+        lastName: updatedUser.lastName,
+        firstName: updatedUser.firstName,
+        phone: updatedUser.phone,
+        email: updatedUser.email,
+        address: updatedUser.address,
+        company: updatedUser.company,
+        about: updatedUser.about,
+        logoUrl: updatedUser.logoUrl,
+        userPictureUrl: updatedUser.userPictureUrl,
+        category: updatedUser.category,
+        geolocation: updatedUser.geolocation,
+        tags: updatedUser.tags
+      })
+      await dbUser.save();
+
+      response.status(200).json({
+        message: 'Changes saved',
+        user: dbUser
+      });
       response.status(200).json({
         message: 'new password encrypted and saved'
       });
