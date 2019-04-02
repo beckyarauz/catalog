@@ -109,7 +109,6 @@ class ContactForm extends React.Component {
       }, 3000)
     }
     if(prevProps.product !== this.props.product){
-      console.log(this.props.product)
       let mail = {...this.state.mail}
       mail.subject = `Product Query: ${this.props.product.name} ${this.props.product.id}`
       if(this.props.sellerMail){
