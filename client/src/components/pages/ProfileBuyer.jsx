@@ -93,18 +93,17 @@ class ProfileBuyer extends Component {
       open:false,
       selectedProduct:{},
       error: null,
-      isOwner: false,
       value: 0, //value of the Tabs
     }
   }
   mounted = false;
+  isOwner = false;
 
   getUser = async (username) => {
     let info = await api.getUserInfo(username);
     let user = info.data.user;
-    let isOwner = info.data.isOwner;
-    let isSeller = info.data.isSeller;
-    this.setState(currentState => ({ user, isOwner, isSeller }))
+    this.isOwner  = info.data.isOwner;
+    this.setState(currentState => ({ user}))
   }
 
   componentWillMount() {
@@ -129,10 +128,22 @@ class ProfileBuyer extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
+    if(prevProps.loggedUser !== this.props.loggedUser){
+      if(this.props.loggedUser){
+        this.isLogged = true;
+      }
+    }
     if (this.mounted) {
       let path = this.props.location.pathname;
-      let link = path.substring(path.search('profile'));
-      let user = link.substring(link.search('/') + 1);
+      let user,link;
+      if (path.includes('company')) {
+        link = path.substring(path.search('company'));
+      } else if (path.includes('user')) {
+        link = path.substring(path.search('user'));
+      } else {
+        link = path.substring(path.search('profile'));
+      }
+      user = link.substring(link.search('/') + 1);
       if (prevProps.location.pathname !== this.props.location.pathname) {
         if (this.mounted) {
           (async () => {
@@ -143,14 +154,18 @@ class ProfileBuyer extends Component {
       if (prevState.message !== this.state.message) {
         setTimeout(() => {
           this.setState(currentState => ({ message: null }))
-        }, 3000)
+        }, 2000)
       }
       if (prevState.error !== this.state.error) {
         setTimeout(() => {
           this.setState(currentState => ({ error: null }))
-        }, 3000)
+        }, 2000)
       }
     }
+  }
+
+  componentWillUnmount(){
+    this.mounted = false;
   }
 
   handleChange = (event, value) => {
@@ -187,7 +202,6 @@ class ProfileBuyer extends Component {
     }
   }
   handleAddBookmark = async (id) => {
-    console.log(id);
     (async () => {
 
       let data = await api.addBookmark(id);
@@ -252,7 +266,7 @@ class ProfileBuyer extends Component {
             centered={true}
           >
             <Tab icon={<PhoneIcon />} />
-            {this.state.isOwner && <Tab icon={<FavoriteIcon />} />}
+            {this.isOwner && <Tab icon={<FavoriteIcon />} />}
           </Tabs>
         </Paper>
         <div className={classNames(classes.container)}>
@@ -268,7 +282,7 @@ class ProfileBuyer extends Component {
           <Bookmarks 
           products={this.state.user.bookmarks} 
           user={this.state.user._id} 
-          isOwner={this.state.isOwner} 
+          isOwner={this.isOwner} 
           handleClickOpenContact={this.handleClickOpenContact}
           handleRemove={this.handleRemoveBookmark} 
           handleUpdate={this.updateBookmarks} />}

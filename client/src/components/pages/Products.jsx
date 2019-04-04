@@ -8,9 +8,6 @@ import Button from '@material-ui/core/Button';
 
 import { withStyles } from '@material-ui/core/styles';
 
-import api from '../../api';
-
-
 const styles = theme => ({
   productContainer :{
     marginTop:'20px',
@@ -47,22 +44,23 @@ class Products extends Component {
       openConfirmation:false,
       delete:{},
       message:'',
-      isLogged:false,
       error:'',
       selectedProduct:{}     
     }
   }
 
-  async componentWillMount(){
-    let data = await api.isLoggedIn();
-    this.setState(stata => ({isLogged: data.isLogged}))
-  }
+  isLogged = false;
 
   componentDidMount(){
     this.setState(currentState => ({products: this.props.products}))
   }
 
   componentDidUpdate(prevProps,prevState){
+    if(prevProps.isLogged !== this.props.isLogged){
+      if(this.props.isLogged){
+        this.isLogged = true;
+      }
+    }
     if(prevState.message !== this.state.message){
       setTimeout(() =>{
         if(this.mounted){this.setState(currentState => ({message: null}))}
@@ -167,7 +165,7 @@ class Products extends Component {
                       delete={this.handleDeleteProduct} 
                       className={this.props.classes.card}
                       isOwner={this.props.isOwner}
-                      isLogged={this.state.isLogged}
+                      isLogged={this.props.isLogged}
                       bookmarked={false}
                       key={product._id}
                       detailHandler={this.handleClickOpen}/>

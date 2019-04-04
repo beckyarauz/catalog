@@ -29,7 +29,6 @@ class Bookmarks extends Component {
       message:'',
       error:'',
       selectedProduct:{},
-      isOwnProduct:false,
       isLogged:false    
     }
   }
@@ -116,7 +115,7 @@ class Bookmarks extends Component {
                       contactSeller={this.handleContactSeller}
                       remove={this.handleOpenConfirmation} 
                       className={this.props.classes.card}
-                      isOwner={this.props.isOwner}
+                      isOwner={false}
                       isLogged={this.state.isLogged}
                       key={product._id}
                       bookmarked={true}

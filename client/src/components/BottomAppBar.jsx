@@ -31,7 +31,8 @@ const styles = theme => ({
     margin: '0 auto',
   },
   link:{
-    textDecoration:'none'
+    'text-decoration':'none',
+    color:'white'
   }
 });
 

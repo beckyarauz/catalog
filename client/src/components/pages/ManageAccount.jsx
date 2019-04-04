@@ -86,15 +86,14 @@ TextMaskCustom.propTypes = {
 };
 
 class ManageAccount extends React.Component {
-
   state = {
     user: {
       username: "",
       firstName: "",
       lastName: "",
       password: "",
-      company: "something",
-      address: "something",
+      company: "Comapny Name",
+      address: "Some Random Street",
       email: "",
       tags: [],
       products: [],
@@ -128,6 +127,10 @@ class ManageAccount extends React.Component {
     return currentValue && (currentValue instanceof Object || currentValue.length > 0 || currentValue instanceof File);
   }
   handleDeleteAccount = async () => {
+    let confirmed = window.confirm('Are you sure you want to delete your account?');
+    if (!confirmed) {
+      return;
+    }
     if (this.state.user.logoUrl) {
       await this.deleteFile();
     }
@@ -140,7 +143,8 @@ class ManageAccount extends React.Component {
       })
     }
     await api.deleteAccount();
-    this.props.history.push('/signup')
+    this.props.logout();
+    this.props.history.push('/signup');
   }
 
   componentWillMount() {
@@ -213,23 +217,20 @@ class ManageAccount extends React.Component {
     let { username, email, phone, about, address, category, company, firstName, lastName } = this.state.user;
     let info, image;
 
-    if (this.props.isSeller) {
-      image = this.state.image !== null ? this.state.image : this.state.user.logoUrl;
+    image = this.state.image !== null ? this.state.image : this.state.user.logoUrl;
 
-      info = {
-        username,
-        email,
-        phone,
-        about,
-        address,
-        category,
-        company,
-        firstName,
-        lastName,
-        image,
-      }
-    } 
-
+    info = {
+      username,
+      email,
+      phone,
+      about,
+      address,
+      category,
+      company,
+      firstName,
+      lastName,
+      image,
+    }
     let stateValues = Object.values(info);
 
     this.setState({ valid: stateValues.every(this.isNotEmpty) });
@@ -347,38 +348,36 @@ class ManageAccount extends React.Component {
         <h2>Account</h2>
         {this.state.user.username && (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-            {!this.props.isSeller &&
-              <div className={classes.flexContainer}>
-                {
-                  (this.state.user.userPictureUrl &&
-                    <div className={classes.imageSection}><img src={this.state.user.userPictureUrl} width="100" height="100" alt="User from DB" /></div>)
-                  || (this.state.imageFS &&
-                    <div className={classes.imageSection}><img src={this.state.imageFS} width="100" height="100" alt="User" /></div>)
-                }
-
-                {this.state.message && <div className="info">
-                  {this.state.message}
-                </div>}
-                <br></br>
-                <input
-                  accept="image/*"
-                  className={classes.input}
-                  style={{ display: 'none' }}
-                  id="raised-button-file"
-                  multiple
-                  type="file"
-                  onChange={this.handleChange('image')}
-                />
-                <label htmlFor="raised-button-file">
-                  <Button variant="contained" component="span" className={classes.button}>
-                    Upload Picture
+            <div className={classes.flexContainer}>
+              {
+                (this.state.user.userPictureUrl &&
+                  <div className={classes.imageSection}><img src={this.state.user.userPictureUrl} width="100" height="100" alt="User from DB" /></div>)
+                || (this.state.imageFS &&
+                  <div className={classes.imageSection}><img src={this.state.imageFS} width="100" height="100" alt="User" /></div>)
+              }
+              {this.state.message && <div className="info">
+                {this.state.message}
+              </div>}
+              <br></br>
+              <input
+                accept="image/*"
+                className={classes.input}
+                style={{ display: 'none' }}
+                id="raised-button-file"
+                multiple
+                type="file"
+                onChange={this.handleChange('image')}
+              />
+              <label htmlFor="raised-button-file">
+                <Button variant="contained" component="span" className={classes.button}>
+                  Upload Picture
             </Button>
-                </label>
-                <Button variant="contained" component="span" className={classes.button} onClick={this.deleteFile}>Delete</Button>
+              </label>
+              <Button variant="contained" component="span" className={classes.button} onClick={this.deleteFile}>Delete</Button>
 
-              </div>
+            </div>
 
-            }
+
             <TextField
               id="username"
               label="Username"
@@ -391,7 +390,7 @@ class ManageAccount extends React.Component {
                 startAdornment: <InputAdornment position="start">@</InputAdornment>,
               }}
             />
-            {this.props.isSeller && <TextField
+            <TextField
               id="company"
               label="Company Name"
               className={classNames(classes.margin, classes.textField)}
@@ -399,7 +398,7 @@ class ManageAccount extends React.Component {
               onChange={this.handleChange('company')}
               margin="normal"
               variant="outlined"
-            />}
+            />
             <TextField
               id="outlined-adornment-password"
               autoComplete="new-password"
@@ -459,124 +458,122 @@ class ManageAccount extends React.Component {
                 inputComponent={TextMaskCustom}
               />
             </FormControl>
-            {this.props.isSeller && (
-              <div className={classes.flexContainer}>
-                <h3>Location</h3>
-                <p>Move the pointer to set your bussiness location</p>
-                <ReactMapGL
-                  {...this.state.viewport}
-                  mapStyle="mapbox://styles/beckyarauz/cjtisim0s272e1fubskpzz1om"
-                  mapboxApiAccessToken={TOKEN}
-                  onViewportChange={(viewport) => this.handleViewportChange(viewport)}
+            <div className={classes.flexContainer}>
+              <h3>Location</h3>
+              <p>Move the pointer to set your bussiness location</p>
+              <ReactMapGL
+                {...this.state.viewport}
+                mapStyle="mapbox://styles/beckyarauz/cjtisim0s272e1fubskpzz1om"
+                mapboxApiAccessToken={TOKEN}
+                onViewportChange={(viewport) => this.handleViewportChange(viewport)}
 
-                >
-                  <div style={{ position: 'absolute' }}>
-                    <NavigationControl onViewportChange={(viewport) => this.setState({ viewport })} />
-                  </div>
-                  {this.state.user.geolocation.longitude && <Marker latitude={this.state.user.geolocation.latitude} longitude={this.state.user.geolocation.longitude} offsetLeft={-20} offsetTop={-10} draggable={true} onDragEnd={e => this.handleMarkerDrag(e)}>
-                    <div ><Icon>location_on</Icon></div>
-                  </Marker>}
-                </ReactMapGL>
-                <TextField
-                  id="standard-description"
-                  label="Address"
-                  className={classNames(classes.textarea, classes.textField)}
-                  value={this.state.user.address}
-                  onChange={this.handleChange('address')}
-                  margin="normal"
-                  variant="outlined"
-                  multiline={true}
-                  rows={2}
-                  rowsMax={4}
-                  InputProps={{
-                    startAdornment: <InputAdornment position="start"> </InputAdornment>,
-                  }}
-                />
-                <h2>Company Info</h2>
-                {
-                  (this.state.user.logoUrl &&
-                    <div className={classes.imageSection}><img src={this.state.user.logoUrl} width="100" height="100" alt="logo from db" /></div>)
-                  || (this.state.imageFS &&
-                    <div className={classes.imageSection}><img src={this.state.imageFS} width="100" height="100" alt="company logo" /></div>)
-                }
+              >
+                <div style={{ position: 'absolute' }}>
+                  <NavigationControl onViewportChange={(viewport) => this.setState({ viewport })} />
+                </div>
+                {this.state.user.geolocation.longitude && <Marker latitude={this.state.user.geolocation.latitude} longitude={this.state.user.geolocation.longitude} offsetLeft={-20} offsetTop={-10} draggable={true} onDragEnd={e => this.handleMarkerDrag(e)}>
+                  <div ><Icon>location_on</Icon></div>
+                </Marker>}
+              </ReactMapGL>
+              <TextField
+                id="standard-description"
+                label="Address"
+                className={classNames(classes.textarea, classes.textField)}
+                value={this.state.user.address}
+                onChange={this.handleChange('address')}
+                margin="normal"
+                variant="outlined"
+                multiline={true}
+                rows={2}
+                rowsMax={4}
+                InputProps={{
+                  startAdornment: <InputAdornment position="start"> </InputAdornment>,
+                }}
+              />
+              <h2>Company Info</h2>
+              {
+                (this.state.user.logoUrl &&
+                  <div className={classes.imageSection}><img src={this.state.user.logoUrl} width="100" height="100" alt="logo from db" /></div>)
+                || (this.state.imageFS &&
+                  <div className={classes.imageSection}><img src={this.state.imageFS} width="100" height="100" alt="company logo" /></div>)
+              }
 
-                {this.state.message && <div className="info info-danger">
-                  {this.state.message}
-                </div>}
-                <br></br>
-                <input
-                  accept="image/*"
-                  className={classes.input}
-                  style={{ display: 'none' }}
-                  id="raised-button-file"
-                  multiple
-                  type="file"
-                  onChange={this.handleChange('image')}
-                />
-                <label htmlFor="raised-button-file">
-                  <Button variant="contained" component="span" className={classes.button}>
-                    Upload Logo
+              {this.state.message && <div className="info info-danger">
+                {this.state.message}
+              </div>}
+              <br></br>
+              <input
+                accept="image/*"
+                className={classes.input}
+                style={{ display: 'none' }}
+                id="raised-button-file"
+                multiple
+                type="file"
+                onChange={this.handleChange('image')}
+              />
+              <label htmlFor="raised-button-file">
+                <Button variant="contained" component="span" className={classes.button}>
+                  Upload Logo
           </Button>
-                </label>
-                <Button variant="contained" component="span" className={classes.button} onClick={this.deleteFile}>Delete</Button>
+              </label>
+              <Button variant="contained" component="span" className={classes.button} onClick={this.deleteFile}>Delete</Button>
 
-                <FormControl variant="outlined" className={classes.formControl}>
-                  <InputLabel
-                    ref={ref => {
-                      this.InputLabelRef = ref;
-                    }}
-                    htmlFor="outlined-category-simple"
-                  >
-                    Category
-          </InputLabel>
-                  <Select
-                    value={this.state.user.category}
-                    onChange={this.handleChange('category')}
-                    input={
-                      <OutlinedInput
-                        labelWidth={this.state.labelWidth}
-                        name="category"
-                        id="outlined-category-simple"
-                      />
-                    }
-                  >
-                    <MenuItem value="">
-                      <em>None</em>
-                    </MenuItem>
-                    <MenuItem value={'beauty'}>Beauty</MenuItem>
-                    <MenuItem value={'clothing'}>Clothing</MenuItem>
-                    <MenuItem value={'food'}>Food</MenuItem>
-                    <MenuItem value={'tattoo'}>Tattoo</MenuItem>
-                    <MenuItem value={'art'}>Art</MenuItem>
-                    <MenuItem value={'furniture'}>Furniture</MenuItem>
-                    <MenuItem value={'gifts'}>Gifts</MenuItem>
-                  </Select>
-                </FormControl>
-
-                <Tag handleTagChange={this.handleChange('tags')} initialTags={this.state.user.tags} />
-
-                <TextField
-                  id="standard-description"
-                  label="About"
-                  className={classNames(classes.textarea, classes.textField)}
-                  value={this.state.user.about}
-                  onChange={this.handleChange('about')}
-                  margin="normal"
-                  variant="outlined"
-                  multiline={true}
-                  rows={4}
-                  rowsMax={4}
-                  InputProps={{
-                    startAdornment: <InputAdornment position="start"> </InputAdornment>,
+              <FormControl variant="outlined" className={classes.formControl}>
+                <InputLabel
+                  ref={ref => {
+                    this.InputLabelRef = ref;
                   }}
-                />
-              </div>
-            )}
+                  htmlFor="outlined-category-simple"
+                >
+                  Category
+          </InputLabel>
+                <Select
+                  value={this.state.user.category}
+                  onChange={this.handleChange('category')}
+                  input={
+                    <OutlinedInput
+                      labelWidth={this.state.labelWidth}
+                      name="category"
+                      id="outlined-category-simple"
+                    />
+                  }
+                >
+                  <MenuItem value="">
+                    <em>None</em>
+                  </MenuItem>
+                  <MenuItem value={'beauty'}>Beauty</MenuItem>
+                  <MenuItem value={'clothing'}>Clothing</MenuItem>
+                  <MenuItem value={'food'}>Food</MenuItem>
+                  <MenuItem value={'tattoo'}>Tattoo</MenuItem>
+                  <MenuItem value={'art'}>Art</MenuItem>
+                  <MenuItem value={'furniture'}>Furniture</MenuItem>
+                  <MenuItem value={'gifts'}>Gifts</MenuItem>
+                </Select>
+              </FormControl>
+
+              <Tag handleTagChange={this.handleChange('tags')} initialTags={this.state.user.tags} />
+
+              <TextField
+                id="standard-description"
+                label="About"
+                className={classNames(classes.textarea, classes.textField)}
+                value={this.state.user.about}
+                onChange={this.handleChange('about')}
+                margin="normal"
+                variant="outlined"
+                multiline={true}
+                rows={4}
+                rowsMax={4}
+                InputProps={{
+                  startAdornment: <InputAdornment position="start"> </InputAdornment>,
+                }}
+              />
+            </div>
             {this.state.message && <div className="info">
               {this.state.message}
             </div>}
             <Button variant="contained" component="span" className={classes.button} onClick={this.handleClick} disabled={!this.state.valid}>Update</Button>
-            <Button variant="contained" component="span" className={classes.button} onClick={this.handleDeleteAccount} >Delete Account</Button>
+            <Button color="secondary" variant="contained" component="span" className={classes.button} onClick={this.handleDeleteAccount} >Delete Account</Button>
           </div>
         )}
       </div>

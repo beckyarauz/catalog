@@ -44,7 +44,9 @@ router.get('/info', async (request, res) => {
   try {
     let dbUser = await User.findOne({
       _id: request.user._id
-    }).select('username about phone email category logoUrl firstName lastName company address geolocation tags bookmarks').populate('bookmarks')
+    })
+    .select('username about phone email category logoUrl firstName lastName company address geolocation tags bookmarks')
+    .populate('bookmarks')
     
     
     res.status(200).json({
@@ -85,7 +87,7 @@ router.post('/info/update', async (request, response) => {
         user: dbUser
       });
     } else {
-      console.log('password will be updated', updatedUser.password);
+      console.log('password will be updated');
       let dbUser = await User.findOne({
         'username': updatedUser.username
       });
@@ -133,7 +135,15 @@ router.get('/profile/company/:user', async (request, res) => {
         select:{'_id':0,'username':1,'logoUrl':1,'company':1,'email':1}
       }
     })
-    .populate('products','name price seller description imageUrl')
+    .populate({
+      path:'products',
+      select: 'name price seller description imageUrl',
+      populate:{
+        path:'seller',
+        model:'User',
+        select:{'_id':0,'username':1,'logoUrl':1,'company':1,'email':1}
+      }
+    })
     .select('username about phone email category logoUrl userPictureUrl firstName lastName company address geolocation tags bookmarks role')
     
     let message = null;
@@ -172,8 +182,6 @@ router.get('/profile/user/:user', async (request, res) => {
     .select('username about phone email userPictureUrl firstName lastName address geolocation tags bookmarks role')
 
     let message = null;
-    
-    // console.log(dbUser)
     let isOwner = request.user && request.user.username === username;
     let isSeller = dbUser.role === 'SELLER';
     res.status(200).json({

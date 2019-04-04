@@ -1,14 +1,10 @@
 import React, { Component } from 'react';
 import { Route, Switch, Redirect } from 'react-router-dom';
 import { BrowserRouter as Router } from 'react-router-dom';
-import { Link } from 'react-router-dom';
-
-import Chip from '@material-ui/core/Chip';
-import FaceIcon from '@material-ui/icons/Face';
-import Avatar from '@material-ui/core/Avatar';
 
 import Home from './pages/Home';
 import NavDrawer from './Drawer';
+import Header from './Header';
 import BottomAppBar from './BottomAppBar';
 import AddProduct from './pages/AddProduct';
 import Profile from './pages/Profile';
@@ -25,10 +21,9 @@ export default class App extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      isLogged: false,
-      isSeller: false,
-      user: null,
       right: false,
+      mounted:false,
+      login:false,
     }
   }
 
@@ -37,67 +32,49 @@ export default class App extends Component {
       [side]: open,
     });
   }
-  componentWillMount() {
+  isLogged = false;
+  isSeller = false;
+  user = null;
+  async componentWillMount() {
     (async (e) => {
       let response = await api.isLoggedIn();
       if (response !== undefined && response.isLogged) {
-        this.setState({
-          user: response.user,
-          isLogged: response.isLogged,
-          isSeller: response.isSeller
-        })
+        this.isLogged = response.isLogged;
+        this.isSeller = response.isSeller;
+        this.user = response.user;
+        this.setState(state => ({mounted:true}))
       }
     })()
   }
-
   handleLogin = () => {
     (async (e) => {
       let data = await api.isLoggedIn();
-      this.setState({
-        user: data.user,
-        isLogged: data.isLogged,
-        isSeller: data.isSeller
-      })
+      this.isLogged = data.isLogged;
+      this.isSeller = data.isSeller;
+      this.user = data.user;
+      this.setState(state => ({login:true}))
     })()
   }
   handleLogout = () => {
-    this.setState({
-      isLogged: false,
-      isSeller: false,
-      user: null
-    })
+    this.isLogged = false;
+    this.isSeller = false;
+    this.user = null;
+    this.setState(state => ({login:false}))
   }
 
   render() {
     return (
       <Router>
         <div className="App">
-          <div className="App-bod">
-            <header className="App-header" style={{ textAlign: 'center' }}>
-              <div className="App-headerItems">
-                <h1 className="App-title">Local Market</h1>
-                {this.state.user && (
-                  <Link to={`/profile/${this.state.user}`} >
-                    <Chip
-                      avatar={
-                        <Avatar>
-                          <FaceIcon />
-                        </Avatar>
-                      }
-                      label={this.state.user}
-                      style={{ marginTop: '10px' }}
-                    />
-                  </Link>)}
-              </div>
-              <NavDrawer toggle={this.toggleDrawer} isLogged={this.state.isLogged} inLogout={this.handleLogout} user={this.state.user} isSeller={this.state.isSeller} open={this.state.right} />
-              <BottomAppBar toggle={this.toggleDrawer} isLogged={this.state.isLogged}/>
-            </header>
+            <Header user={this.user}/>
+            <NavDrawer toggle={this.toggleDrawer} isLogged={this.isLogged} inLogout={this.handleLogout} user={this.user} isSeller={this.isSeller} open={this.state.right} />
+            <BottomAppBar toggle={this.toggleDrawer} isLogged={this.isLogged}/>
             <div className="App-content">
               <Switch>
                 <Route path="/" exact component={Home} />
                 <Route path="/home" exact component={Home} />
                 <Route path="/add-product" render={(props) => (
-                  (this.state.isSeller === false) ? (
+                  (this.isSeller === false) ? (
                     <Redirect to="/" />
                   ) : (
                       <AddProduct {...props} />
@@ -105,39 +82,39 @@ export default class App extends Component {
                 )} />
                 <Route path="/signup" render={(props) => <Signup {...props} inLogin={this.handleLogin} />} />
                 <Route path="/login" render={(props) =>
-                  this.state.isLogged ?
-                    <Redirect to={`/profile/${this.state.user}`} /> :
+                  this.isLogged ?
+                    <Redirect to={`/profile/${this.user}`} /> :
                     <Login {...props} inLogin={this.handleLogin} />
                 } />
-                {this.state.isSeller && <Route path={`/profile/${this.state.user}`} render={(props) => (
-                  (!this.state.isLogged && this.state.isSeller) ? (
+                {this.isSeller && <Route path={`/profile/${this.user}`} render={(props) => (
+                  (!this.isLogged && this.isSeller) ? (
                     <Redirect to="/" />
                   ) : (
-                      <Profile {...props} isSeller={this.state.isSeller} />
+                      <Profile {...props} isSeller={this.isSeller} loggedUser={this.user} />
                     )
                 )} />}
-                {!this.state.isSeller && <Route path={`/profile/${this.state.user}`} render={(props) => (
-                  (!this.state.isLogged) ? (
+                {!this.isSeller && <Route path={`/profile/${this.user}`} render={(props) => (
+                  (!this.isLogged) ? (
                     <Redirect to="/" />
                   ) : (
-                      <ProfileBuyer {...props} />
+                      <ProfileBuyer {...props} loggedUser={this.user} />
                     )
                 )} />}
-                <Route path={`/profile/company/:user`} render={(props) => (<Profile loggedUser={this.state.user} {...props} />)} />
-                <Route path={`/profile/user/:user`} render={(props) => (<ProfileBuyer {...props} />)} />
+                <Route path={`/profile/company/:user`} render={(props) => (<Profile loggedUser={this.user} {...props} />)} />
+                {this.isLogged && <Route path={`/profile/user/:user`} render={(props) => (<ProfileBuyer loggedUser={this.user} {...props} />)} />}
 
-                {this.state.isSeller && <Route path="/manage-account" render={(props) => (
-                  !this.state.isLogged ? (
+                {this.isSeller && <Route path="/manage-account" render={(props) => (
+                  !this.isLogged ? (
                     <Redirect to="/login" />
                   ) : (
-                      <ManageAccount {...props} user={this.state.user} isSeller={this.state.isSeller} />
+                      <ManageAccount {...props} user={this.user} isSeller={this.isSeller} logout={this.handleLogout} />
                     )
                 )} />}
-                {!this.state.isSeller && <Route path="/manage-account" render={(props) => (
-                  !this.state.isLogged ? (
+                {!this.isSeller && <Route path="/manage-account" render={(props) => (
+                  !this.isLogged ? (
                     <Redirect to="/login" />
                   ) : (
-                      <ManageAccountBuyer {...props} user={this.state.user} isSeller={this.state.isSeller} />
+                      <ManageAccountBuyer {...props} user={this.user} isSeller={this.isSeller} logout={this.handleLogout}/>
                     )
                 )} />}
                 <Route path="/browse" component={Browse} />
@@ -145,8 +122,6 @@ export default class App extends Component {
               </Switch>
             </div>
           </div>
-
-        </div>
       </Router>
     );
   }

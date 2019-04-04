@@ -113,11 +113,16 @@ class ManageAccountBuyer extends React.Component {
     return currentValue && (currentValue instanceof Object || currentValue.length > 0 || currentValue instanceof File);
   }
   handleDeleteAccount = async () => {
+    let confirmed = window.confirm('Are you sure you want to delete your account?');
+    if(!confirmed){
+      return;
+    }
     if(this.state.user.userPictureUrl){
       await this.deleteFile();
     }  
     await api.deleteAccount();
-    this.props.history.push('/signup')
+    this.props.logout();
+    this.props.history.push('/signup');
   }
 
   componentWillMount() {
@@ -254,7 +259,6 @@ class ManageAccountBuyer extends React.Component {
       await api.deleteFromS3(user.userPictureUrl, 'userPicture');
     }
   }
-
   handleViewportChange = (viewport) => {
     this.setState(prevState => ({ viewport }));
   }
@@ -410,7 +414,7 @@ class ManageAccountBuyer extends React.Component {
             {this.state.message}
             </div>}
             <Button variant="contained" component="span" className={classes.button} onClick={this.handleClick} disabled={!this.state.valid}>Update</Button>
-            <Button variant="contained" component="span" className={classes.button} onClick={this.handleDeleteAccount} >Delete Account</Button>
+            <Button color="secondary" variant="contained" component="span" className={classes.button} onClick={this.handleDeleteAccount} >Delete Account</Button>
           </div>
         )}
       </div>

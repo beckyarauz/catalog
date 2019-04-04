@@ -7,14 +7,17 @@ const User = require('../models/User');
 router.get('/:user/all', async (req,res) => {
   try{
     let user = req.params.user;
-    // console.log('body',req.params);
-  
     let userId = await User.findOne({username: user}).select({_id:1});
-  
-    // console.log('userId',userId);
-    let products = await Product.find({seller: userId._id}).select('tags name price description imageUrl')
-    // console.log('products',products);
-  
+    let products = await Product.find({seller: userId._id})
+    .select('tags name price description imageUrl seller')
+    .populate(
+      {
+        path:'seller',
+        model:'User',
+        select:{'_id':0,'username':1,'logoUrl':1,'company':1,'email':1}
+      }
+    )
+
     if(products.length > 0){
       res.status(200).json({message:'products', products:products})
     } else {
@@ -69,7 +72,6 @@ router.post('/add', async (request, res) => {
 });
 
 router.post('/delete', async (request, res) => {
-  console.log('product.js /delete product info',request.body.product);
   try{
     let product = request.body.product;
     let deletedProduct = await Product.findOneAndRemove({_id: product})
@@ -84,10 +86,9 @@ router.post('/delete', async (request, res) => {
     
     let updateUser = await User.findOneAndUpdate({_id:request.user._id},{products});
 
-    let bookmarks = await User.update(
+    let bookmarks = await User.updateMany(
         { },
         { $pull: { bookmarks: { $in: [product] } } },
-        { multi: true }
       );
 
     res.status(200).json({message: `Product has been deleted: ${deletedProduct.name}`})
