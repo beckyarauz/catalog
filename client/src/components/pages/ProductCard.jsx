@@ -2,7 +2,6 @@
   import PropTypes from 'prop-types';
   import { withStyles } from '@material-ui/core/styles';
   import Card from '@material-ui/core/Card';
-  // import CardActionArea from '@material-ui/core/CardActionArea';
   import CardActions from '@material-ui/core/CardActions';
   import CardContent from '@material-ui/core/CardContent';
   import CardMedia from '@material-ui/core/CardMedia';
@@ -58,6 +57,9 @@
   };
   
   function ProductCard(props) {
+    // console.log('is Owner?:',props.isOwner)
+    // console.log('is Logged?:',props.isLogged)
+    // console.log('is Bookmarked?:',props.bookmarked)
     const { classes } = props;
     let handleDetail = (e) => {
       props.detailHandler({...props.product})
@@ -84,7 +86,6 @@
 
     return (
       <Card className={classes.card}>
-        {/* <CardActionArea> */}
           {props.product.imageUrl ?
          (<CardMedia
           className={classes.media}
@@ -110,13 +111,12 @@
                 <Icon>delete</Icon>
               </ButtonBase>
             </div>) :
-            (props.isLogged && <div className={classes.actionBookmark}>
+            ( props.isLogged && (!props.isOwner || props.bookmarked) && <div className={classes.actionBookmark}>
               <ButtonBase className={classes.bookmarkButton} onClick={handleBookmark}>
                 <Avatar className={classes.bookmark}><Icon>{!props.bookmarked ? 'bookmark_border': 'clear'}</Icon></Avatar>
               </ButtonBase>
             </div>)}
           </CardContent>
-        {/* </CardActionArea> */}
         {(!props.isOwner || props.bookmarked) &&
         <CardActions>
           <Button size="small" className={classes.actionText} color="primary" onClick={e => handleDetail(e)}>

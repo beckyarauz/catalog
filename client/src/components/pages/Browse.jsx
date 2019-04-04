@@ -193,7 +193,6 @@ class Browse extends Component {
       selectedCategory:null,
       searchInput:'',
       mounted: false,
-
     }
   }
 

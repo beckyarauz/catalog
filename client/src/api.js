@@ -8,7 +8,7 @@ const service = axios.create({
 export default {
   service: service,
   // To know if the user is connected, we just check if we have a value for localStorage.getItem('user')
-   isLoggedIn() {
+  async isLoggedIn() {
     return service.get(`/isLogged`)
       .then( res => {
         return res.data;
@@ -19,12 +19,10 @@ export default {
     return await service
       .post(`/signup`, userInfo);
   },
-
   async login(username, password) {
     let data = await service.post(`/login`,{username, password});
     return data;
   },
-
   logout() {
     localStorage.removeItem('user')
     return service
@@ -38,7 +36,6 @@ export default {
     if(!file){
       return {message: 'no image to upload'}
     }
-    // console.log('type',type);
       const formData = new FormData();
     
       formData.append('file', file);
@@ -50,7 +47,6 @@ export default {
                           'Content-Type': 'multipart/form-data'
                         }
                       })
-      // console.log('uploadtoS3 async', data);
       return data;
   },
   async getUserInfo(username){
@@ -94,12 +90,10 @@ export default {
   async addProduct(product){
     let savedProd = await service.post(`/product/add`,{product});
     return savedProd;
-
   },
   async editProduct(product){
     let editedProd = await service.post(`/product/edit`,{product});
     return editedProd;
-
   },
   async getProducts(user){
     let products = await service.get(`/product/${user}/all`);
@@ -113,7 +107,6 @@ export default {
     let response = await service.post(`/message/send`,{mail})
     return response;
   }
-
 }
 
 

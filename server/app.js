@@ -13,7 +13,9 @@ const bcryptSalt = 10;
 const passport = require('passport');
 const User = require("./models/User")
 const MongoStore = require('connect-mongo')(session);
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
+const helmet = require('helmet');
+const compression = require('compression');
 
 require('./configs/database')
 
@@ -32,6 +34,9 @@ app.use(cors({
   optionsSuccessStatus: 200,
   credentials: true
 }))
+
+app.use(compression());
+app.use(helmet());
 app.use(logger('dev'))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))

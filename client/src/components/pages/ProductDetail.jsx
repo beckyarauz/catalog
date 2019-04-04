@@ -69,12 +69,16 @@ class ProductDetail extends React.Component {
               <Typography component="p">
                 ${this.props.product.price}
               </Typography>
-              <Typography variant="subtitle1" color="textSecondary">
+              {this.props.product.seller && 
+              <div>
+                <Typography variant="subtitle1" color="textSecondary">
                 Seller
-              </Typography>
-              <Typography component="p">
-              {this.props.product.seller && <Link to={`/profile/company/${this.props.product.seller.username}`}> {this.props.product.seller.company}</Link>}
-              </Typography>
+                </Typography>
+                <Typography component="p">
+                <Link to={`/profile/company/${this.props.product.seller.username}`}> {this.props.product.seller.company}</Link>
+                </Typography>
+              </div>
+            }
             </div>
           </div>
           <Divider />
