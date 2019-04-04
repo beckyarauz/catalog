@@ -3,14 +3,13 @@ import { Route, Switch, Redirect } from 'react-router-dom';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
-import Icon from '@material-ui/core/Icon';
 import Chip from '@material-ui/core/Chip';
 import FaceIcon from '@material-ui/icons/Face';
 import Avatar from '@material-ui/core/Avatar';
-import Button from '@material-ui/core/Button';
 
 import Home from './pages/Home';
 import NavDrawer from './Drawer';
+import BottomAppBar from './BottomAppBar';
 import AddProduct from './pages/AddProduct';
 import Profile from './pages/Profile';
 import ProfileBuyer from './pages/ProfileBuyer';
@@ -75,7 +74,6 @@ export default class App extends Component {
         <div className="App">
           <div className="App-bod">
             <header className="App-header" style={{ textAlign: 'center' }}>
-              <Button onClick={this.toggleDrawer('right', true)}><Icon className='App-menu'>view_headline</Icon></Button>
               <div className="App-headerItems">
                 <h1 className="App-title">Local Market</h1>
                 {this.state.user && (
@@ -92,6 +90,7 @@ export default class App extends Component {
                   </Link>)}
               </div>
               <NavDrawer toggle={this.toggleDrawer} isLogged={this.state.isLogged} inLogout={this.handleLogout} user={this.state.user} isSeller={this.state.isSeller} open={this.state.right} />
+              <BottomAppBar toggle={this.toggleDrawer} isLogged={this.state.isLogged}/>
             </header>
             <div className="App-content">
               <Switch>
