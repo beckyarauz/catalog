@@ -55,6 +55,7 @@ body {
     // justify-content: center;
     margin-left: 15px;
     margin-right: 15px;
+    margin-bottom:100px;
   }
   .App-menu{
     font-size:48px;
@@ -87,6 +88,7 @@ body {
   }
 
   .App-headerItems{
+    width:100%;
     display:flex;
     flex-direction: column;
     align-items: center
