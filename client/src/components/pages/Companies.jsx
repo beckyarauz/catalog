@@ -28,7 +28,7 @@ const styles = theme => ({
     justifyContent: 'center',
     alignItems: 'center',
     fontSize: 14,
-    padding:'5px 13px',
+    padding:'5px',
     borderRadius: '15px 50px 30px',
     '-webkit-border-top-left-radius' :'15px',
     '-webkit-border-top-right-radius' :'50px',
@@ -49,26 +49,30 @@ const styles = theme => ({
   gridContainer: {
     height: '100%',
     borderRadius: '15px 50px 30px',
+    width: '100%',
+    margin: '0px',
     '-webkit-border-top-left-radius' :'15px',
     '-webkit-border-top-right-radius' :'50px',
     '-webkit-border-bottom-right-radius' :'30px',
     '-webkit-border-bottom-left-radius' :'50px',
   },
   gridImage: {
+    width:'100%',
     borderRadius: '15px 50px 0px 0px',
     '-webkit-border-top-left-radius' :'15px',
     '-webkit-border-top-right-radius' :'50px',
     '-webkit-border-bottom-right-radius' :'0px',
     '-webkit-border-bottom-left-radius' :'0px',
+    position: 'relative',
     flex: 1,
   },
   gridContent: {
+    width:'100%',
     borderRadius: '0px 0px 30px 50px',
     '-webkit-border-top-left-radius' :'0px',
     '-webkit-border-top-right-radius' :'0px',
     '-webkit-border-bottom-right-radius' :'30px',
     '-webkit-border-bottom-left-radius' :'50px',
-    
   },
   gridItem: {
     flex: 1,
@@ -91,7 +95,12 @@ const styles = theme => ({
     margin: '0 3px',
     marginBottom: '3px',
     backgroundColor: '#eee',
-  }
+  },
+  categoryIcon :{ 
+    backgroundColor: 'rgba(0,0,0,0.5)', 
+    position: 'absolute', 
+    bottom: 5, 
+    right: 5 }
 });
 
 class Companies extends Component {
@@ -164,9 +173,9 @@ class Companies extends Component {
             <ButtonBase className={classNames(classes.buttonBase)} onClick={e => this.handleClick(e, company.username)}>
               <Grid className={classNames(classes.gridContainer)} container spacing={16} direction='column'>
                 <Paper className={classNames(classes.gridImage, classes.gridItem)} elevation={18} style={{ backgroundImage: `url(${image})` }}>
-                  <Grid container style={{ height: '100%', width: '100%', position: 'relative' }}>
-                    <Avatar style={{ backgroundColor: 'rgba(0,0,0,0.5)', position: 'absolute', bottom: 5, right: 5 }}><Icon>{icon}</Icon></Avatar>
-                  </Grid>
+                    <Avatar className={classNames(classes.categoryIcon)}>
+                      <Icon>{icon}</Icon>
+                    </Avatar>
                 </Paper>
                 <Paper className={classNames(classes.gridContent, classes.gridItem)} elevation={4}>
                   <Typography variant="h5" component="h3">
