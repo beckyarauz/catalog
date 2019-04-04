@@ -30,6 +30,10 @@ const styles = theme => ({
     fontSize: 14,
     padding:'5px 13px',
     borderRadius: '15px 50px 30px',
+    '-webkit-border-top-left-radius' :15,
+    '-webkit-border-top-right-radius' :50,
+    '-webkit-border-bottom-right-radius' :30,
+    '-webkit-border-bottom-left-radius' :50,
     marginTop: 20,
   },
   buttonBase: {
@@ -43,11 +47,19 @@ const styles = theme => ({
   },
   gridImage: {
     borderRadius: '15px 50px 0px 0px',
-    // minHeight:'100px',
+    '-webkit-border-top-left-radius' :15,
+    '-webkit-border-top-right-radius' :50,
+    '-webkit-border-bottom-right-radius' :0,
+    '-webkit-border-bottom-left-radius' :0,
     flex: 1,
   },
   gridContent: {
-    borderRadius: '0px 0px 30px 50px'
+    borderRadius: '0px 0px 30px 50px',
+    '-webkit-border-top-left-radius' :0,
+    '-webkit-border-top-right-radius' :0,
+    '-webkit-border-bottom-right-radius' :30,
+    '-webkit-border-bottom-left-radius' :50,
+    
   },
   gridItem: {
     flex: 1,
