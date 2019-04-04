@@ -153,7 +153,7 @@ class ProductEdit extends React.Component {
   handleSave = async () => {
     if (this.state.imageFS !== undefined && this.state.imageFS !== null) {
       let product = { ...this.state.product };
-      if(this.state.image){
+      if(this.state.product.imageUrl){
         await api.deleteFromS3(this.state.product.imageUrl, 'product',this.state.product._id);
       }
       let url = await api.uploadToS3(this.state.image, 'product');

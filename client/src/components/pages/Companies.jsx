@@ -24,6 +24,7 @@ const styles = theme => ({
   },
   paper: {
     height: 300,
+    maxWidth:310,
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
