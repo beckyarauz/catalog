@@ -43,7 +43,11 @@ const styles = theme => ({
   },
   gridContainer: {
     height: '100%',
-    borderRadius: 4,
+    borderRadius: '15px 50px 30px',
+    '-webkit-border-top-left-radius' :15,
+    '-webkit-border-top-right-radius' :50,
+    '-webkit-border-bottom-right-radius' :30,
+    '-webkit-border-bottom-left-radius' :50,
   },
   gridImage: {
     borderRadius: '15px 50px 0px 0px',
