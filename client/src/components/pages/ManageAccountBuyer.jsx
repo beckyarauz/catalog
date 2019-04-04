@@ -1,44 +1,43 @@
-import React from 'react';
+import React from "react";
 
-import PropTypes from 'prop-types';
-import classNames from 'classnames';
-import MaskedInput from 'react-text-mask';
-import api from '../../api';
+import PropTypes from "prop-types";
+import classNames from "classnames";
+import MaskedInput from "react-text-mask";
+import api from "../../api";
 
-import { withStyles } from '@material-ui/core/styles';
-import TextField from '@material-ui/core/TextField';
-import Input from '@material-ui/core/Input';
-import InputLabel from '@material-ui/core/InputLabel';
-import FormControl from '@material-ui/core/FormControl';
-import IconButton from '@material-ui/core/IconButton';
-import InputAdornment from '@material-ui/core/InputAdornment';
-import Button from '@material-ui/core/Button';
+import { withStyles } from "@material-ui/core/styles";
+import TextField from "@material-ui/core/TextField";
+import Input from "@material-ui/core/Input";
+import InputLabel from "@material-ui/core/InputLabel";
+import FormControl from "@material-ui/core/FormControl";
+// import IconButton from "@material-ui/core/IconButton";
+import InputAdornment from "@material-ui/core/InputAdornment";
+import Button from "@material-ui/core/Button";
 
-import Visibility from '@material-ui/icons/Visibility';
-import VisibilityOff from '@material-ui/icons/VisibilityOff';
+// import Visibility from "@material-ui/icons/Visibility";
+// import VisibilityOff from "@material-ui/icons/VisibilityOff";
 
 const styles = theme => ({
   root: {
-    display: 'flex',
-    flexWrap: 'wrap',
+    display: "flex",
+    flexWrap: "wrap"
   },
   margin: {
-    margin: theme.spacing.unit,
+    margin: theme.spacing.unit
   },
   textField: {
     marginLeft: theme.spacing.unit,
     marginRight: theme.spacing.unit,
-    width: 200,
+    width: 200
   },
   imageSection: {
-    display: 'flex',
-    'justify-content': 'center',
-    alignItems: 'center'
-
+    display: "flex",
+    "justify-content": "center",
+    alignItems: "center"
   },
   formControl: {
     margin: theme.spacing.unit,
-    minWidth: 200,
+    minWidth: 200
   },
   button: {
     margin: theme.spacing.unit,
@@ -48,10 +47,10 @@ const styles = theme => ({
     width: 200
   },
   flexContainer: {
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center"
   }
 });
 
@@ -64,19 +63,34 @@ function TextMaskCustom(props) {
       ref={ref => {
         inputRef(ref ? ref.inputElement : null);
       }}
-      mask={['(', /[1-9]/, /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
-      placeholderChar={'\u2000'}
+      mask={[
+        "(",
+        /[1-9]/,
+        /\d/,
+        /\d/,
+        ")",
+        " ",
+        /\d/,
+        /\d/,
+        /\d/,
+        /\d/,
+        "-",
+        /\d/,
+        /\d/,
+        /\d/,
+        /\d/
+      ]}
+      placeholderChar={"\u2000"}
       showMask
     />
   );
 }
 
 TextMaskCustom.propTypes = {
-  inputRef: PropTypes.func.isRequired,
+  inputRef: PropTypes.func.isRequired
 };
 
 class ManageAccountBuyer extends React.Component {
-
   state = {
     user: {
       username: "",
@@ -85,8 +99,9 @@ class ManageAccountBuyer extends React.Component {
       password: "",
       address: "something",
       email: "",
-      phone: '( 49)0000-0000',
-      about: "Write What's your coumpany about, the inspiration and what makes you unique! :D",
+      phone: "( 49)0000-0000",
+      about:
+        "Write What's your coumpany about, the inspiration and what makes you unique! :D",
       userPictureUrl: "",
       geolocation: {
         latitude: 0,
@@ -100,30 +115,37 @@ class ManageAccountBuyer extends React.Component {
       bearing: 0,
       pitch: 0,
       width: 200,
-      height: 200,
+      height: 200
     },
     image: null,
     imageFS: null,
     message: null,
     valid: false,
-    showPassword: false,
-  }
+    showPassword: false
+  };
 
-  isNotEmpty = (currentValue) => {
-    return currentValue && (currentValue instanceof Object || currentValue.length > 0 || currentValue instanceof File);
-  }
+  isNotEmpty = currentValue => {
+    return (
+      currentValue &&
+      (currentValue instanceof Object ||
+        currentValue.length > 0 ||
+        currentValue instanceof File)
+    );
+  };
   handleDeleteAccount = async () => {
-    let confirmed = window.confirm('Are you sure you want to delete your account?');
-    if(!confirmed){
+    let confirmed = window.confirm(
+      "Are you sure you want to delete your account?"
+    );
+    if (!confirmed) {
       return;
     }
-    if(this.state.user.userPictureUrl){
+    if (this.state.user.userPictureUrl) {
       await this.deleteFile();
-    }  
+    }
     await api.deleteAccount();
     this.props.logout();
-    this.props.history.push('/signup');
-  }
+    this.props.history.push("/signup");
+  };
 
   componentWillMount() {
     (async () => {
@@ -135,14 +157,19 @@ class ManageAccountBuyer extends React.Component {
           username,
           email,
           firstName,
-          lastName,
-        }
+          lastName
+        };
 
         let stateValues = Object.values(info);
         let valid = stateValues.every(this.isNotEmpty);
-        if ((!user.geolocation && "geolocation" in navigator) || ((user.geolocation.latitude === 0 && user.geolocation.longitude === 0) && "geolocation" in navigator)) {
+        if (
+          (!user.geolocation && "geolocation" in navigator) ||
+          (user.geolocation.latitude === 0 &&
+            user.geolocation.longitude === 0 &&
+            "geolocation" in navigator)
+        ) {
           let self = this;
-          navigator.geolocation.getCurrentPosition(function (position) {
+          navigator.geolocation.getCurrentPosition(function(position) {
             let geolocation = {};
 
             geolocation.latitude = position.coords.latitude;
@@ -153,21 +180,24 @@ class ManageAccountBuyer extends React.Component {
             let viewport = { ...self.state.viewport };
             viewport.latitude = user.geolocation.latitude;
             viewport.longitude = user.geolocation.longitude;
-            self.setState(prevState => ({ user, viewport, valid }), () => {
-              // console.log('changed user geolocation:', self.state.user.geolocation)
-            });
-          })
+            self.setState(
+              prevState => ({ user, viewport, valid }),
+              () => {
+                // console.log('changed user geolocation:', self.state.user.geolocation)
+              }
+            );
+          });
         } else {
           /* geolocation IS NOT available */
           let viewport = { ...this.state.viewport };
           viewport.latitude = user.geolocation.latitude;
           viewport.longitude = user.geolocation.longitude;
-          this.setState(prevState => ({ viewport, user, valid }))
+          this.setState(prevState => ({ viewport, user, valid }));
         }
       } catch (e) {
-        console.error(e.message)
+        console.error(e.message);
       }
-    })()
+    })();
   }
 
   validateFields = () => {
@@ -178,43 +208,48 @@ class ManageAccountBuyer extends React.Component {
       email,
       firstName,
       lastName
-    }
+    };
     let stateValues = Object.values(info);
 
     this.setState({ valid: stateValues.every(this.isNotEmpty) });
-  }
+  };
 
   handleChange = name => event => {
-    if (name !== 'image') {
-      if (name === 'tags') {
+    if (name !== "image") {
+      if (name === "tags") {
         let user = { ...this.state.user };
         let tags = [...event];
 
         user.tags = tags;
 
-        this.setState({ user })
+        this.setState({ user });
         return;
       }
-      var user = { ...this.state.user }
+      var user = { ...this.state.user };
       user[name] = event.target.value;
-      this.setState(currentState => ({ user }), () => {
-        this.validateFields();
-      });
+      this.setState(
+        currentState => ({ user }),
+        () => {
+          this.validateFields();
+        }
+      );
     } else if (event.target.files.length > 0) {
       var file = event.target.files[0];
-      this.setState(state => ({ image: file }), () => {
-        this.validateFields();
-      });
+      this.setState(
+        state => ({ image: file }),
+        () => {
+          this.validateFields();
+        }
+      );
       var reader = new FileReader();
       const scope = this;
-      reader.onload = function () {
+      reader.onload = function() {
         scope.setState({
           imageFS: reader.result
-        })
-      }
+        });
+      };
 
       reader.readAsDataURL(file);
-
     }
   };
   handleClickShowPassword = () => {
@@ -225,48 +260,51 @@ class ManageAccountBuyer extends React.Component {
     if (this.state.imageFS !== undefined && this.state.imageFS !== null) {
       await this.deleteFile();
       let user = { ...this.state.user };
-      let url = await api.uploadToS3(this.state.image, 'userPicture');
-      
+      let url = await api.uploadToS3(this.state.image, "userPicture");
+
       user.userPictureUrl = url.data.Location;
-      this.setState(currentState => ({ user }), async () => {
-        let data = await api.updateUser(this.state.user);
-        if (data.data.message) {
-          this.setState(state => ({ message: data.data.message }))
+      this.setState(
+        currentState => ({ user }),
+        async () => {
+          let data = await api.updateUser(this.state.user);
+          if (data.data.message) {
+            this.setState(state => ({ message: data.data.message }));
+          }
         }
-      });
+      );
       return;
     }
 
     let response = await api.updateUser(this.state.user);
 
-    this.setState({ message: response.data.message })
-  }
+    this.setState({ message: response.data.message });
+  };
   unvalidFormHandler = () => {
-    this.setState({ message: 'fill all the fields!' })
-  }
+    this.setState({ message: "fill all the fields!" });
+  };
 
-  handleClick = (e) => {
+  handleClick = e => {
     this.state.valid ? this.submitToServer() : this.unvalidFormHandler();
-  }
-  getUser = async (username) => {
+  };
+  getUser = async username => {
     let info = await api.getUserInfo(username);
     let user = info.data.user;
     return user;
-  }
-  deleteFile = async (e) => {
+  };
+  deleteFile = async e => {
     let user = { ...this.state.user };
-    if(user.userPictureUrl){
-      await api.deleteFromS3(user.userPictureUrl, 'userPicture');
+    if (user.userPictureUrl) {
+      await api.deleteFromS3(user.userPictureUrl, "userPicture");
     }
-  }
-  handleViewportChange = (viewport) => {
+  };
+  handleViewportChange = viewport => {
     this.setState(prevState => ({ viewport }));
-  }
+  };
   componentDidUpdate(prevProps, prevState) {
     if (prevState.message !== this.state.message) {
       setTimeout(() => {
-        this.setState(currentState => ({ message: null }))
-      }, 3000)
+        this.setState(currentState => ({ message: null }));
+      }, 3000);
     }
     if (prevState.viewport !== this.state.viewport) {
       let user = this.state.user;
@@ -277,8 +315,7 @@ class ManageAccountBuyer extends React.Component {
 
       user.geolocation = geolocation;
 
-      this.setState(currentState => ({ user }))
-
+      this.setState(currentState => ({ user }));
     }
   }
 
@@ -287,64 +324,100 @@ class ManageAccountBuyer extends React.Component {
     const { phone } = this.state.user;
 
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center"
+        }}
+      >
         <h2>Account</h2>
         {this.state.user.username && (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center"
+            }}
+          >
             <div className={classes.flexContainer}>
-              {
-                (this.state.user.userPictureUrl &&
-                  <div className={classes.imageSection}><img src={this.state.user.userPictureUrl} width="100" height="100" alt="User from DB" /></div>)
-                || (this.state.imageFS &&
-                  <div className={classes.imageSection}><img src={this.state.imageFS} width="100" height="100" alt="User" /></div>)
-              }
+              {(this.state.user.userPictureUrl && (
+                <div className={classes.imageSection}>
+                  <img
+                    src={this.state.user.userPictureUrl}
+                    width="100"
+                    height="100"
+                    alt="User from DB"
+                  />
+                </div>
+              )) ||
+                (this.state.imageFS && (
+                  <div className={classes.imageSection}>
+                    <img
+                      src={this.state.imageFS}
+                      width="100"
+                      height="100"
+                      alt="User"
+                    />
+                  </div>
+                ))}
 
-              {this.state.message && <div className="info">
-                {this.state.message}
-              </div>}
-              <br></br>
+              {this.state.message && (
+                <div className="info">{this.state.message}</div>
+              )}
+              <br />
               <input
                 accept="image/*"
                 className={classes.input}
-                style={{ display: 'none' }}
+                style={{ display: "none" }}
                 id="raised-button-file"
                 multiple
                 type="file"
-                onChange={this.handleChange('image')}
+                onChange={this.handleChange("image")}
               />
               <label htmlFor="raised-button-file">
-                <Button variant="contained" component="span" className={classes.button}>
+                <Button
+                  variant="contained"
+                  component="span"
+                  className={classes.button}
+                >
                   Upload Picture
-            </Button>
+                </Button>
               </label>
-              <Button variant="contained" component="span" className={classes.button} onClick={this.deleteFile}>Delete</Button>
-
+              <Button
+                variant="contained"
+                component="span"
+                className={classes.button}
+                onClick={this.deleteFile}
+              >
+                Delete
+              </Button>
             </div>
-
-
             <TextField
               id="username"
               label="Username"
               className={classNames(classes.margin, classes.textField)}
               value={this.state.user.username}
-              onChange={this.handleChange('username')}
+              onChange={this.handleChange("username")}
               margin="normal"
               variant="outlined"
               InputProps={{
-                startAdornment: <InputAdornment position="start">@</InputAdornment>,
+                startAdornment: (
+                  <InputAdornment position="start">@</InputAdornment>
+                )
               }}
             />
 
-            <TextField
+            {/* <TextField
               id="outlined-adornment-password"
               className={classNames(classes.margin, classes.textField)}
               autoComplete="new-password"
               variant="outlined"
-              type={this.state.showPassword ? 'text' : 'password'}
+              type={this.state.showPassword ? "text" : "password"}
               label="Password"
               value={this.state.password}
-              onChange={this.handleChange('password')}
+              onChange={this.handleChange("password")}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
@@ -352,19 +425,23 @@ class ManageAccountBuyer extends React.Component {
                       aria-label="Toggle password visibility"
                       onClick={this.handleClickShowPassword}
                     >
-                      {this.state.showPassword ? <VisibilityOff /> : <Visibility />}
+                      {this.state.showPassword ? (
+                        <VisibilityOff />
+                      ) : (
+                        <Visibility />
+                      )}
                     </IconButton>
                   </InputAdornment>
-                ),
+                )
               }}
-            />
+            /> */}
             <h2>Contact Info</h2>
             <TextField
               id="standard-firstname"
               label="First Name"
               className={classes.textField}
               value={this.state.user.firstName}
-              onChange={this.handleChange('firstName')}
+              onChange={this.handleChange("firstName")}
               margin="normal"
               variant="outlined"
             />
@@ -373,7 +450,7 @@ class ManageAccountBuyer extends React.Component {
               label="Last Name"
               className={classes.textField}
               value={this.state.user.lastName}
-              onChange={this.handleChange('lastName')}
+              onChange={this.handleChange("lastName")}
               margin="normal"
               variant="outlined"
             />
@@ -382,15 +459,17 @@ class ManageAccountBuyer extends React.Component {
               label="Email"
               className={classes.textField}
               value={this.state.user.email}
-              onChange={this.handleChange('email')}
+              onChange={this.handleChange("email")}
               margin="normal"
               variant="outlined"
             />
             <FormControl className={classes.formControl}>
-              <InputLabel htmlFor="formatted-text-mask-input">Phone Number</InputLabel>
+              <InputLabel htmlFor="formatted-text-mask-input">
+                Phone Number
+              </InputLabel>
               <Input
                 value={phone}
-                onChange={this.handleChange('phone')}
+                onChange={this.handleChange("phone")}
                 id="formatted-text-mask-input"
                 inputComponent={TextMaskCustom}
               />
@@ -400,21 +479,39 @@ class ManageAccountBuyer extends React.Component {
               label="About"
               className={classNames(classes.textarea, classes.textField)}
               value={this.state.user.about}
-              onChange={this.handleChange('about')}
+              onChange={this.handleChange("about")}
               margin="normal"
               variant="outlined"
               multiline={true}
               rows={4}
               rowsMax={4}
               InputProps={{
-                startAdornment: <InputAdornment position="start"> </InputAdornment>,
+                startAdornment: (
+                  <InputAdornment position="start"> </InputAdornment>
+                )
               }}
             />
-            {this.state.message && <div className="info">
-            {this.state.message}
-            </div>}
-            <Button variant="contained" component="span" className={classes.button} onClick={this.handleClick} disabled={!this.state.valid}>Update</Button>
-            <Button color="secondary" variant="contained" component="span" className={classes.button} onClick={this.handleDeleteAccount} >Delete Account</Button>
+            {this.state.message && (
+              <div className="info">{this.state.message}</div>
+            )}
+            <Button
+              variant="contained"
+              component="span"
+              className={classes.button}
+              onClick={this.handleClick}
+              disabled={!this.state.valid}
+            >
+              Update
+            </Button>
+            <Button
+              color="secondary"
+              variant="contained"
+              component="span"
+              className={classes.button}
+              onClick={this.handleDeleteAccount}
+            >
+              Delete Account
+            </Button>
           </div>
         )}
       </div>
@@ -423,7 +520,7 @@ class ManageAccountBuyer extends React.Component {
 }
 
 ManageAccountBuyer.propTypes = {
-  classes: PropTypes.object.isRequired,
+  classes: PropTypes.object.isRequired
 };
 
 export default withStyles(styles)(ManageAccountBuyer);

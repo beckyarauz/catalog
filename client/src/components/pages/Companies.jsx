@@ -17,6 +17,7 @@ const styles = theme => ({
     display: 'flex',
     flexWrap: 'wrap',
     flexDirection: 'column',
+    alignItems:'center'
   },
   margin: {
     margin: theme.spacing.unit,
@@ -25,6 +26,7 @@ const styles = theme => ({
   paper: {
     height: 300,
     maxWidth:310,
+    minWidth:310,
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',

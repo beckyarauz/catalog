@@ -19,6 +19,10 @@ import blue from '@material-ui/core/colors/blue';
 import classNames from 'classnames';
 
 const styles = {
+  detailPanel :{
+    display:'flex',
+    justifyContent:'center'
+  },
   avatar: {
     backgroundColor: blue[100],
     color: blue[600],
@@ -26,9 +30,6 @@ const styles = {
   details :{
     textAlign: 'center',
     fontSize: 14
-  },
-  root:{
-    width:'80%'
   },
   header:{
     display:'flex',
@@ -52,7 +53,7 @@ class ProductDetail extends React.Component {
     const { classes, onClose, selectedValue, ...other } = this.props;
 
     return (
-      <Dialog fullScreen onClose={this.handleClose} aria-labelledby="simple-dialog-title" {...other}>
+      <Dialog fullScreen className={classNames(classes.detailPanel)} onClose={this.handleClose} aria-labelledby="simple-dialog-title" {...other}>
       <IconButton color="inherit" onClick={this.handleClose} aria-label="Close">
                 <CloseIcon />
               </IconButton>

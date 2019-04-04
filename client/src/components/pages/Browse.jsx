@@ -86,6 +86,7 @@ const styles = theme => ({
   },
   demo:{
     overflow: 'scroll',
+    'overflow-y': 'hidden',
     minWidth: 375,
     maxWidth: 375,
   },
@@ -197,13 +198,14 @@ class Browse extends Component {
   }
 
   handleChange = (event, value) => {
+    //action to take when picking a category
     if(this.state.searchInput.length > 0){
       // if(this.state.mounted){
         this.setState(state => ({searchInput: ''}))
       // }
     }
     // if(this.state.mounted){
-    this.setState({ selectedCategory: value });
+    this.setState({ selectedCategory: value,companies:null });
     // }
   };
   handleSearchChange = (e) => {

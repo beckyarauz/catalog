@@ -14,7 +14,7 @@ import TextField from '@material-ui/core/TextField';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormControl from '@material-ui/core/FormControl';
-import IconButton from '@material-ui/core/IconButton';
+// import IconButton from '@material-ui/core/IconButton';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import Select from '@material-ui/core/Select';
 import OutlinedInput from '@material-ui/core/OutlinedInput';
@@ -22,8 +22,8 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Button from '@material-ui/core/Button';
 import Icon from '@material-ui/core/Icon';
 
-import Visibility from '@material-ui/icons/Visibility';
-import VisibilityOff from '@material-ui/icons/VisibilityOff';
+// import Visibility from '@material-ui/icons/Visibility';
+// import VisibilityOff from '@material-ui/icons/VisibilityOff';
 
 const styles = theme => ({
   root: {
@@ -58,8 +58,10 @@ const styles = theme => ({
   flexContainer: {
     display: 'flex',
     flexDirection: 'column',
-    justifyContent: 'center',
     alignItems: 'center',
+  },
+  justifyCenter :{
+    justifyContent: 'center',
   }
 });
 
@@ -297,7 +299,7 @@ class ManageAccount extends React.Component {
     this.setState({ message: response.data.message })
   }
   unvalidFormHandler = () => {
-    this.setState({ message: 'fill all the fields!' })
+    this.setState({ message: 'Please fill all the fields' })
   }
 
   handleClick = (e) => {
@@ -344,40 +346,10 @@ class ManageAccount extends React.Component {
     const { phone } = this.state.user;
 
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <div className={classNames(classes.flexContainer)}>
         <h2>Account</h2>
         {this.state.user.username && (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-            <div className={classes.flexContainer}>
-              {
-                (this.state.user.userPictureUrl &&
-                  <div className={classes.imageSection}><img src={this.state.user.userPictureUrl} width="100" height="100" alt="User from DB" /></div>)
-                || (this.state.imageFS &&
-                  <div className={classes.imageSection}><img src={this.state.imageFS} width="100" height="100" alt="User" /></div>)
-              }
-              {this.state.message && <div className="info">
-                {this.state.message}
-              </div>}
-              <br></br>
-              <input
-                accept="image/*"
-                className={classes.input}
-                style={{ display: 'none' }}
-                id="raised-button-file"
-                multiple
-                type="file"
-                onChange={this.handleChange('image')}
-              />
-              <label htmlFor="raised-button-file">
-                <Button variant="contained" component="span" className={classes.button}>
-                  Upload Picture
-            </Button>
-              </label>
-              <Button variant="contained" component="span" className={classes.button} onClick={this.deleteFile}>Delete</Button>
-
-            </div>
-
-
+          <div className={classNames(classes.flexContainer, classes.justifyCenter)} >
             <TextField
               id="username"
               label="Username"
@@ -399,7 +371,7 @@ class ManageAccount extends React.Component {
               margin="normal"
               variant="outlined"
             />
-            <TextField
+            {/* <TextField
               id="outlined-adornment-password"
               autoComplete="new-password"
               className={classNames(classes.margin, classes.textField)}
@@ -420,7 +392,7 @@ class ManageAccount extends React.Component {
                   </InputAdornment>
                 ),
               }}
-            />
+            /> */}
             <h2>Contact Info</h2>
             <TextField
               id="standard-firstname"
@@ -458,7 +430,7 @@ class ManageAccount extends React.Component {
                 inputComponent={TextMaskCustom}
               />
             </FormControl>
-            <div className={classes.flexContainer}>
+            <div className={classNames(classes.flexContainer, classes.justifyCenter)}>
               <h3>Location</h3>
               <p>Move the pointer to set your bussiness location</p>
               <ReactMapGL
