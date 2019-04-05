@@ -72,12 +72,12 @@ router.post('/upload', (request, response) => {
         if (error) throw new Error(error);
         const path = files.file[0].path;
         const name = files.file[0].originalFilename;
-        const myType = fields.myType[0];        
+        const myType = fields.myType[0];
         // console.log('POST test',files.file[0]);
         const buffer = fs.readFileSync(path);
         const type = fileType(buffer);
         const timestamp = Date.now().toString();
-        let data; 
+        let data;
         let fileName;
 
         if( type.ext ==='pdf' || name ==='pdf'){
@@ -108,7 +108,7 @@ router.post('/upload', (request, response) => {
           }
 
           data = await uploadFile(sharpBuffer, fileName, type);
-         
+
         }
         return response.status(200).send(data);
       } catch (error) {

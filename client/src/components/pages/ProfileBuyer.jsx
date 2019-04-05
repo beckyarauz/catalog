@@ -24,6 +24,7 @@ const styles = theme => ({
     display: 'flex',
     flexWrap: 'wrap',
     flexDirection: 'column',
+    minWidth: '320px',
   },
   margin: {
     margin: theme.spacing.unit,
@@ -39,6 +40,7 @@ const styles = theme => ({
     alignItems: 'center',
     width: '100%',
     height: '200px',
+    marginBottom:'20px',
     // backgroundColor: 'blue'
   },
   bigAvatar: {

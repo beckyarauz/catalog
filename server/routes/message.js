@@ -1,5 +1,8 @@
+/* eslint-disable no-underscore-dangle */
 const express = require('express');
+
 const router = express.Router();
+const sgMail = require('@sendgrid/mail');
 const User = require('../models/User');
 // const nodemailer = require('nodemailer');
 
@@ -14,43 +17,42 @@ const User = require('../models/User');
 // const transporter = nodemailer.createTransport(transport);
 
 
-const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-router.post('/send', async (req, res, next) => {
+router.post('/send', async (req, res) => {
   try {
-    let mail = req.body.mail;
-    let user = await User.findOne({
-      _id: req.user._id
+    const { mail } = req.body;
+    const user = await User.findOne({
+      _id: req.user._id,
     }).select({
       email: 1,
-      _id: 0
+      _id: 0,
     });
 
-    let msg = {
+    const msg = {
       to: mail.to,
       from: {
         email: 'local.market.catalog@gmail.com',
-        name: `@${req.user.username} from Local Market`
+        name: `@${req.user.username} from Local Market`,
       },
       subject: mail.subject,
       text: mail.message,
       html: `<p>@${req.user.username} from Local Market:<br><br>Message:<br><br>${mail.message}. <br><br> Please reply to: <a href='mailto:${user.email}'} target="_blank" rel="noopener noreferrer">${user.email}</a></p><br><strong>Message from Local Market</strong>`,
     };
-    let ms = await sgMail.send(msg); //statusMessage ='Accepted'
-    console.log(ms[0].statusMessage)
-    let statusCode = ms[0].statusCode
+    const ms = await sgMail.send(msg); // statusMessage ='Accepted'
+    const { statusCode } = ms[0];
     res.status(statusCode).json({
-      message: 'Message Sent'
-    })
+      message: 'Message Sent',
+    });
   } catch (e) {
-    console.log(e.message)
+    // eslint-disable-next-line no-console
+    console.log(e.message);
     res.json({
-      error: 'Failed to send Message' + e.message
-    })
+      error: `Failed to send Message${e.message}`,
+    });
   }
 
-  //statusMessage
+  // statusMessage
   // transporter.verify((error, success) => {
   //   if (error) {
   //     res.json({
