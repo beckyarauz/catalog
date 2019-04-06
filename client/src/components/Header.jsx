@@ -21,6 +21,7 @@ const styles = {
   },
   link:{
     'text-decoration':'none',
+    color:'white',
   }
 };
 
@@ -31,9 +32,11 @@ function Header(props) {
     <div className={classes.root}>
       <AppBar position="static" color="primary">
         <Toolbar className={classes.toolbar}>
+        <Link to="/" className={classes.link}>
           <Typography className="App-title" variant="h1" color="inherit">
             Local Market
           </Typography>
+         </Link> 
           {props.user && (
           <Link 
           className={classes.link} 

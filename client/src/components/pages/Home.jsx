@@ -145,7 +145,7 @@ class Home extends Component {
                 Want to become a Seller?
               </Typography>
               <Typography component="p">
-              Create an account and contact us at <address>local.market.catalog@gmail.com</address>
+              Create an account and contact us at local.market.catalog@gmail.com
                for further information on how to become part of <b>Local Market</b>.
               </Typography>
             </div>

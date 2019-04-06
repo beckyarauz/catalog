@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { Route, Switch, Redirect } from 'react-router-dom';
 import { BrowserRouter as Router } from 'react-router-dom';
 
+import api from '../api';
+
 import Home from './pages/Home';
 import NavDrawer from './Drawer';
 import Header from './Header';
@@ -14,9 +16,6 @@ import Signup from './pages/Signup';
 import ManageAccount from './pages/ManageAccount';
 import ManageAccountBuyer from './pages/ManageAccountBuyer';
 import Browse from './pages/Browse';
-
-import api from '../api';
-
 export default class App extends Component {
   constructor(props) {
     super(props)

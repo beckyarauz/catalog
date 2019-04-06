@@ -83,6 +83,7 @@ const styles = theme => ({
   paperText:{
     color:'white',
     position: 'relative',
+    fontSize:'1.05rem',
   },
   demo:{
     overflow: 'scroll',

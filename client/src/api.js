@@ -7,7 +7,6 @@ const service = axios.create({
 
 export default {
   service: service,
-  // To know if the user is connected, we just check if we have a value for localStorage.getItem('user')
   async isLoggedIn() {
     return service.get(`/isLogged`)
       .then( res => {
@@ -30,7 +29,7 @@ export default {
   },
   async deleteFromS3(url,type,id){
     return await service
-    .post(`/file/delete`,{url,type:type,id})
+    .post(`/file/delete`,{url,type,id})
   },
   async uploadToS3(file,type) {
     if(!file){
