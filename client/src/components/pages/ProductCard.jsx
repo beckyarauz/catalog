@@ -10,6 +10,8 @@
   import Icon from '@material-ui/core/Icon';
   import ButtonBase from '@material-ui/core/ButtonBase';
   import Avatar from '@material-ui/core/Avatar';
+
+  import imagePlaceholder from '../../images/image-placeholder.gif';
   
   const styles = {
     card: {
@@ -93,7 +95,7 @@
         />) : 
         (<CardMedia
         className={classes.media}
-        image='http://saveabandonedbabies.org/wp-content/uploads/2015/08/default.png'
+        image={imagePlaceholder}
       />)}
           <CardContent className={classes.content}>
           <Typography className={classes.title} color="textSecondary" gutterBottom>

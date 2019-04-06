@@ -63,7 +63,7 @@ router.post('/add', async (request, res) => {
     const newProduct = await Product({ ...productDB });
     const savedProduct = await newProduct.save();
 
-    productArray.push(savedProduct._id);
+    productArray.unshift(savedProduct._id);
 
     await User.findOneAndUpdate({ username: request.user.username }, { products: productArray });
 
@@ -79,16 +79,10 @@ router.post('/delete', async (request, res) => {
     const { product } = request.body;
     const deletedProduct = await Product.findOneAndRemove({ _id: product });
 
-    const user = await User.findOne({ _id: request.user._id });
-
-    const products = [...user.products];
-
-    const found = products.filter(prod => prod._id === deletedProduct._id)
-      .map(prod => products.indexOf(prod));
-
-    products.splice(found[0], 1);
-
-    await User.findOneAndUpdate({ _id: request.user._id }, { products });
+    await User.updateOne(
+      { _id: request.user._id },
+      { $pull: { products: { $in: [product] } } },
+    );
 
     await User.updateMany(
       { },
