@@ -22,7 +22,8 @@
     "react-router-dom": "^4.3.1",
     "react-scripts": "^2.1.8",
     "react-tag-input": "^6.4.0",
-    "react-text-mask": "^5.4.3"
+    "react-text-mask": "^5.4.3",
+    "snyk": "^1.161.1"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -30,7 +31,9 @@
     "build-prod": "dotenv -e .env.production react-scripts build",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -40,5 +43,6 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "snyk": true
 }
