@@ -23,7 +23,7 @@
     "express": "^4.16.4",
     "express-fileupload": "^1.1.1-alpha.3",
     "express-session": "^1.15.6",
-    "file-type": "^10.9.0",
+    "file-type": "^16.5.4",
     "fs": "0.0.1-security",
     "helmet": "^3.16.0",
     "mongoose": "^5.4.15",
