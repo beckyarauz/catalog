@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@sendgrid/mail": "^6.3.1",
-    "aws-sdk": "^2.415.0",
+    "aws-sdk": "^2.1354.0",
     "bcrypt": "^3.0.4",
     "bluebird": "^3.5.3",
     "body-parser": "^1.18.3",
